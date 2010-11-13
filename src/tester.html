@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+	<title>tester</title>
+	
+	<script type="text/javascript" src="pinta.js"></script>
+    <script type="text/javascript" src="pintaconf.js"></script>
+    <script type="text/javascript">
+
+        // PINTA SETUP
+
+        window.onload = function() {
+            
+            Pinta.log.level = 3;
+
+            //Pinta.init(window.document, pintaconf);
+			Pinta.init(window.document, "acto.xml");
+
+			Pinta.onConfLoaded = function() {
+            	Pinta.goto("one");
+			}
+
+        }
+        
+    </script>
+
+    <style type="text/css">
+
+        body {
+            font-family: Candara;
+            font-size: 10pt;
+        }
+
+        a {
+            color: #666666;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: #999999;
+        }
+
+        #menu {
+            float: left;
+            width: 100px;
+        }
+
+        #pages {
+            float: left;
+        }
+
+        #pages div {
+            display: none;
+            width: 300px;
+            height: 300px;
+            padding: 25px;
+        }
+
+		#news {
+			display: block !important;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div id="menu">
+    <a href="javascript: Pinta.goto('one');">FRONTPAGE</a><br />
+    <a href="javascript: Pinta.goto('two');">ABOUT</a><br />
+	<a href="javascript: Pinta.goto('three');">NEWS</a>
+</div>
+
+<div id="pages">
+	<div id="frontpage" style="background-color: #ff0000;"></div>
+	<div id="about" style="background-color: #ff00ff;"></div>
+	<div id="news"></div>
+</div>
+
+</body>
+</html>
