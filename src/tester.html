@@ -7,21 +7,21 @@
 
 	<title>tester</title>
 	
-	<script type="text/javascript" src="pinta.js"></script>
-    <script type="text/javascript" src="pintaconf.js"></script>
+	<script type="text/javascript" src="zumo.js"></script>
+    <script type="text/javascript" src="conf.js"></script>
     <script type="text/javascript">
 
-        // PINTA SETUP
+        // ZUMO SETUP
 
         window.onload = function() {
             
-            Pinta.log.level = 3;
+            Zumo.log.level = 3;
 
-            //Pinta.init(window.document, pintaconf);
-			Pinta.init(window.document, "acto.xml");
+            //Pinta.init(window.document, conf);
+			Zumo.init(window.document, "conf.xml");
 
-			Pinta.onConfLoaded = function() {
-            	Pinta.goto("one");
+			Zumo.onConfLoaded = function() {
+            	Zumo.goto("one");
 			}
 
         }
@@ -71,9 +71,9 @@
 <body>
 
 <div id="menu">
-    <a href="javascript: Pinta.goto('one');">FRONTPAGE</a><br />
-    <a href="javascript: Pinta.goto('two');">ABOUT</a><br />
-	<a href="javascript: Pinta.goto('three');">NEWS</a>
+    <a href="javascript: Zumo.goto('one');">FRONTPAGE</a><br />
+    <a href="javascript: Zumo.goto('two');">ABOUT</a><br />
+	<a href="javascript: Zumo.goto('three');">NEWS</a>
 </div>
 
 <div id="pages">
