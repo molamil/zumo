@@ -2,10 +2,10 @@
 
  DECLARATION OF IMPLICIT OBJECTS ACCROSS THE ZUMO FRAMEWORK
 
- session: {id:String, root:Object, viewMasters:Array, defaultMasterClass:Object}
- request: {id:String, params:Object}
- context: {id:String, type:String, target:String, container:String}
-
+ session:	{id:String, root:Object, defaultPropName:String, viewMasters:Array, defaultMasterClass:Object}
+ request:	{id:String, params:Object}
+ context:	{id:String, type:String, target:String, container:String}
+ prop:		{name:String, value:*, target:String}
 
  */
 (function(window) {
@@ -189,6 +189,41 @@
 
 
 	// ************************************************************************************************************
+	// PROPS
+	// ************************************************************************************************************
+
+
+	// *** PROPS MANAGER OBJECT
+
+	var PropsManager = {
+
+		// --- METHODS
+
+		apply: function(target, props, session) {
+
+			Log.debug("--- Applying props on " + target);
+
+			//TODO: Add checks
+			
+			// Merge the props
+			for(var i = 0; i < props.length; i++) {
+				var prop = props[i];
+				Log.debug("---");
+				Log.debug("--- Applying prop with target " + prop.target);
+				if (prop.target)
+					target = Selector.select(prop.target);
+				var name = prop.name || session.defaultPropName;
+				Log.debug("--- Applying prop with name " + name);
+				target[name] = prop.value;
+			}
+			
+		}
+
+	};
+
+
+
+	// ************************************************************************************************************
 	// PAGES
 	// ************************************************************************************************************
 
@@ -308,7 +343,7 @@
 
 				init: function() {
 					Log.debug("Initting " + this.context.id);
-					ObjectUtils.merge(this.target, this.context.props);
+					PropsManager.apply(this.target, this.context.props, this.session);
 				}
 
 			};
@@ -326,7 +361,7 @@
 
 				//TODO: See how to configure the master properties.
 				changeDisplay: true,
-				changeVisibility: false,
+				changeVisibility: true,
 
 				// --- METHODS
 
@@ -338,22 +373,20 @@
 						Log.error("Invalid target for page " + this.context.id + ": " + this.context.target);
 						return;
 					}
-					if (this.changeDisplay) {
+					if (this.changeDisplay)
 						this.target.style.display = "block";
-					} else if (this.changeVisibility) {
+					if (this.changeVisibility)
 						this.target.style.visibility = "visible";
-					}
+					this.init();
 				},
 
 				destroy: function() {
 					AbstractMaster.prototype.destroy.apply(this, arguments); // Call super
 					Log.debug("DomMaster destroy");
-					if (this.changeDisplay) {
+					if (this.changeDisplay)
 						this.target.style.display = "none";
-					} else if (this.changeVisibility) {
+					if (this.changeVisibility)
 						this.target.style.visibility = "hidden";
-					}
-					this.init();
 				},
 
 				init: function() {
@@ -523,6 +556,7 @@
 			loader: "LoaderMaster"
 		},
 		_DEFAULT_VIEW_TYPE: "dom",
+		_DEFAULT_PROP_NAME: "innerHTML",
 
 		log: Log,
 		root: null,
@@ -570,6 +604,7 @@
 				id: this._params.id || this._createSessionId(),
 				root: root,
 				defaultMasterClass: null,
+				defaultPropName: this._DEFAULT_PROP_NAME,
 				viewMasters: {}
 			};
 			this._initViewMasters();
