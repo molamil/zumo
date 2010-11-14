@@ -12,7 +12,7 @@
 
 
 	// ************************************************************************************************************
-	// CORE
+	// COMMONS
 	// ************************************************************************************************************
 
 	
@@ -101,7 +101,12 @@
 
 		extend: function(child, supertype) {
 			child.prototype.__proto__ = supertype.prototype;
-		}
+		},
+
+		merge: function(target, origin) {
+			for (var prop in origin)
+				target[prop] = origin[prop];
+        }
 
 	};
 
@@ -299,6 +304,11 @@
 
 				clear: function() {
 					Log.info("Clearing " + this.context.id);
+				},
+
+				init: function() {
+					Log.debug("Initting " + this.context.id);
+					ObjectUtils.merge(this.target, this.context.props);
 				}
 
 			};
@@ -343,6 +353,11 @@
 					} else if (this.changeVisibility) {
 						this.target.style.visibility = "hidden";
 					}
+					this.init();
+				},
+
+				init: function() {
+					AbstractMaster.prototype.init.apply(this, arguments); // Call super
 				}
 
 			};
@@ -378,7 +393,13 @@
 
 				onLoaded: function(xmlHttp) {
 					Log.debug("LoaderMaster received content");
-					this.container.innerHTML = xmlHttp.responseText;
+					this.target = xmlHttp.responseText;
+					this.container.innerHTML = this.target;
+					this.init();
+				},
+
+				init: function() {
+					AbstractMaster.prototype.init.apply(this, arguments); // Call super
 				}
 
 			};
@@ -468,6 +489,8 @@
 		_parseProp: function(conf, session) {
 			var propContext = {};
 			//TODO: Add checks
+			//TODO: Implement type resolvers
+			//TODO: Implement expressions
 			this._mergeAttributes(propContext, conf, ["name", "value", "target"]);
 			Log.debug(conf);
 			if (!propContext.value)
@@ -528,7 +551,7 @@
 			if (typeof conf == "string") {
 				Log.info("Initializing with remote configuration: " + conf);
 				var confLoader = new Loader();
-				//XXX: Check that conf looks like a URL
+				//TODO: Check that conf looks like a URL
 				confLoader.load(conf, this._onConfLoaded, this);
 			} else if (typeof conf == "object") {
 				Log.info("Initializing with object configuration");
@@ -621,7 +644,7 @@
 			page.master.display();
 			this._currentPage = page;
 
-			//TODO: Implement managers
+			//TODO: Implement state managers
 			this._displayedPage = page;
 
 		},
