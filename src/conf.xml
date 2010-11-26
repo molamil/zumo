@@ -11,6 +11,8 @@
 
 		<page id="three" type="loader" target="news.txt" container="#news"/>
 
+		<block id="teaser" target="#teaser"/>
+
 	</views>
 
 </zumo>

@@ -201,19 +201,14 @@
 
 		apply: function(target, props, session) {
 
-			Log.debug("--- Applying props on " + target);
-
 			//TODO: Add checks
 			
 			// Merge the props
 			for(var i = 0; i < props.length; i++) {
 				var prop = props[i];
-				Log.debug("---");
-				Log.debug("--- Applying prop with target " + prop.target);
 				if (prop.target)
 					target = Selector.select(prop.target);
 				var name = prop.name || session.defaultPropName;
-				Log.debug("--- Applying prop with name " + name);
 				target[name] = prop.value;
 			}
 			
@@ -466,6 +461,7 @@
 
 		parse: function(conf, session) {
 			// TODO: Check for XML
+			// TODO: Parse props
 			Log.debug("Parsing conf: " + conf);
 			var confObject = {};
 			confObject.views = this._parseViews(conf, session);
@@ -485,19 +481,30 @@
 				return;
 			}
 
-			var views = [];
+			var views = {
+				pages: [],
+				blocks: []
+			};
+
 			var pageNodes = viewNodes[0].getElementsByTagName("page");
 			for (var i = 0; i < pageNodes.length; i++) {
-				var pageContext = this._parsePage(pageNodes[i], session);
+				var pageContext = this._parsePageBlock(pageNodes[i], session);
 				if (pageContext)
-					views.push(pageContext);
+					views.pages.push(pageContext);
+			}
+
+			var blockNodes = viewNodes[0].getElementsByTagName("block");
+			for (i = 0; i < blockNodes.length; i++) {
+				var blockContext = this._parsePageBlock(blockNodes[i], session);
+				if (blockNodes)
+					views.blocks.push(blockNodes);
 			}
 
 			return views;
 			
 		},
 
-		_parsePage: function(conf, session) {
+		_parsePageBlock: function(conf, session) {
 			var pageContext = {};
 			this._mergeAttributes(pageContext, conf, ["id", "type", "target", "container"]);
 			pageContext.props = this._parseProps(conf, session);
@@ -697,8 +704,8 @@
 			}
 
 			var pageContext;
-			for (var i = 0; i < this._conf.views.length; i++) {
-				var iPageContext = this._conf.views[i];
+			for (var i = 0; i < this._conf.views.pages.length; i++) {
+				var iPageContext = this._conf.views.pages[i];
 				if (iPageContext.id == id) {
 					pageContext = iPageContext;
 					break;
@@ -750,6 +757,7 @@
 		_onConfLoaded: function(xmlHttp) {
 			Log.info("Conf was loaded");
 			Log.debug(xmlHttp);
+			//TODO: Check whether it is XML or JSON, etc.
 			this._conf = XmlConfParser.parse(xmlHttp.responseXML, this.session);
 			//TODO: Check for error
 			this.onConfLoaded();
