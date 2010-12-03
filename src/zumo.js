@@ -219,13 +219,26 @@
 
 
 	// ************************************************************************************************************
-	// PAGES
+	// VIEWS
 	// ************************************************************************************************************
 
 
 	// *** PAGE CLASS
 
 	var Page = function (context, request, session) {
+		this.id = context.id;
+		this.context = context;
+		this.request = request;
+		this.session = session;
+		// --
+		// Implementing:
+		// this.master = null;
+	};
+
+	
+	// *** BLOCK CLASS
+
+	var Block = function (context, request, session) {
 		this.id = context.id;
 		this.context = context;
 		this.request = request;
@@ -251,6 +264,18 @@
 			page.master = this._buildMaster(context, request, session);
 
 			return page;
+
+		},
+
+		createBlock: function(context, request, session) {
+
+			//TODO: Implement state managers.
+			//TODO: Implement property injection.
+
+			var block = new Block(context, request, session);
+			block.master = this._buildMaster(context, request, session);
+
+			return block;
 
 		},
 
@@ -496,8 +521,8 @@
 			var blockNodes = viewNodes[0].getElementsByTagName("block");
 			for (i = 0; i < blockNodes.length; i++) {
 				var blockContext = this._parsePageBlock(blockNodes[i], session);
-				if (blockNodes)
-					views.blocks.push(blockNodes);
+				if (blockContext)
+					views.blocks.push(blockContext);
 			}
 
 			return views;
@@ -694,7 +719,7 @@
 		getPageContext: function(id) {
 
 			if (!this.isInit()) {
-				Log.warn("Cannot getPageContext (" + id + ")- Zumo is not yet initalized");
+				Log.warn("Cannot get page context (" + id + ")- Zumo is not yet initalized");
 				return;
 			}
 
@@ -722,6 +747,88 @@
 
 		getCurrentPage: function() {
 			return this._currentPage;
+		},
+
+		// Displays a specific block by id
+		displayBlock: function(id, params) {
+
+			//TODO: Implement display block!
+
+			Log.info("Displaying block " + id);
+
+			if (!this.isInit()) {
+				Log.warn("Cannot display " + id + " - Zumo is not yet initalized");
+				return;
+			}
+
+			var block = this.getDisplayedBlock();
+
+			// Check whether the block is already displayed
+			if (block) {
+
+				//TODO: Add callers when depends are implemented
+
+				Log.info("No block to display - the block is already displayed: " + id);
+				
+			} else {
+
+				// Get the block from the conf
+				var blockContext = this.getBlockContext(id);
+				if (typeof blockContext !== "object") {
+					Log.error("No page context found with id: " + id);
+					return;
+				}
+
+				//TODO: Implement aliases
+				//TODO: Check wether that page is already being requested
+				//TODO: Set referrer
+
+				var request = {
+					id: id,
+					params: params,
+					referrer: null
+				};
+				block = PageBlockBuilder.createBlock(blockContext, request, this.session);
+
+				// Check we have a proper block
+				if (block.master == null)
+					return;
+
+				block.master.display();
+
+				//TODO: Add to the displayed blocks
+
+			}
+
+		},
+
+		getBlockContext: function(id) {
+
+			if (!this.isInit()) {
+				Log.warn("Cannot get block context (" + id + ")- Zumo is not yet initalized");
+				return;
+			}
+
+			if (this._conf.views == null) {
+				Log.info("Cannot get block context since there are no views configured");
+				return;
+			}
+
+			var blockContext;
+			for (var i = 0; i < this._conf.views.blocks.length; i++) {
+				var iBlockContext = this._conf.views.blocks[i];
+				if (iBlockContext.id == id) {
+					blockContext = iBlockContext;
+					break;
+				}
+			}
+
+			return blockContext;
+
+		},
+
+		getDisplayedBlock: function() {
+			//TODO: Implement getDisplayedBlock
 		},
 
 		registerViewMaster: function(name, master) {
