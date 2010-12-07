@@ -258,7 +258,6 @@
 		createPage: function(context, request, session) {
 
 			//TODO: Implement state managers.
-			//TODO: Implement property injection.
 
 			var page = new Page(context, request, session);
 			page.master = this._buildMaster(context, request, session);
@@ -270,7 +269,6 @@
 		createBlock: function(context, request, session) {
 
 			//TODO: Implement state managers.
-			//TODO: Implement property injection.
 
 			var block = new Block(context, request, session);
 			block.master = this._buildMaster(context, request, session);
@@ -486,7 +484,7 @@
 
 		parse: function(conf, session) {
 			// TODO: Check for XML
-			// TODO: Parse props
+			// TODO: Parse top level props
 			Log.debug("Parsing conf: " + conf);
 			var confObject = {};
 			confObject.views = this._parseViews(conf, session);
@@ -598,6 +596,7 @@
 		_params: null,
 		_currentPage: null,
 		_displayedPage: null,
+		_displayedBlocks: [],
 
 		// --- METHODS
 
@@ -612,6 +611,8 @@
 				return;
 			}
 			this.root = root;
+
+			this._displayedBlocks = [];
 
 			// Checking for conf
 			if (typeof conf == "string") {
@@ -752,8 +753,6 @@
 		// Displays a specific block by id
 		displayBlock: function(id, params) {
 
-			//TODO: Implement display block!
-
 			Log.info("Displaying block " + id);
 
 			if (!this.isInit()) {
@@ -780,7 +779,7 @@
 				}
 
 				//TODO: Implement aliases
-				//TODO: Check wether that page is already being requested
+				//TODO: Check wether that block is already being requested
 				//TODO: Set referrer
 
 				var request = {
@@ -795,10 +794,29 @@
 					return;
 
 				block.master.display();
-
-				//TODO: Add to the displayed blocks
+				this._addDisplayedBlock(block);
 
 			}
+
+		},
+
+		clearBlock: function(id) {
+
+			Log.info("Clearing block " + id);
+
+			var block = this.getDisplayedBlock(id);
+
+			if (!block) {
+				Log.info("There is no block to clear with id " + id);
+				return;
+			}
+
+			if (block.master.isCleared) {
+				Log.info("The block is already being cleared: " + id);
+				return;
+			}
+
+			block.master.destroy(); //TODO: Implement clear.
 
 		},
 
@@ -827,8 +845,15 @@
 
 		},
 
-		getDisplayedBlock: function() {
-			//TODO: Implement getDisplayedBlock
+		getDisplayedBlock: function(id) {
+			var block;
+			for (var i = 0; i < this._displayedBlocks.length; i++) {
+				if (this._displayedBlocks[i].id == id) {
+					block = this._displayedBlocks[i];
+					break;
+				}
+			}
+			return block;
 		},
 
 		registerViewMaster: function(name, master) {
@@ -875,6 +900,20 @@
 				window._nZumo = 0;
 			window._nZumo++;
 			return _NAME + window._nZumo;
+		},
+
+		_addDisplayedBlock: function(block) {
+			if (!this.getDisplayedBlock(block.id))
+				this._displayedBlocks.push(block);
+		},
+
+		_removeDisplayedBlock: function(id) {
+			var i;
+			for (i = 0; i < this._displayedBlocks.length; i++) {
+				if (this._displayedBlocks[i].id == id)
+					break;
+			}
+			this._displayedBlocks.splice(i, 1);
 		}
 
 	};

@@ -6,7 +6,7 @@
 		<page id="one" target="#frontpage"/>
 
 		<page id="two" type="dom" target="#about">
-			<prop target="#content"><![CDATA[I am a header]]></prop>
+			<prop target="#content"><![CDATA[I am a nice header]]></prop>
 		</page>
 
 		<page id="three" type="loader" target="news.txt" container="#news"/>
