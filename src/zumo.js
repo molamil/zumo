@@ -309,7 +309,7 @@
 
 	var ViewMasters = {
 
-		// --- METHODS - Using init method to create class functions as PageMasters members
+		// --- METHODS - Using init method to create class functions as ViewMasters members
 
 		init: function() {
 
@@ -362,6 +362,184 @@
 				init: function() {
 					Log.debug("Initting " + this.context.id);
 					PropsManager.apply(this.target, this.context.props, this.session);
+				}
+
+			};
+
+
+			// *** DOM CLASS
+
+			var DomMaster = function(context, request, session) {
+				AbstractMaster.call(this, context, request, session);
+			};
+
+			DomMaster.prototype = {
+
+				// --- PROPERTIES
+
+				//TODO: See how to configure the master properties.
+				changeDisplay: true,
+				changeVisibility: true,
+
+				// --- METHODS
+
+				display: function() {
+					AbstractMaster.prototype.display.apply(this, arguments); // Call super
+					Log.debug("DomMaster display");
+					this.target = Selector.select(this.context.target);
+					if (this.target == null) {
+						Log.error("Invalid target for page " + this.context.id + ": " + this.context.target);
+						return;
+					}
+					if (this.changeDisplay)
+						this.target.style.display = "block";
+					if (this.changeVisibility)
+						this.target.style.visibility = "visible";
+					this.init();
+				},
+
+				destroy: function() {
+					AbstractMaster.prototype.destroy.apply(this, arguments); // Call super
+					Log.debug("DomMaster destroy");
+					if (this.changeDisplay)
+						this.target.style.display = "none";
+					if (this.changeVisibility)
+						this.target.style.visibility = "hidden";
+				},
+
+				init: function() {
+					AbstractMaster.prototype.init.apply(this, arguments); // Call super
+				}
+
+			};
+
+
+			// *** LOADER CLASS
+
+			var LoaderMaster = function(context, request, session) {
+				AbstractMaster.call(this, context, request, session);
+			};
+
+			LoaderMaster.prototype = {
+
+				// --- PROPERTIES
+
+				useXml: false,
+				loader: null,
+
+				// --- METHODS
+
+				display: function() {
+					AbstractMaster.prototype.display.apply(this, arguments); // Call super
+					Log.debug("LoaderMaster display");
+					this.loader = new Loader();
+					this.loader.load(this.context.target, this.onLoaded, this);
+				},
+
+				destroy: function() {
+					AbstractMaster.prototype.destroy.apply(this, arguments); // Call super
+					Log.debug("LoaderMaster destroy");
+					this.container.innerHTML = "";
+				},
+
+				onLoaded: function(xmlHttp) {
+					Log.debug("LoaderMaster received content");
+					this.target = xmlHttp.responseText;
+					this.container.innerHTML = this.target;
+					this.init();
+				},
+
+				init: function() {
+					AbstractMaster.prototype.init.apply(this, arguments); // Call super
+				}
+
+			};
+
+
+			// *** INIT - Initializing ViewMasters
+
+			this.AbstractMaster = AbstractMaster;
+			this.DomMaster = DomMaster;
+			this.LoaderMaster = LoaderMaster;
+
+			ObjectUtils.extend(this.DomMaster, this.AbstractMaster);
+			ObjectUtils.extend(this.LoaderMaster, this.AbstractMaster);
+
+
+		}
+
+	};
+
+
+	// *** STATE MANAGERS OBJECT
+
+	var StateManagers = {
+
+		// --- METHODS - Using init method to create class functions as StateManagers members
+
+		init: function() {
+
+
+			// *** ABSTRACT MASTER CLASS
+
+			var BaseIo3Manager = function(target, session) {
+				this.target = target;
+				this.session = session;
+			};
+
+			BaseIo3Manager.prototype = {
+
+				// --- PROPERTIES
+
+				STATE_IN: "IN",
+				STATE_ON: "ON",
+				STATE_OUT: "OUT",
+				STATE_OFF: "OFF",
+				_state: false,
+				// --
+				// Implementing:
+				// target: target
+
+				// --- METHODS
+
+				destroy: function() {
+					//TODO: Implement
+				},
+
+				getState: function() {
+					return this._state;
+				},
+
+				setState: function(state) {
+					state = state.toUpperCase();
+					if (state != this.STATE_IN && state != this.STATE_ON && state != this.STATE_OUT && state != this.STATE_OFF) {
+						Log.warn("Unknown state, returning without changing state for target " + this.target);
+						return;
+					}
+					if (state != this._state) {
+						this._state = state;
+						this._changeState();
+					}
+				},
+
+				_changeState: function() {
+					//TODO: Implement
+				},
+
+				_doIn: function() {
+					this.setState(this.STATE_ON);
+				},
+
+				_doOn: function() {
+					// Empty
+				},
+
+				_doOut: function() {
+					this.setState(this.STATE_OFF);
+				},
+
+				_doOff: function() {
+					// Empty
 				}
 
 			};

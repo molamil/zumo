@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+	<title>tester</title>
+	
+	<script type="text/javascript">
+
+		var Agent = {
+
+
+			// --- PROPERTIES
+
+			_registry: [],
+
+
+			// --- METHODS
+
+			observe: function(arg1, arg2, arg3, arg4) {
+				//TODO: Check if o null.
+				//TODO: Check if o[name] is a function.
+				//TODO: Check for circular references.
+				var defaultsO = (typeof arg1 == "string");
+				var o =  defaultsO ? window : arg1;
+				var fName = defaultsO ? arg1 : arg2;
+				var hook = defaultsO ? arg2 : arg3;
+				var priority = defaultsO ? (arg3 || 0) : (arg4 || 0);
+				var n = 0;
+				var proxyExists = false;
+				var proxy;
+				for (var i = 0; i < this._registry.length; i++) {
+					var p = this._registry[i];
+					if (p.o === o && p.fName == fName) {
+						proxy = p;
+						proxyExists = true;
+						break;
+					}
+				}
+				if (!proxyExists)
+					proxy = this._createProxy(o, fName);
+				this._addHook(proxy, hook, priority)
+			},
+
+			ignore: function(origin, hook) {
+
+			},
+
+			_createProxy: function(o, fName) {
+				var proxy = {
+					o: o,
+					fName: fName,
+					hooks: [] // of {f, priority}
+					// Adding original after adding the hook.
+				};
+				var original = o[fName];
+				this._addHook(proxy, original, 0);
+				proxy.original = original;
+				this._registry.push(proxy);
+				return proxy;
+			},
+
+			_buildProxy: function(proxy) {
+				proxy.o[proxy.fName] = function() {
+					//TODO: Review the this context of the called function.
+					for (var i = proxy.hooks.length - 1; i >= 0; i--)
+						proxy.hooks[i].f.apply(this, arguments);
+				}
+			},
+
+			_addHook: function(proxy, f, priority) {
+
+				if (proxy.original === f) {
+					//TODO: Use Logger.
+					window.console["warn"]("You cannot observe a function to itself: " + f);
+					return;
+				}
+
+				var n = 0;
+				var hookExists = false;
+				for (var i = 0; i < proxy.hooks.length; i++) {
+					var h = proxy.hooks[i];
+					if (h.f === f) {
+						hookExists = true;
+						break;
+					}
+					if (h.priority < priority)
+						n = i + 1;
+				}
+				if (hookExists) {
+					//TODO: Use Logger.
+					window.console["info"]("Hook already exists, will not be added: " + f);
+				} else {
+					var hook = {
+						f: f,
+						priority: priority
+					};
+					proxy.hooks.splice(n, 0, hook);
+				}
+				this._buildProxy(proxy);
+				
+			}
+			
+
+		};
+
+	</script>
+
+	<script type="text/javascript">
+
+
+		function sayHi() {
+			window.console["info"]("Hi! - sayHi called");
+		}
+
+		function sayBye() {
+			window.console["info"]("Bye! - sayBye called");
+		}
+
+		function sayPizza() {
+			window.console["info"]("Pizza! - sayPizza called");
+		}
+
+		function saySomething(something) {
+			window.console["info"](something + "! - saySomething called");
+		}
+
+		Agent.observe(this, "sayBye", sayHi);
+		Agent.observe("sayHi", sayBye);
+		Agent.observe("sayHi", sayPizza, 10);
+		Agent.observe("sayHi", saySomething, 5);
+
+		sayHi("Pasta");
+
+        
+    </script>
+	
+</head>
+
+<body>
+
+Event tester
+
+</body>
+</html>
