@@ -8,83 +8,83 @@
 	<title>tester</title>
 	
 	<script type="text/javascript" src="zumo.js"></script>
-    <script type="text/javascript">
+	<script type="text/javascript">
 
-        // ZUMO SETUP
+		// ZUMO SETUP
 
-        window.onload = function() {
-            
-            Zumo.log.level = 3;
+		window.onload = function() {
 
-            Zumo.init(window.document, "conf.xml");
+			Zumo.log.level = 3;
+
+			Zumo.init(window.document, "conf.xml");
 
 			Zumo.onConfLoaded = function() {
-            	Zumo.goto("one");
+				Zumo.goto("one");
 			}
 
-        }
-        
-    </script>
+		}
 
-    <style type="text/css">
+	</script>
 
-        body {
-            font-family: Candara, sans-serif;
-            font-size: 10pt;
-        }
+	<style type="text/css">
 
-        a {
-            color: #666666;
-            font-weight: bold;
-            text-decoration: none;
-        }
+		body {
+			font-family: Candara, sans-serif;
+			font-size: 10pt;
+		}
 
-        a:hover {
-            color: #999999;
-        }
+		a {
+			color: #666666;
+			font-weight: bold;
+			text-decoration: none;
+		}
+
+		a:hover {
+			color: #999999;
+		}
 
 		hr {
 			visibility: hidden;
 		}
 
-        #menu {
-            float: left;
-            width: 100px;
-        }
+		#menu {
+			float: left;
+			width: 100px;
+		}
 
-        #pages {
-            float: left;
-        }
+		#pages {
+			float: left;
+		}
 
-        #pages div {
-            display: none;
-            width: 300px;
-            height: 300px;
-            padding: 25px;
-        }
+		#pages div {
+			display: none;
+			width: 300px;
+			height: 300px;
+			padding: 25px;
+		}
 
 		#news {
 			display: block !important;
-        }
+		}
 
 		#teaser {
 			position: absolute;
 			top: 0;
 			left: 108px;
 			width: 350px;
-            height: 10px;
+			height: 10px;
 			background-color: #996600;
 			visibility: hidden;
-        }
+		}
 
-    </style>
+	</style>
 </head>
 
 <body>
 
 <div id="menu">
-    <a href="javascript: Zumo.goto('one');">FRONTPAGE</a><br />
-    <a href="javascript: Zumo.goto('two');">ABOUT</a><br />
+	<a href="javascript: Zumo.goto('one');">FRONTPAGE</a><br />
+	<a href="javascript: Zumo.goto('two');">ABOUT</a><br />
 	<a href="javascript: Zumo.goto('three');">NEWS</a>
 	<hr />
 	<a href="javascript: Zumo.displayBlock('teaser');">TEASER</a> <a href="javascript: Zumo.clearBlock('teaser');">(clear)</a>

@@ -45,7 +45,7 @@
 			},
 
 			ignore: function(origin, hook) {
-
+				//TODO: Implement ignore.
 			},
 
 			_createProxy: function(o, fName) {
@@ -127,10 +127,10 @@
 			window.console["info"](something + "! - saySomething called");
 		}
 
-		Agent.observe(this, "sayBye", sayHi);
-		Agent.observe("sayHi", sayBye);
-		Agent.observe("sayHi", sayPizza, 10);
-		Agent.observe("sayHi", saySomething, 5);
+//		Agent.observe(this, "sayBye", sayHi);
+//		Agent.observe("sayHi", sayBye);
+//		Agent.observe("sayHi", sayPizza, 10);
+		Agent.observe("sayHi", saySomething);
 
 		sayHi("Pasta");
 
