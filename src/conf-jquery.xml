@@ -3,16 +3,23 @@
 
 	<views>
 
-		<page id="one" target="#frontpage"/>
+		<page id="one" target="#frontpage">
+			<handler target="#linkFrontpage" type="click"/>
+		</page>
 
 		<page id="two" type="dom" target="#about">
 			<prop target="#content"><![CDATA[I am a nice header]]></prop>
 			<handler target="#linkAbout" type="click"/>
 		</page>
 
-		<page id="three" type="loader" target="news.txt" container="#news"/>
+		<page id="three" type="loader" target="news.txt" container="#news">
+			<handler target="#linkNews" type="click"/>
+		</page>
 
-		<block id="teaser" target="#teaser"/>
+		<block id="teaser" target="#teaser">
+			<handler target="#linkTeaser" type="click"/>
+			<handler target="#clearTeaser" type="click" action="clearBlock"/>
+		</block>
 
 	</views>
 

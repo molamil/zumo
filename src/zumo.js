@@ -745,18 +745,52 @@
 		},
 
 		_createPageHandlerAction: function(handlerContext, pageContext) {
-			//TODO: Implement _createPageHandlerAction
+
 			var app = this.app;
-			var f = function() {
+			var f;
+
+			var fGoto = function() {
 				app.goto(pageContext.id);
 			};
+
+			if (handlerContext.action == "goto" || handlerContext.action == "call" || handlerContext.action == "" || handlerContext.action == null) {
+				f = fGoto;
+			} else {
+				Log.warn("Could not resolve handler action: " + handlerContext.action);
+			}
+
 			this._bindHandler(handlerContext.target, handlerContext.type, f);
+
 			return f;
+
 		},
 
 		_createBlockHandlerAction: function(handlerContext, blockContext) {
 			Log.info("There is no block action handler implemented (" + blockContext.id + ", " + handlerContext.type + ")");
-			//TODO: Implement _createBlockHandlerAction
+
+			var app = this.app;
+			var f;
+
+			var fDisplay = function() {
+				app.displayBlock(blockContext.id);
+			};
+
+			var fClear = function() {
+				app.clearBlock(blockContext.id);
+			};
+
+			if (handlerContext.action == "clearBlock") {
+				f = fClear;
+			} else if (handlerContext.action == "displayBlock" || handlerContext.action == "call" || handlerContext.action == "" || handlerContext.action == null) {
+				f = fDisplay;
+			} else {
+				Log.warn("Could not resolve handler action: " + handlerContext.action);
+			}
+
+			this._bindHandler(handlerContext.target, handlerContext.type, f);
+
+			return f;
+
 		},
 
 		_removePageBlockHandlerAction: function(activeHandler) {
