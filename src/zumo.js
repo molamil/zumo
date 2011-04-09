@@ -4,7 +4,7 @@
 
  session:	{id:String, root:Object, defaultPropName:String, viewMasters:Array, defaultMasterClass:Object}
  request:	{id:String, params:Object}
- context:	{id:String, type:String, target:String, container:String}
+ context:	{id:String, type:String, target:String, container:String, props:Array, handlers:Array}
  prop:		{name:String, value:*, target:String}
 
  */
@@ -15,7 +15,7 @@
 	// COMMONS
 	// ************************************************************************************************************
 
-	
+
 	var _NAME = 'Zumo';
 	var _VERSION = '0.1';
 
@@ -202,7 +202,7 @@
 		apply: function(target, props, session) {
 
 			//TODO: Add checks
-			
+
 			// Merge the props
 			for(var i = 0; i < props.length; i++) {
 				var prop = props[i];
@@ -211,7 +211,7 @@
 				var name = prop.name || session.defaultPropName;
 				target[name] = prop.value;
 			}
-			
+
 		}
 
 	};
@@ -235,7 +235,7 @@
 		// this.master = null;
 	};
 
-	
+
 	// *** BLOCK CLASS
 
 	var Block = function (context, request, session) {
@@ -287,7 +287,7 @@
 			} else {
 				masterClass = session.defaultMasterClass;
 			}
-			
+
 			if (masterClass) {
 				if (typeof masterClass == "function") {
 					master = new masterClass(context, request, session);
@@ -320,8 +320,6 @@
 				this.context = context;
 				this.request = request;
 				this.session = session;
-				this.isDisplayed = false;
-				this.isCleared = false;
 			};
 
 			AbstractMaster.prototype = {
@@ -360,7 +358,7 @@
 				},
 
 				init: function() {
-					Log.debug("Initting " + this.context.id);
+					Log.debug("Initializing " + this.context.id);
 					PropsManager.apply(this.target, this.context.props, this.session);
 				}
 
@@ -574,9 +572,9 @@
 		_parseViews: function(conf, session) {
 
 			var viewNodes = conf.getElementsByTagName("views");
-			
+
 			if (viewNodes.length > 1) {
-				Log.warn("There can only be zero or one views nodes on the XML configuration, there were " 
+				Log.warn("There can only be zero or one views nodes on the XML configuration, there were "
 						+ viewNodes.length + " views nodes found");
 				return;
 			} else if (viewNodes.length == 0) {
@@ -604,14 +602,15 @@
 			}
 
 			return views;
-			
+
 		},
 
 		_parsePageBlock: function(conf, session) {
-			var pageContext = {};
-			this._mergeAttributes(pageContext, conf, ["id", "type", "target", "container"]);
-			pageContext.props = this._parseProps(conf, session);
-			return pageContext;
+			var pageBlockContext = {};
+			this._mergeAttributes(pageBlockContext, conf, ["id", "type", "target", "container"]);
+			pageBlockContext.props = this._parseProps(conf, session);
+			pageBlockContext.handlers = this._parseHandlers(conf, session);
+			return pageBlockContext;
 		},
 
 		_parseProps: function(conf, session) {
@@ -648,6 +647,144 @@
 				if (value)
 					o[name] = value.nodeValue;
 			}
+		},
+
+
+		_parseHandlers: function(conf, session) {
+
+			var handlerNodes = conf.getElementsByTagName("handler");
+
+			var handlers = [];
+			for (var i = 0; i < handlerNodes.length; i++) {
+				var handlerContext = this._parseHandler(handlerNodes[i], session);
+				if (handlerContext)
+					handlers.push(handlerContext);
+			}
+
+			return handlers;
+
+		},
+
+		_parseHandler: function(conf, session) {
+			var handlerContext = {};
+			//TODO: Implement expressions
+			//TODO: Implement params
+			Log.debug(conf);
+			this._mergeAttributes(handlerContext, conf, ["type", "target", "priority", "class", "source", "action", "priority"]);
+			return handlerContext;
+		}
+
+	};
+
+
+	// *** HANDLER MANAGER CLASS
+
+	var HandlerManager = function(app) {
+		this.app = app;
+	};
+
+	HandlerManager.prototype = {
+
+		// --- PROPERTIES
+
+		_activeHandlers: [], // of {handlerContext:Object, context:Object, contextType:String, f:Function}
+		// --
+		// Implementing:
+		// app: Zumo
+
+		// -- METHODS
+
+		registerHandlers: function() {
+
+			//TODO: Consider sorting on priorities
+
+			this.unregisterHandlers();
+
+			var pageContexts = this.app.getPageContexts();
+			for (var i = 0; i < pageContexts.length; i++) {
+				var pageContext = pageContexts[i];
+				this._registerHandlersFromContext(pageContext, "page");
+			}
+
+			var blockContexts = this.app.getBlockContexts();
+			for (i = 0; i < blockContexts.length; i++) {
+				var blockContext = blockContexts[i];
+				this._registerHandlersFromContext(blockContext, "block");
+			}
+
+		},
+
+		unregisterHandlers: function() {
+			//TODO: Test
+			while (this._activeHandlers.length > 0) {
+				var activeHandler = this._activeHandlers.pop();
+				this._removePageBlockHandlerAction(activeHandler);
+			}
+		},
+
+		_registerHandlersFromContext: function(context, contextType) {
+			for (var i = 0; i < context.handlers.length; i++) {
+				var activeHandler = {
+					handlerContext: context.handlers[i],
+					context: context,
+					contextType: contextType,
+					f: this._createPageBlockHandlerAction(context.handlers[i], context, contextType)
+				};
+				this._activeHandlers.push(activeHandler);
+			}
+		},
+
+		_createPageBlockHandlerAction: function(handlerContext, pageBlockContext, contextType) {
+			if (contextType == "page") {
+				this._createPageHandlerAction(handlerContext, pageBlockContext);
+			} else if (contextType == "block") {
+				this._createBlockHandlerAction(handlerContext, pageBlockContext);
+			} else {
+				Log.warn("Could not create handler action - the context type is neither a page or a block");
+			}
+		},
+
+		_createPageHandlerAction: function(handlerContext, pageContext) {
+			//TODO: Implement _createPageHandlerAction
+			var app = this.app;
+			var f = function() {
+				app.goto(pageContext.id);
+			};
+			this._bindHandler(handlerContext.target, handlerContext.type, f);
+			return f;
+		},
+
+		_createBlockHandlerAction: function(handlerContext, blockContext) {
+			Log.info("There is no block action handler implemented (" + blockContext.id + ", " + handlerContext.type + ")");
+			//TODO: Implement _createBlockHandlerAction
+		},
+
+		_removePageBlockHandlerAction: function(activeHandler) {
+			if (activeHandler.contextType == "page") {
+				this._removePageHandlerAction(activeHandler);
+			} else if (activeHandler.contextType == "block") {
+				this._removeBlockHandlerAction(activeHandler);
+			} else {
+				Log.warn("Could not remove handler action - the context type is neither a page or a block");
+			}
+		},
+
+		_removePageHandlerAction: function(activeHandler) {
+			//TODO: Implement _removePageHandlerAction
+		},
+
+		_removeBlockHandlerAction: function(activeHandler) {
+			//TODO: Implement _removeBlockHandlerAction
+		},
+
+		_bindHandler: function(target, type, handler) {
+			Log.info("There is no handler binder implemented");
+			//TODO: Implement _bindHandler
+		},
+
+		_unbindHandler: function() {
+			Log.info("There is no handler unbinder implemented");
+			//TODO: Implement _unbindHandler
 		}
 
 	};
@@ -677,6 +814,7 @@
 		_currentPage: null,
 		_displayedPage: null,
 		_displayedBlocks: [],
+		_handlerManager: null,
 
 		// --- METHODS
 
@@ -711,6 +849,8 @@
 			// Setting the params
 			this._params = params || {};
 			//TODO: Merge conf with params.
+
+			this._handlerManager = new HandlerManager(this);
 
 			// Create the initial session
 			this.session = {
@@ -822,6 +962,10 @@
 
 		},
 
+		getPageContexts: function() {
+			return this._conf.views.pages;
+		},
+
 		getDisplayedPage: function() {
 			return this._displayedPage;
 		},
@@ -848,7 +992,7 @@
 				//TODO: Add callers when depends are implemented
 
 				Log.info("No block to display - the block is already displayed: " + id);
-				
+
 			} else {
 
 				// Get the block from the conf
@@ -925,6 +1069,10 @@
 
 		},
 
+		getBlockContexts: function() {
+			return this._conf.views.blocks;
+		},
+
 		getDisplayedBlock: function(id) {
 			var block;
 			for (var i = 0; i < this._displayedBlocks.length; i++) {
@@ -952,7 +1100,7 @@
 						"with that name")
 			}
 		},
-		
+
 		unregisterViewMaster: function(name) {
 			this.session.viewMasters[name] = null;
 		},
@@ -972,6 +1120,7 @@
 			//TODO: Check whether it is XML or JSON, etc.
 			this._conf = XmlConfParser.parse(xmlHttp.responseXML, this.session);
 			//TODO: Check for error
+			this._handlerManager.registerHandlers();
 			this.onConfLoaded();
 		},
 
@@ -1000,12 +1149,30 @@
 
 
 	// ************************************************************************************************************
+	// EXTENSION POINTS
+	// ************************************************************************************************************
+
+	var ZumoExt = {
+
+		// -- METHODS
+
+		addHandlerBinder: function(bindFunction, unbindFunction, setAsDefault) {
+			//TODO: Implement setAsDefault
+			HandlerManager.prototype._bindHandler = bindFunction;
+			HandlerManager.prototype._unbindHandler = unbindFunction;
+		}
+		
+	};
+
+
+	// ************************************************************************************************************
 	// INIT
 	// ************************************************************************************************************
 
 
-	// Expose Zumo to the global object and init
+	// Expose Zumo and ZumoExt to the global object and init
 	window.Zumo = Zumo;
+	window.ZumoExt = ZumoExt;
 
 
 })(this);

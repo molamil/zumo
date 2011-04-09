@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+	<title>tester</title>
+	
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+	<script type="text/javascript" src="zumo.js"></script>
+	<script type="text/javascript" src="zumo-jquery.js"></script>
+	<script type="text/javascript">
+
+		// ZUMO SETUP
+
+		window.onload = function() {
+
+			Zumo.log.level = 3;
+
+			Zumo.init(window.document, "conf-jquery.xml");
+
+			Zumo.onConfLoaded = function() {
+				Zumo.goto("one");
+			}
+
+		}
+
+	</script>
+
+	<style type="text/css">
+
+		body {
+			font-family: Candara, sans-serif;
+			font-size: 10pt;
+		}
+
+		a {
+			color: #666666;
+			font-weight: bold;
+			text-decoration: none;
+		}
+
+		a:hover {
+			color: #999999;
+		}
+
+		hr {
+			visibility: hidden;
+		}
+
+		#menu {
+			float: left;
+			width: 100px;
+		}
+
+		#pages {
+			float: left;
+		}
+
+		#pages div {
+			display: none;
+			width: 300px;
+			height: 300px;
+			padding: 25px;
+		}
+
+		#news {
+			display: block !important;
+		}
+
+		#teaser {
+			position: absolute;
+			top: 0;
+			left: 108px;
+			width: 350px;
+			height: 10px;
+			background-color: #996600;
+			visibility: hidden;
+		}
+
+	</style>
+</head>
+
+<body>
+
+<div id="menu">
+	<a id="linkFrontpage" href="javascript: void(0);">FRONTPAGE</a><br />
+	<a id="linkAbout" href="javascript: void(0);">ABOUT</a><br />
+	<a id="linkNews" href="javascript: void(0);">NEWS</a>
+	<hr />
+	<a id="linkTeaser" href="javascript: void(0);">TEASER</a> <a id="clearTeaser" href="javascript: void(0);">(clear)</a>
+</div>
+
+<div id="pages">
+	<div id="frontpage" style="background-color: #cccccc;"></div>
+	<div id="about" style="background-color: #ff00ff;">
+		<p id="content"></p>
+	</div>
+	<div id="news"></div>
+</div>
+
+<div id="teaser"></div>
+
+</body>
+</html>

@@ -6,7 +6,8 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
 	<title>tester</title>
-	
+
+	<script type="text/javascript" src="zumo.js"></script>
 	<script type="text/javascript">
 
 		var Agent = {
@@ -19,16 +20,34 @@
 
 			// --- METHODS
 
+			/*
+			 * Usage:
+			 * - observe(fName, hook)
+			 * - observe(fName, hook, priority)
+			 * - observe(o, fName, hook);
+			 * - observe(o, fName, hook, priority);
+			 */
 			observe: function(arg1, arg2, arg3, arg4) {
-				//TODO: Check if o null.
-				//TODO: Check if o[name] is a function.
-				//TODO: Check for circular references.
-				var defaultsO = (typeof arg1 == "string");
-				var o =  defaultsO ? window : arg1;
-				var fName = defaultsO ? arg1 : arg2;
-				var hook = defaultsO ? arg2 : arg3;
-				var priority = defaultsO ? (arg3 || 0) : (arg4 || 0);
-				var n = 0;
+
+				// Map the dynamic usage of the parameters and check for bad calls.
+				var request = this._buildRequest(arg1, arg2, arg3, arg4);
+				if (!request.success)
+					return;
+
+				// Map arguments.
+				var o =  request.o;
+				var fName = request.fName;
+				var hook = request.hook;
+				var priority = request.priority;
+
+				// Check that the original function is either null or of type function
+				var oF = o[fName];
+				if (oF != undefined && (typeof oF != "function")) {
+					Zumo.log.warn("The provided function name \"" + fName + "\" does not reference a function but a " +
+							(typeof o[fName]) + " - this member should be changed at runtime to a function in order " +
+							"to avoid unexpected results");
+				}
+
 				var proxyExists = false;
 				var proxy;
 				for (var i = 0; i < this._registry.length; i++) {
@@ -42,10 +61,84 @@
 				if (!proxyExists)
 					proxy = this._createProxy(o, fName);
 				this._addHook(proxy, hook, priority)
+				
 			},
 
-			ignore: function(origin, hook) {
-				//TODO: Implement ignore.
+			/*
+			 * Usage:
+			 * - ignore(fName, hook)
+			 * - ignore(o, fName, hook);
+			 */
+			ignore: function(arg1, arg2, arg3) {
+
+				// Map the dynamic usage of the parameters and check for bad calls.
+				var request = this._buildRequest(arg1, arg2, arg3);
+				if (!request.success)
+					return;
+
+				// Map arguments.
+				var o =  request.o;
+				var fName = request.fName;
+				var hook = request.hook;
+
+				// Get the position of the proxy to remove.
+				var proxyPos = -1;
+				for (var i = 0; i < this._registry.length; i++) {
+					var p = this._registry[i];
+					if (p.o === o && p.fName == fName && p.hook === hook) {
+						proxyPos = i;
+						break;
+					}
+				}
+
+				if (proxyPos > -1) {
+					this._registry.splice(proxyPos, 1);
+				} else {
+					Zumo.log.info("There is no matching function to remove on " + fName);
+				}
+
+			},
+
+			_buildRequest: function(arg1, arg2, arg3, arg4) {
+
+				//XXX: Set messages with ignore also, not just observe.
+
+				// Check that the first parameter is either an object or a string.
+				if (typeof arg1 != "object" && typeof arg1 != "string") {
+					Zumo.log.warn("The first parameter to observe should be either an object (that holds the function " +
+							"to be observed) or a string (the function name to be obeserved, taking window as the " +
+							"default object), no hook will be processed");
+					return;
+				}
+
+				// Map arguments.
+				var defaultsO = (typeof arg1 == "string");
+				var request = {
+					o: defaultsO ? window : arg1,
+					fName: defaultsO ? arg1 : arg2,
+					hook: defaultsO ? arg2 : arg3,
+					priority: defaultsO ? (arg3 || 0) : (arg4 || 0),
+					success: true
+				}
+
+				// Check that we have an object.
+				if (typeof request.o != "object") {
+					Zumo.log.warn("No object to observe, no hook will be processed");
+					request.success = false;
+
+				// Check that we have a function name.
+				} else if (typeof request.fName != "string") {
+					Zumo.log.warn("There was no function name string provided to observe, no hook will be processed");
+					request.success = false;
+
+				// Check that we have a function name.
+				} else if (typeof request.hook != "function") {
+					Zumo.log.warn("There was no hook function provided to observe, no hook will be processed");
+					request.success = false;
+				}
+
+				return request;
+
 			},
 
 			_createProxy: function(o, fName) {
@@ -72,9 +165,12 @@
 
 			_addHook: function(proxy, f, priority) {
 
+				// Check whether there is a function member defined for the object.
+				if (!f)
+					return;
+
 				if (proxy.original === f) {
-					//TODO: Use Logger.
-					window.console["warn"]("You cannot observe a function to itself: " + f);
+					Zumo.log.warn("You cannot observe a function to itself: " + f);
 					return;
 				}
 
@@ -90,8 +186,7 @@
 						n = i + 1;
 				}
 				if (hookExists) {
-					//TODO: Use Logger.
-					window.console["info"]("Hook already exists, will not be added: " + f);
+					Zumo.log.info("Hook already exists, will not be added: " + f);
 				} else {
 					var hook = {
 						f: f,
@@ -112,27 +207,46 @@
 
 
 		function sayHi() {
-			window.console["info"]("Hi! - sayHi called");
+			Zumo.log.info("Hi! - sayHi called");
 		}
 
 		function sayBye() {
-			window.console["info"]("Bye! - sayBye called");
+			Zumo.log.info("Bye! - sayBye called");
 		}
 
 		function sayPizza() {
-			window.console["info"]("Pizza! - sayPizza called");
+			Zumo.log.info("Pizza! - sayPizza called");
 		}
 
 		function saySomething(something) {
-			window.console["info"](something + "! - saySomething called");
+			Zumo.log.info(something + "! - saySomething called");
 		}
 
+		Zumo.log.level = 3;
+		
 //		Agent.observe(this, "sayBye", sayHi);
-//		Agent.observe("sayHi", sayBye);
+//		Agent.observe("sayPizza", sayHi);
+//		Agent.observe("sayBye", sayPizza);
+//		Agent.observe("sayBye", sayPizza);
 //		Agent.observe("sayHi", sayPizza, 10);
-		Agent.observe("sayHi", saySomething);
+//		Agent.observe("sayHi", saySomething);
 
-		sayHi("Pasta");
+//		Agent.observe("sayHi", sayBye);
+//		sayHi("Pasta");
+//		Agent.ignore("sayHi", sayBye);
+//		Agent.observe("sayHi", alert, 10);
+//		sayHi("Pasta");
+		
+		function createLinkHook() {
+			var link = document.getElementById("link");
+			Agent.observe(link, "onclick", sayHi);
+		}
+		
+		Agent.observe("onload", function() {
+				window.console["info"]("window loaded");
+				createLinkHook();
+			}
+		);
 
         
     </script>
@@ -141,7 +255,7 @@
 
 <body>
 
-Event tester
+<a id="link" href="javascript: void(0);">Event tester</a>
 
 </body>
 </html>

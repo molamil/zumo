@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<zumo>
+
+	<views>
+
+		<page id="one" target="#frontpage"/>
+
+		<page id="two" type="dom" target="#about">
+			<prop target="#content"><![CDATA[I am a nice header]]></prop>
+			<handler target="#linkAbout" type="click"/>
+		</page>
+
+		<page id="three" type="loader" target="news.txt" container="#news"/>
+
+		<block id="teaser" target="#teaser"/>
+
+	</views>
+
+</zumo>
