@@ -766,7 +766,6 @@
 		},
 
 		_createBlockHandlerAction: function(handlerContext, blockContext) {
-			Log.info("There is no block action handler implemented (" + blockContext.id + ", " + handlerContext.type + ")");
 
 			var app = this.app;
 			var f;
