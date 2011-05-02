@@ -27,7 +27,7 @@
 		// --- PROPERTIES
 
 		LEVELS: ["error", "warn", "info", "debug"],
-		level: 3,
+		level: 2,
 		prefix: _NAME.toUpperCase() + " - ",
 
 		// --- METHODS
@@ -210,6 +210,32 @@
 					target = Selector.select(prop.target);
 				var name = prop.name || session.defaultPropName;
 				target[name] = prop.value;
+			}
+
+		}
+
+	};
+
+
+	// ************************************************************************************************************
+	// PARAMS
+	// ************************************************************************************************************
+
+
+	// *** PARAMS MANAGER OBJECT
+
+	var ParamsManager = {
+
+		// --- METHODS
+
+		apply: function(target, params, session) {
+
+			//TODO: Add checks
+
+			// Merge the params
+			for(var i = 0; i < params.length; i++) {
+				var param = params[i];
+				target[param.name] = param.value;
 			}
 
 		}
@@ -566,6 +592,7 @@
 			Log.debug("Parsing conf: " + conf);
 			var confObject = {};
 			confObject.views = this._parseViews(conf, session);
+			confObject.commands = this._parseCommands(conf, session);
 			return confObject;
 		},
 
@@ -608,9 +635,39 @@
 		_parsePageBlock: function(conf, session) {
 			var pageBlockContext = {};
 			this._mergeAttributes(pageBlockContext, conf, ["id", "type", "target", "container"]);
+			var dependsValue = conf.attributes.getNamedItem("depends");
+			if (dependsValue) {
+				var depends = dependsValue.nodeValue.replace(" ", "").split(",");
+				if (!(depends.length == 1 && depends[0] == ""))
+					pageBlockContext.depends = depends;
+			}
 			pageBlockContext.props = this._parseProps(conf, session);
 			pageBlockContext.handlers = this._parseHandlers(conf, session);
 			return pageBlockContext;
+		},
+
+		_parseCommands: function(conf, session) {
+
+			var commandsNodes = conf.getElementsByTagName("commands");
+			var commands = [];
+
+			if (commandsNodes.length > 1) {
+				Log.warn("There can only be zero or one commands nodes on the XML configuration, there were "
+						+ commandsNodes.length + " commands nodes found");
+			} else if (commandsNodes.length == 0) {
+				Log.info("No commands to parse");
+			} else {
+				var commandNodes = commandsNodes[0].getElementsByTagName("command");
+				for (var i = 0; i < commandNodes.length; i++) {
+					var commandContext = {};
+					this._mergeAttributes(commandContext, commandNodes[i], ["id", "type"]);
+					commandContext.handlers = this._parseHandlers(commandNodes[i], session);
+					commands.push(commandContext);
+				}
+			}
+
+			return commands;
+
 		},
 
 		_parseProps: function(conf, session) {
@@ -671,7 +728,38 @@
 			//TODO: Implement params
 			Log.debug(conf);
 			this._mergeAttributes(handlerContext, conf, ["type", "target", "priority", "class", "source", "action", "priority"]);
+			handlerContext.params = this._parseParams(conf, session);
 			return handlerContext;
+		},
+
+		_parseParams: function(conf, session) {
+
+			var paramNodes = conf.getElementsByTagName("param");
+
+			var params = [];
+			for (var i = 0; i < paramNodes.length; i++) {
+				var paramContext = this._parseParam(paramNodes[i], session);
+				if (paramContext)
+					params.push(paramContext);
+			}
+
+			return params;
+
+		},
+
+		_parseParam: function(conf, session) {
+			var paramContext = {};
+			//TODO: Add checks
+			//TODO: Implement type resolvers
+			//TODO: Implement required
+			//TODO: Implement validators
+			//TODO: Implement expressions
+			//TODO: Implement props
+			this._mergeAttributes(paramContext, conf, ["name", "value"]);
+			Log.debug(conf);
+			if (!paramContext.value)
+				paramContext.value = conf.firstChild.nodeValue;
+			return paramContext;
 		}
 
 	};
@@ -712,6 +800,12 @@
 				this._registerHandlersFromContext(blockContext, "block");
 			}
 
+			var commandContexts = this.app.getCommandContexts();
+			for (i = 0; i < commandContexts.length; i++) {
+				var commandContext = commandContexts[i];
+				this._registerHandlersFromContext(commandContext, "command");
+			}
+
 		},
 
 		unregisterHandlers: function() {
@@ -728,17 +822,19 @@
 					handlerContext: context.handlers[i],
 					context: context,
 					contextType: contextType,
-					f: this._createPageBlockHandlerAction(context.handlers[i], context, contextType)
+					f: this._createHandlerAction(context.handlers[i], context, contextType)
 				};
 				this._activeHandlers.push(activeHandler);
 			}
 		},
 
-		_createPageBlockHandlerAction: function(handlerContext, pageBlockContext, contextType) {
+		_createHandlerAction: function(handlerContext, mainContext, contextType) {
 			if (contextType == "page") {
-				this._createPageHandlerAction(handlerContext, pageBlockContext);
+				this._createPageHandlerAction(handlerContext, mainContext);
 			} else if (contextType == "block") {
-				this._createBlockHandlerAction(handlerContext, pageBlockContext);
+				this._createBlockHandlerAction(handlerContext, mainContext);
+			} else if (contextType == "command") {
+				this._createCommandHandlerAction(handlerContext, mainContext);
 			} else {
 				Log.warn("Could not create handler action - the context type is neither a page or a block");
 			}
@@ -750,7 +846,16 @@
 			var f;
 
 			var fGoto = function() {
-				app.goto(pageContext.id);
+				//TODO: See if we can not call Zumo but app on the timeout
+				//TODO: Pass params
+				var page = app.getCurrentPage();
+				if (handlerContext.source == page.id) {
+					if (pageContext.id == page.id) {
+						ParamsManager.apply(page.master.target, handlerContext.params, this.session);
+					} else {
+						setTimeout("Zumo.goto('" + pageContext.id + "')", 10);
+					}
+				}
 			};
 
 			if (handlerContext.action == "goto" || handlerContext.action == "call" || handlerContext.action == "" || handlerContext.action == null) {
@@ -759,7 +864,7 @@
 				Log.warn("Could not resolve handler action: " + handlerContext.action);
 			}
 
-			this._bindHandler(handlerContext.target, handlerContext.type, f);
+			this._bindHandler(handlerContext.type, f, handlerContext.target);
 
 			return f;
 
@@ -771,11 +876,20 @@
 			var f;
 
 			var fDisplay = function() {
-				app.displayBlock(blockContext.id);
+				if (handlerContext.source == app.getCurrentPage().id) {
+					var block = app.getDisplayedBlock(blockContext.id);
+					if (block) {
+						ParamsManager.apply(block.master.target, handlerContext.params, this.session);
+					} else {
+						//TODO: Implement params on request
+						app.displayBlock(blockContext.id);
+					}
+				}
 			};
 
 			var fClear = function() {
-				app.clearBlock(blockContext.id);
+				if (handlerContext.source == app.getCurrentPage().id)
+					app.clearBlock(blockContext.id);
 			};
 
 			if (handlerContext.action == "clearBlock") {
@@ -786,7 +900,32 @@
 				Log.warn("Could not resolve handler action: " + handlerContext.action);
 			}
 
-			this._bindHandler(handlerContext.target, handlerContext.type, f);
+			this._bindHandler(handlerContext.type, f, handlerContext.target);
+
+			return f;
+
+		},
+
+		_createCommandHandlerAction: function(handlerContext, commandContext) {
+
+			var app = this.app;
+			var f;
+
+			var fExecute= function() {
+				var page = app.getCurrentPage();
+				if (handlerContext.source == page.id) {
+					//TODO: Pass params
+					app.execute(commandContext.id);
+				}
+			};
+
+			if (handlerContext.action == "execute" || handlerContext.action == "" || handlerContext.action == null) {
+				f = fExecute;
+			} else {
+				Log.warn("Could not resolve handler action: " + handlerContext.action);
+			}
+
+			this._bindHandler(handlerContext.type, f, handlerContext.target);
 
 			return f;
 
@@ -810,12 +949,12 @@
 			//TODO: Implement _removeBlockHandlerAction
 		},
 
-		_bindHandler: function(target, type, handler) {
+		_bindHandler: function(type, handler, target) {
 			Log.info("There is no handler binder implemented");
 			//TODO: Implement _bindHandler
 		},
 
-		_unbindHandler: function() {
+		_unbindHandler: function(type, handler, target) {
 			Log.info("There is no handler unbinder implemented");
 			//TODO: Implement _unbindHandler
 		}
@@ -837,6 +976,7 @@
 		},
 		_DEFAULT_VIEW_TYPE: "dom",
 		_DEFAULT_PROP_NAME: "innerHTML",
+		_PARAM_NAME_CALLER: "_caller",
 
 		log: Log,
 		root: null,
@@ -968,6 +1108,8 @@
 			//TODO: Implement state managers
 			this._displayedPage = page;
 
+			this._displayDepends(page);
+
 		},
 
 		getPageContext: function(id) {
@@ -1074,6 +1216,7 @@
 			}
 
 			block.master.destroy(); //TODO: Implement clear.
+			this._removeDisplayedBlock(id);
 
 		},
 
@@ -1138,6 +1281,54 @@
 			this.session.viewMasters[name] = null;
 		},
 
+		getCommandContexts: function() {
+			return this._conf.commands;
+		},
+
+		getCommandContext: function(id) {
+
+			if (!this.isInit()) {
+				Log.warn("Cannot get command context (" + id + ")- Zumo is not yet initalized");
+				return;
+			}
+
+			if (this._conf.commands == null || this._conf.commands.length == 0) {
+				Log.info("Cannot get block context since there are no commands configured");
+				return;
+			}
+
+			var commandContext;
+			for (var i = 0; i < this._conf.commands.length; i++) {
+				var iCommandContext = this._conf.commands[i];
+				if (iCommandContext.id == id) {
+					commandContext = iCommandContext;
+					break;
+				}
+			}
+
+			return commandContext;
+
+		},
+
+		execute: function(id) {
+
+			var commandContext = this.getCommandContext(id);
+
+			if (!commandContext) {
+				//TODO: Log warning
+				return;
+			}
+
+			var parts = commandContext.type.split(".");
+			var o = window;
+			for (var i = 0; i < parts.length; i++) {
+				o = o[parts[i]];
+			}
+			if (typeof o == "function")
+				o();
+
+		},
+
 		_initViewMasters: function() {
 			ViewMasters.init();
 			for (var p in this._VIEW_MASTERS) {
@@ -1176,6 +1367,61 @@
 					break;
 			}
 			this._displayedBlocks.splice(i, 1);
+		},
+
+		_displayDepends: function(pageBlock) {
+			
+			Log.debug("Displaying depends for " + pageBlock.id)
+
+			if (pageBlock)
+				return;
+
+			var a = this._getFlattenedDepends(pageBlock);
+
+			for (var i = 0; i < a.length; i++) {
+				var params = {};
+				params[this._PARAM_NAME_CALLER] = getPageBlockId(pageBlock);
+				this.displayBlock(a[i], params);
+			}
+
+			// If the caller is a page, remove the previous page's obsolete depends.
+			/*
+			if (pageBlock is Page) {
+				var prevPage:Page = Page(pageBlock).request.referrer;
+				if (prevPage != null)
+					clearDepends(prevPage);
+			}
+			*/
+
+		},
+
+		_getFlattenedDepends: function(o, aInit) {
+
+			// Create the array containing depends names or set it to an initial one.
+			var a = aInit || [];
+			var depends = o.depends;
+			if (!depends && o.context)
+				depends = o.context.depends;
+
+			// Iterate through all depends in this context.
+			for (var i = 0; i < depends.length; i++) {
+
+				// Get the name.
+				var id = depends[i];
+
+				// If it's already in the array, continue.
+				if (a.indexOf(id) != -1)
+					continue;
+
+				// Add the depends and subdepends to the array.
+				a.push(id);
+				var blockContext = this.getBlockContext(id);
+				this._getFlattenedDepends(blockContext, a);
+
+			}
+
+			return a;
+
 		}
 
 	};
