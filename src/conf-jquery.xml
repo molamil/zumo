@@ -9,7 +9,7 @@
 
 		<page id="two" type="dom" target="#about">
 			<prop target="#content"><![CDATA[I am a nice header]]></prop>
-			<handler target="#linkAbout" type="click"/>
+			<handler target="#linkAbout" type="click" at="one"/>
 		</page>
 
 		<page id="three" type="loader" target="news.txt" container="#news">

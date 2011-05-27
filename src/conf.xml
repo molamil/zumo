@@ -3,9 +3,9 @@
 
 	<views>
 
-		<page id="one" target="#frontpage" depends="teaser, "/>
+		<page id="one" target="#frontpage" depends="teaser"/>
 
-		<page id="two" type="dom" target="#about">
+		<page id="two" type="dom" target="#about" depends="teaser">
 			<prop target="#content"><![CDATA[I am a nice header]]></prop>
 		</page>
 

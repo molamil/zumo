@@ -12,17 +12,29 @@
 
 		// ZUMO SETUP
 
-		window.onload = function() {
+		function initZumo() {
 
 			Zumo.log.level = 3;
 
 			Zumo.init(window.document, "conf.xml");
 
-			Zumo.onConfLoaded = function() {
-				Zumo.goto("one");
-			}
+			Zumo.observe("onConfLoaded", function() {
+					Zumo.goto("one");
+				}
+			);
+
+			Zumo.observe("onPageRequest", function(context, request) {
+					Zumo.log.info("!!!");
+					Zumo.log.info("*** onPageRequest: " + context.id);
+					Zumo.log.debug(context);
+					Zumo.log.debug(request);
+					Zumo.log.info("!!!");
+				}
+			);
 
 		}
+
+		ZumoAgent.observe(window, "onload", initZumo);
 
 	</script>
 

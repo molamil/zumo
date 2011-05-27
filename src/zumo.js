@@ -4,7 +4,7 @@
 
  session:	{id:String, root:Object, defaultPropName:String, viewMasters:Array, defaultMasterClass:Object}
  request:	{id:String, params:Object}
- context:	{id:String, type:String, target:String, container:String, props:Array, handlers:Array}
+ context:	{id:String, type:String, target:String, container:String, props:Array, handlers:Array, node:String}
  prop:		{name:String, value:*, target:String}
 
  */
@@ -54,17 +54,212 @@
 		_log: function(message, level) {
 
 			// Check that Firebug is enabled.
-			if (!("console" in window) || !("firebug" in window.console))
+			if (!window.console)
 				return;
 
 			// Set level as default if not passed.
 			if (level == null)
 				level = this.level;
 
-			if (this.level >= level)
-				window.console[this.LEVELS[level]](message);
+			if (this.level >= level) {
+				var fLevel = window.console[this.LEVELS[level]];
+				if (typeof fLevel == "function")
+					fLevel(message);
+			}
 
 		}
+
+	};
+
+
+	// *** AGENT OBJECT
+
+	var Agent = {
+
+		// --- PROPERTIES
+
+		_registry: [],
+
+		// --- METHODS
+
+		/*
+		 * Usage:
+		 * - observe(fName, hook)
+		 * - observe(fName, hook, priority)
+		 * - observe(o, fName, hook);
+		 * - observe(o, fName, hook, priority);
+		 */
+		observe: function(arg1, arg2, arg3, arg4) {
+
+			// Map the dynamic usage of the parameters and check for bad calls.
+			var request = this._buildRequest(arg1, arg2, arg3, arg4);
+			if (!request.success)
+				return;
+
+			// Map arguments.
+			var o =  request.o;
+			var fName = request.fName;
+			var hook = request.hook;
+			var priority = request.priority;
+
+			// Check that the original function is either null or of type function
+			var oF = o[fName];
+			if (oF != undefined && (typeof oF != "function")) {
+				Zumo.log.warn("The provided function name \"" + fName + "\" does not reference a function but a " +
+						(typeof o[fName]) + " - this member should be changed at runtime to a function in order " +
+						"to avoid unexpected results");
+			}
+
+			var proxyExists = false;
+			var proxy;
+			for (var i = 0; i < this._registry.length; i++) {
+				var p = this._registry[i];
+				if (p.o === o && p.fName == fName) {
+					proxy = p;
+					proxyExists = true;
+					break;
+				}
+			}
+			if (!proxyExists)
+				proxy = this._createProxy(o, fName);
+			this._addHook(proxy, hook, priority)
+
+		},
+
+		/*
+		 * Usage:
+		 * - ignore(fName, hook)
+		 * - ignore(o, fName, hook);
+		 */
+		ignore: function(arg1, arg2, arg3) {
+
+			// Map the dynamic usage of the parameters and check for bad calls.
+			var request = this._buildRequest(arg1, arg2, arg3);
+			if (!request.success)
+				return;
+
+			// Map arguments.
+			var o =  request.o;
+			var fName = request.fName;
+			var hook = request.hook;
+
+			// Get the position of the proxy to remove.
+			var proxyPos = -1;
+			for (var i = 0; i < this._registry.length; i++) {
+				var p = this._registry[i];
+				if (p.o === o && p.fName == fName && p.hook === hook) {
+					proxyPos = i;
+					break;
+				}
+			}
+
+			if (proxyPos > -1) {
+				this._registry.splice(proxyPos, 1);
+			} else {
+				Zumo.log.info("There is no matching function to remove on " + fName);
+			}
+
+		},
+
+		_buildRequest: function(arg1, arg2, arg3, arg4) {
+
+			//TODO: Set log messages with ignore also, not just observe.
+
+			// Check that the first parameter is either an object or a string.
+			if (typeof arg1 != "object" && typeof arg1 != "string") {
+				Zumo.log.warn("The first parameter to observe should be either an object (that holds the function " +
+						"to be observed) or a string (the function name to be obeserved, taking window as the " +
+						"default object), no hook will be processed");
+				return;
+			}
+
+			// Map arguments.
+			var defaultsO = (typeof arg1 == "string");
+			var request = {
+				o: defaultsO ? window : arg1,
+				fName: defaultsO ? arg1 : arg2,
+				hook: defaultsO ? arg2 : arg3,
+				priority: defaultsO ? (arg3 || 0) : (arg4 || 0),
+				success: true
+			}
+
+			// Check that we have an object.
+			if (typeof request.o != "object") {
+				Zumo.log.warn("No object to observe, no hook will be processed");
+				request.success = false;
+
+			// Check that we have a function name.
+			} else if (typeof request.fName != "string") {
+				Zumo.log.warn("There was no function name string provided to observe, no hook will be processed");
+				request.success = false;
+
+			// Check that we have a function name.
+			} else if (typeof request.hook != "function") {
+				Zumo.log.warn("There was no hook function provided to observe, no hook will be processed");
+				request.success = false;
+			}
+
+			return request;
+
+		},
+
+		_createProxy: function(o, fName) {
+			var proxy = {
+				o: o,
+				fName: fName,
+				hooks: [] // of {f, priority}
+				// Adding original after adding the hook.
+			};
+			var original = o[fName];
+			this._addHook(proxy, original, 0);
+			proxy.original = original;
+			this._registry.push(proxy);
+			return proxy;
+		},
+
+		_buildProxy: function(proxy) {
+			proxy.o[proxy.fName] = function() {
+				//TODO: Review the this context of the called function.
+				for (var i = proxy.hooks.length - 1; i >= 0; i--)
+					proxy.hooks[i].f.apply(this, arguments);
+			}
+		},
+
+		_addHook: function(proxy, f, priority) {
+
+			// Check whether there is a function member defined for the object.
+			if (!f)
+				return;
+
+			if (proxy.original === f) {
+				Zumo.log.warn("You cannot observe a function to itself: " + f);
+				return;
+			}
+
+			var n = 0;
+			var hookExists = false;
+			for (var i = 0; i < proxy.hooks.length; i++) {
+				var h = proxy.hooks[i];
+				if (h.f === f) {
+					hookExists = true;
+					break;
+				}
+				if (h.priority < priority)
+					n = i + 1;
+			}
+			if (hookExists) {
+				Zumo.log.info("Hook already exists, will not be added: " + f);
+			} else {
+				var hook = {
+					f: f,
+					priority: priority
+				};
+				proxy.hooks.splice(n, 0, hook);
+			}
+			this._buildProxy(proxy);
+
+		}
+
 
 	};
 
@@ -127,18 +322,16 @@
 
 	// *** LOADER CLASS
 
-	var Loader = function() {};
+	var Loader = function() {
+		this.method = "GET";
+		// --
+		// Implementing:
+		// this.xmlHttp = null;
+		// this.callback= null;
+		// this.callbackObject = null;
+	};
 
 	Loader.prototype = {
-
-		// --- PROPERTIES
-
-		method: "GET",
-		xmlHttp: null,
-		callback: null,
-		callbackObject: null,
-
-		// --- METHODS
 
 		load: function(url, onLoaded, callbackObject) {
 
@@ -158,7 +351,9 @@
 				Log.info("Loader using ActiveX");
 				this.xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
 				if (this.xmlHttp) {
-					this.xmlHttp.onreadystatechange = xmlhttpChange;
+					this.xmlHttp.onreadystatechange = function() {
+						thisObject.onState.call(thisObject);
+					};
 					this.xmlHttp.open(this.method, url, true);
 					this.xmlHttp.send();
 				}
@@ -174,7 +369,7 @@
 				if (this.xmlHttp.status == 200 || this.xmlHttp.status == 0) {
 					this.onLoaded(this.xmlHttp);
 				} else {
-					Log.warn("The server returned an error when trying to load: " + xmlHttp.responseXML);
+					Log.warn("The server returned an error when trying to load: " + this.xmlHttp.responseXML);
 				}
 			}
 		},
@@ -243,7 +438,6 @@
 	};
 
 
-
 	// ************************************************************************************************************
 	// VIEWS
 	// ************************************************************************************************************
@@ -269,9 +463,33 @@
 		this.context = context;
 		this.request = request;
 		this.session = session;
+		this._callers = [];
 		// --
 		// Implementing:
 		// this.master = null;
+	};
+
+	Block.prototype = {
+
+		addCaller: function(id) {
+			if (!this.existsCaller(id))
+				this._callers.push(id);
+		},
+
+		removeCaller: function(id) {
+			var i = this._callers.indexOf(id);
+			if (i != -1)
+				this._callers.splice(i, 1);
+		},
+
+		existsCaller: function(id) {
+			return this._callers.indexOf(id) != -1;
+		},
+
+		getCallers: function() {
+			return this._callers;
+		}
+
 	};
 
 
@@ -346,24 +564,13 @@
 				this.context = context;
 				this.request = request;
 				this.session = session;
+				this.isDisplayed = false;
+				this.isCleared = false;
+				this.target = null;
+				this.container = null;
 			};
 
 			AbstractMaster.prototype = {
-
-				// --- PROPERTIES
-
-				isDisplayed: false,
-				isCleared: false,
-				target: null,
-				container: null,
-				// --
-				// Implementing:
-				// context: context,
-				// request: request,
-				// session: session,
-				// stateManager: null,
-
-				// --- METHODS
 
 				display: function() {
 					Log.info("Displaying " + this.context.id + " with target " + this.context.target);
@@ -395,18 +602,13 @@
 
 			var DomMaster = function(context, request, session) {
 				AbstractMaster.call(this, context, request, session);
+				//TODO: See how to configure the master properties.
+				this.changeDisplay = true;
+				this.changeVisibility = true;
 			};
 
 			DomMaster.prototype = {
-
-				// --- PROPERTIES
-
-				//TODO: See how to configure the master properties.
-				changeDisplay: true,
-				changeVisibility: true,
-
-				// --- METHODS
-
+				
 				display: function() {
 					AbstractMaster.prototype.display.apply(this, arguments); // Call super
 					Log.debug("DomMaster display");
@@ -442,16 +644,11 @@
 
 			var LoaderMaster = function(context, request, session) {
 				AbstractMaster.call(this, context, request, session);
+				this.useXml = false;
+				this.loader = null;
 			};
 
 			LoaderMaster.prototype = {
-
-				// --- PROPERTIES
-
-				useXml: false,
-				loader: null,
-
-				// --- METHODS
 
 				display: function() {
 					AbstractMaster.prototype.display.apply(this, arguments); // Call super
@@ -509,22 +706,15 @@
 			var BaseIo3Manager = function(target, session) {
 				this.target = target;
 				this.session = session;
+				this._state = false;
 			};
 
 			BaseIo3Manager.prototype = {
-
-				// --- PROPERTIES
 
 				STATE_IN: "IN",
 				STATE_ON: "ON",
 				STATE_OUT: "OUT",
 				STATE_OFF: "OFF",
-				_state: false,
-				// --
-				// Implementing:
-				// target: target
-
-				// --- METHODS
 
 				destroy: function() {
 					//TODO: Implement
@@ -614,18 +804,24 @@
 				blocks: []
 			};
 
-			var pageNodes = viewNodes[0].getElementsByTagName("page");
+			var nodeName = "page";
+			var pageNodes = viewNodes[0].getElementsByTagName(nodeName);
 			for (var i = 0; i < pageNodes.length; i++) {
 				var pageContext = this._parsePageBlock(pageNodes[i], session);
-				if (pageContext)
+				if (pageContext) {
+					pageContext.node = nodeName;
 					views.pages.push(pageContext);
+				}
 			}
 
-			var blockNodes = viewNodes[0].getElementsByTagName("block");
+			nodeName = "block";
+			var blockNodes = viewNodes[0].getElementsByTagName(nodeName);
 			for (i = 0; i < blockNodes.length; i++) {
 				var blockContext = this._parsePageBlock(blockNodes[i], session);
-				if (blockContext)
+				if (blockContext) {
+					blockContext.node = nodeName;
 					views.blocks.push(blockContext);
+				}
 			}
 
 			return views;
@@ -727,7 +923,7 @@
 			//TODO: Implement expressions
 			//TODO: Implement params
 			Log.debug(conf);
-			this._mergeAttributes(handlerContext, conf, ["type", "target", "priority", "class", "source", "action", "priority"]);
+			this._mergeAttributes(handlerContext, conf, ["type", "target", "priority", "class", "at", "action", "priority"]);
 			handlerContext.params = this._parseParams(conf, session);
 			return handlerContext;
 		},
@@ -769,18 +965,10 @@
 
 	var HandlerManager = function(app) {
 		this.app = app;
+		this._activeHandlers = []; // of {handlerContext:Object, context:Object, contextType:String, f:Function}
 	};
 
 	HandlerManager.prototype = {
-
-		// --- PROPERTIES
-
-		_activeHandlers: [], // of {handlerContext:Object, context:Object, contextType:String, f:Function}
-		// --
-		// Implementing:
-		// app: Zumo
-
-		// -- METHODS
 
 		registerHandlers: function() {
 
@@ -849,7 +1037,7 @@
 				//TODO: See if we can not call Zumo but app on the timeout
 				//TODO: Pass params
 				var page = app.getCurrentPage();
-				if (handlerContext.source == page.id) {
+				if (!handlerContext.at || handlerContext.at == "" || handlerContext.at == page.id) {
 					if (pageContext.id == page.id) {
 						ParamsManager.apply(page.master.target, handlerContext.params, this.session);
 					} else {
@@ -876,7 +1064,7 @@
 			var f;
 
 			var fDisplay = function() {
-				if (handlerContext.source == app.getCurrentPage().id) {
+				if (!handlerContext.at || handlerContext.at == "" || handlerContext.at == app.getCurrentPage().id) {
 					var block = app.getDisplayedBlock(blockContext.id);
 					if (block) {
 						ParamsManager.apply(block.master.target, handlerContext.params, this.session);
@@ -888,7 +1076,7 @@
 			};
 
 			var fClear = function() {
-				if (handlerContext.source == app.getCurrentPage().id)
+				if (!handlerContext.at || handlerContext.at == "" || handlerContext.at == app.getCurrentPage().id)
 					app.clearBlock(blockContext.id);
 			};
 
@@ -913,7 +1101,7 @@
 
 			var fExecute= function() {
 				var page = app.getCurrentPage();
-				if (handlerContext.source == page.id) {
+				if (!handlerContext.at || handlerContext.at == "" || handlerContext.at == page.id) {
 					//TODO: Pass params
 					app.execute(commandContext.id);
 				}
@@ -1051,11 +1239,6 @@
 			return this.root != null && this._conf != null;
 		},
 
-		onConfLoaded: function() {
-			// To be overriden, do nothing
-			//TODO: use events so several actions can be hooked up when the configuration is loaded
-		},
-
 		// Displays a specific page by id, taking out the page currently displayed
 		goto: function(id, params) {
 
@@ -1065,6 +1248,8 @@
 				Log.warn("Cannot goto " + id + " - Zumo is not yet initalized");
 				return;
 			}
+
+			params = params || {};
 
 			if (this._currentPage != null) {
 				Log.debug("currentPage id = " + this._currentPage.id);
@@ -1085,14 +1270,15 @@
 
 			//TODO: Implement aliases
 			//TODO: Check wether that page is already being requested
-			//TODO: Set referrer
 
 			var request = {
 				id: id,
 				params: params,
-				referrer: null
+				referrer: this._currentPage
 			};
 			var page = PageBlockBuilder.createPage(pageContext, request, this.session);
+
+			this.onPageRequest(pageContext, request);
 
 			// Check we have a proper page
 			if (page.master == null)
@@ -1159,12 +1345,19 @@
 				return;
 			}
 
-			var block = this.getDisplayedBlock();
+			params = params || {};
+
+			var block = this.getDisplayedBlock(id);
 
 			// Check whether the block is already displayed
 			if (block) {
 
-				//TODO: Add callers when depends are implemented
+				// If it's a depends block, add the caller.
+				if (params[this._PARAM_NAME_CALLER]) {
+					block.addCaller(params[this._PARAM_NAME_CALLER]);
+				} else {
+					block.addCaller(block.id);
+				}
 
 				Log.info("No block to display - the block is already displayed: " + id);
 
@@ -1179,18 +1372,24 @@
 
 				//TODO: Implement aliases
 				//TODO: Check wether that block is already being requested
-				//TODO: Set referrer
 
 				var request = {
 					id: id,
-					params: params,
-					referrer: null
+					params: params
 				};
 				block = PageBlockBuilder.createBlock(blockContext, request, this.session);
 
 				// Check we have a proper block
 				if (block.master == null)
 					return;
+
+				// Add the caller
+				if (params[this._PARAM_NAME_CALLER]) {
+					block.request.caller = params[this._PARAM_NAME_CALLER];
+				} else {
+					block.request.caller = block.id;
+				}
+				block.addCaller(block.request.caller);
 
 				block.master.display();
 				this._addDisplayedBlock(block);
@@ -1217,6 +1416,8 @@
 
 			block.master.destroy(); //TODO: Implement clear.
 			this._removeDisplayedBlock(id);
+
+			this._clearDepends(block);
 
 		},
 
@@ -1329,6 +1530,14 @@
 
 		},
 
+		observe: function(fName, hook, priority) {
+			Agent.observe(this, fName, hook, priority);
+		},
+
+		ignore: function(fName, hook) {
+			Agent.ignore(this, fName, hook);
+		},
+
 		_initViewMasters: function() {
 			ViewMasters.init();
 			for (var p in this._VIEW_MASTERS) {
@@ -1373,25 +1582,43 @@
 			
 			Log.debug("Displaying depends for " + pageBlock.id)
 
-			if (pageBlock)
+			if (!pageBlock)
 				return;
 
 			var a = this._getFlattenedDepends(pageBlock);
 
 			for (var i = 0; i < a.length; i++) {
 				var params = {};
-				params[this._PARAM_NAME_CALLER] = getPageBlockId(pageBlock);
+				params[this._PARAM_NAME_CALLER] = pageBlock.id;
 				this.displayBlock(a[i], params);
 			}
 
 			// If the caller is a page, remove the previous page's obsolete depends.
-			/*
-			if (pageBlock is Page) {
-				var prevPage:Page = Page(pageBlock).request.referrer;
+			if (pageBlock.context.node == "page") {
+				var prevPage = pageBlock.request.referrer;
 				if (prevPage != null)
-					clearDepends(prevPage);
+					this._clearDepends(prevPage);
 			}
-			*/
+
+		},
+
+		_clearDepends: function(pageBlock) {
+
+			Log.debug("Clearing depends for " + pageBlock.id)
+
+			if (!pageBlock)
+				return;
+
+			var a = this._getFlattenedDepends(pageBlock);
+
+			for (var i = 0; i < a.length; i++) {
+				var block = this.getDisplayedBlock(a[i]);
+				if (!block)
+					continue;
+				block.removeCaller(pageBlock.id);
+				if (block.getCallers().length == 0)
+					this.clearBlock(block.id);
+			}
 
 		},
 
@@ -1402,6 +1629,9 @@
 			var depends = o.depends;
 			if (!depends && o.context)
 				depends = o.context.depends;
+			if (!depends)
+				return [];
+
 
 			// Iterate through all depends in this context.
 			for (var i = 0; i < depends.length; i++) {
@@ -1422,7 +1652,12 @@
 
 			return a;
 
-		}
+		},
+
+		// --- EVENTS
+
+		onConfLoaded: function() {},
+		onPageRequest: function(context, request) {}
 
 	};
 
@@ -1430,6 +1665,9 @@
 	// ************************************************************************************************************
 	// EXTENSION POINTS
 	// ************************************************************************************************************
+
+
+	// *** ZUMO EXT OBJECT
 
 	var ZumoExt = {
 
@@ -1449,9 +1687,10 @@
 	// ************************************************************************************************************
 
 
-	// Expose Zumo and ZumoExt to the global object and init
+	// Expose the global Zumo objects
 	window.Zumo = Zumo;
 	window.ZumoExt = ZumoExt;
+	window.ZumoAgent = Agent;
 
 
 })(this);
