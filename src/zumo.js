@@ -2,10 +2,10 @@
 
  DECLARATION OF IMPLICIT OBJECTS ACCROSS THE ZUMO FRAMEWORK
 
- session:	{id:String, root:Object, defaultPropName:String, viewMasters:Array, defaultMasterClass:Object}
- request:	{id:String, params:Object}
- context:	{id:String, type:String, target:String, container:String, props:Array, handlers:Array, node:String}
- prop:		{name:String, value:*, target:String}
+ session:		{id:String, root:Object, defaultPropName:String, viewMasters:Array, defaultMasterClass:Object}
+ request:		{id:String, params:Object}
+ context:		{id:String, type:String, target:String, container:String, props: Object, propContexts:Array, handlers:Array, node:String}
+ propContext:	{name:String, value:*, target:String}
 
  */
 (function(window) {
@@ -394,17 +394,17 @@
 
 		// --- METHODS
 
-		apply: function(target, props, session) {
+		apply: function(target, propContexts, session) {
 
 			//TODO: Add checks
 
 			// Merge the props
-			for(var i = 0; i < props.length; i++) {
-				var prop = props[i];
-				if (prop.target)
-					target = Selector.select(prop.target);
-				var name = prop.name || session.defaultPropName;
-				target[name] = prop.value;
+			for(var i = 0; i < propContexts.length; i++) {
+				var propContext = propContexts[i];
+				if (propContext.target)
+					target = Selector.select(propContext.target);
+				var name = propContext.name || session.defaultPropName;
+				target[name] = propContext.value;
 			}
 
 		}
@@ -592,7 +592,7 @@
 
 				init: function() {
 					Log.debug("Initializing " + this.context.id);
-					PropsManager.apply(this.target, this.context.props, this.session);
+					PropsManager.apply(this.target, this.context.propContexts, this.session);
 				}
 
 			};
@@ -837,7 +837,8 @@
 				if (!(depends.length == 1 && depends[0] == ""))
 					pageBlockContext.depends = depends;
 			}
-			pageBlockContext.props = this._parseProps(conf, session);
+			pageBlockContext.propContexts = this._parsePropContexts(conf, session);
+			//TODO: Set props (no prop contexts)
 			pageBlockContext.handlers = this._parseHandlers(conf, session);
 			return pageBlockContext;
 		},
@@ -866,22 +867,22 @@
 
 		},
 
-		_parseProps: function(conf, session) {
+		_parsePropContexts: function(conf, session) {
 
 			var propNodes = conf.getElementsByTagName("prop");
 
-			var props = [];
+			var propContexts = [];
 			for (var i = 0; i < propNodes.length; i++) {
-				var propContext = this._parseProp(propNodes[i], session);
+				var propContext = this._parsePropContext(propNodes[i], session);
 				if (propContext)
-					props.push(propContext);
+					propContexts.push(propContext);
 			}
 
-			return props;
+			return propContexts;
 
 		},
 
-		_parseProp: function(conf, session) {
+		_parsePropContext: function(conf, session) {
 			var propContext = {};
 			//TODO: Add checks
 			//TODO: Implement type resolvers
