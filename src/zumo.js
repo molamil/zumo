@@ -301,9 +301,38 @@
 		merge: function(target, origin) {
 			for (var prop in origin)
 				target[prop] = origin[prop];
-        }
+        },
+
+		find: function(target, container) {
+			var parts = target.split(".");
+			var o = container || window;
+			for (var i = 0; i < parts.length; i++) {
+				o = o[parts[i]];
+			}
+			return o;
+		}
 
 	};
+
+
+	// *** DOM UTILS OBJECT
+
+	var DomUtils = {
+
+		getChildrenByName: function(o, name) {
+			var children;
+			if (typeof o.children == "object") {
+				children = [];
+				for (var i = 0; i < o.children.length; i++) {
+					var child = o.children[i];
+					if (child.nodeName == name)
+						children.push(child);
+				}
+			}
+			return children;
+		}
+
+	}
 
 
 	// *** SELECTOR OBJECT
@@ -598,13 +627,14 @@
 			};
 
 
-			// *** DOM CLASS
+			// *** DOM MASTER CLASS
 
 			var DomMaster = function(context, request, session) {
 				AbstractMaster.call(this, context, request, session);
 				//TODO: See how to configure the master properties.
 				this.changeDisplay = true;
 				this.changeVisibility = true;
+				this.cloneDom = false;
 			};
 
 			DomMaster.prototype = {
@@ -616,6 +646,10 @@
 					if (this.target == null) {
 						Log.error("Invalid target for page " + this.context.id + ": " + this.context.target);
 						return;
+					}
+					if (this.cloneDom) {
+						this.target = this.target.cloneNode(true);
+						this.container.appendChild(this.target);
 					}
 					if (this.changeDisplay)
 						this.target.style.display = "block";
@@ -631,12 +665,22 @@
 						this.target.style.display = "none";
 					if (this.changeVisibility)
 						this.target.style.visibility = "hidden";
+					if (this.cloneDom)
+						this.container.removeChild(this.target);
 				},
 
 				init: function() {
 					AbstractMaster.prototype.init.apply(this, arguments); // Call super
 				}
 
+			};
+
+
+			// *** DOM CLONE MASTER CLASS
+
+			var DomCloneMaster = function(context, request, session) {
+				DomMaster.call(this, context, request, session);
+				this.cloneDom = true;
 			};
 
 
@@ -676,15 +720,61 @@
 
 			};
 
+			// *** BUILDER MASTER CLASS
+
+			var BuilderMaster = function(context, request, session) {
+				AbstractMaster.call(this, context, request, session);
+				this.fConstructor = null;
+				this.domContent = null;
+			};
+
+			BuilderMaster.prototype = {
+
+				display: function() {
+					AbstractMaster.prototype.display.apply(this, arguments); // Call super
+					Log.debug("BuilderMaster display");
+					this.fConstructor = ObjectUtils.find(this.context.target);
+					if (typeof this.fConstructor != "function") {
+						Log.error("Invalid target for page " + this.context.id + ": " + this.context.target);
+						return;
+					}
+					this.target = new this.fConstructor();
+					//TODO: Implement checks on build to make sure it is a function and it returns dom
+					this.domContent = this.target.build();
+					this.container.appendChild(this.domContent);
+					this.init();
+					if (typeof this.target.init == "function")
+						this.target.init();
+				},
+
+				destroy: function() {
+					AbstractMaster.prototype.destroy.apply(this, arguments); // Call super
+					Log.debug("BuilderMaster destroy");
+					if (typeof this.target.destroy == "function")
+						this.target.destroy();
+					if (this.domContent)
+						this.container.removeChild(this.domContent);
+				},
+
+				init: function() {
+					AbstractMaster.prototype.init.apply(this, arguments); // Call super
+				}
+
+			};
+
 
 			// *** INIT - Initializing ViewMasters
 
 			this.AbstractMaster = AbstractMaster;
 			this.DomMaster = DomMaster;
+			this.DomCloneMaster = DomCloneMaster;
 			this.LoaderMaster = LoaderMaster;
+			this.BuilderMaster = BuilderMaster;
 
 			ObjectUtils.extend(this.DomMaster, this.AbstractMaster);
+			ObjectUtils.extend(this.DomCloneMaster, this.DomMaster);
 			ObjectUtils.extend(this.LoaderMaster, this.AbstractMaster);
+			//ObjectUtils.extend(this.BuilderMaster, this.BuilderMaster);
 
 
 		}
@@ -869,7 +959,7 @@
 
 		_parsePropContexts: function(conf, session) {
 
-			var propNodes = conf.getElementsByTagName("prop");
+			var propNodes = DomUtils.getChildrenByName(conf, "prop");
 
 			var propContexts = [];
 			for (var i = 0; i < propNodes.length; i++) {
@@ -883,15 +973,79 @@
 		},
 
 		_parsePropContext: function(conf, session) {
+
 			var propContext = {};
+
 			//TODO: Add checks
 			//TODO: Implement type resolvers
 			//TODO: Implement expressions
-			this._mergeAttributes(propContext, conf, ["name", "value", "target"]);
-			Log.debug(conf);
-			if (!propContext.value)
-				propContext.value = conf.firstChild.nodeValue;
+
+			this._mergeAttributes(propContext, conf, ["name", "target"]);
+			propContext.value = this._parsePropValue(conf, session);
+
 			return propContext;
+
+		},
+
+		_parsePropValue: function(conf, session) {
+
+			var propContext = {};
+			this._mergeAttributes(propContext, conf, ["name", "value"]);
+
+			var hasChildren = conf.children.length > 0;
+			var itemNodes = DomUtils.getChildrenByName(conf, "item");
+			var propNodes = DomUtils.getChildrenByName(conf, "prop");
+
+			if (hasChildren) {
+
+				if (propContext.value) {
+
+					Log.warn("Both value attribute and children nodes found on prop: '" + propContext.name + "'. Only value attribute will be used.");
+
+				} else {
+
+					var i;
+
+					if (propNodes.length > 0) {
+
+						if (itemNodes.length > 0)
+							Log.warn("Both prop and item nodes found on prop: '" + propContext.name + "'. Only prop nodes will be used.");
+
+						propContext.value = {};
+
+						for (i = 0; i < propNodes.length; i++) {
+							var propNode = propNodes[i];
+							propContext.value[propNode.attributes.getNamedItem("name").nodeValue] = this._parsePropValue(propNode);
+						}
+
+					} else if (itemNodes.length > 0) {
+
+						propContext.value = [];
+
+						for (i = 0; i < itemNodes.length; i++)
+							propContext.value.push(this._parsePropValue(itemNodes[i]));
+
+					}
+
+				}
+
+			} else {
+
+				if (propContext.value) {
+
+					if (conf.firstChild && StringUtils.trim(conf.firstChild.nodeValue) != "")
+						Log.warn("Both value attribute and text content found on prop: '" + propContext.name + "'. Only value attribute will be used.");
+
+				} else {
+
+					propContext.value = conf.firstChild.nodeValue;
+
+				}
+
+			}
+
+			return propContext.value;
+
 		},
 
 		_mergeAttributes: function(o, element, list) {
@@ -902,7 +1056,6 @@
 					o[name] = value.nodeValue;
 			}
 		},
-
 
 		_parseHandlers: function(conf, session) {
 
@@ -1161,7 +1314,9 @@
 
 		_VIEW_MASTERS: {
 			dom: "DomMaster",
-			loader: "LoaderMaster"
+			domclone: "DomCloneMaster",
+			loader: "LoaderMaster",
+			builder: "BuilderMaster"
 		},
 		_DEFAULT_VIEW_TYPE: "dom",
 		_DEFAULT_PROP_NAME: "innerHTML",
@@ -1367,7 +1522,7 @@
 				// Get the block from the conf
 				var blockContext = this.getBlockContext(id);
 				if (typeof blockContext !== "object") {
-					Log.error("No page context found with id: " + id);
+					Log.error("No block context found with id: " + id);
 					return;
 				}
 
@@ -1521,11 +1676,7 @@
 				return;
 			}
 
-			var parts = commandContext.type.split(".");
-			var o = window;
-			for (var i = 0; i < parts.length; i++) {
-				o = o[parts[i]];
-			}
+			var o = ObjectUtils.find(commandContext.type);
 			if (typeof o == "function")
 				o();
 
