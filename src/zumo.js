@@ -2,7 +2,7 @@
 
  DECLARATION OF IMPLICIT OBJECTS ACCROSS THE ZUMO FRAMEWORK
 
- session:		{id:String, root:Object, defaultPropName:String, viewMasters:Array, defaultMasterClass:Object}
+ session:		{id:String, root:Object, defaultPropName:String, viewMasters:Array, defaultViewMasterClass:Object, commandMasters:Array, defaultCommandMasterClass:Object}
  request:		{id:String, params:Object}
  context:		{id:String, type:String, target:String, container:String, props: Object, propContexts:Array, handlers:Array, node:String}
  propContext:	{name:String, value:*, target:String}
@@ -308,6 +308,8 @@
 			var o = container || window;
 			for (var i = 0; i < parts.length; i++) {
 				o = o[parts[i]];
+				if (!o)
+					break;
 			}
 			return o;
 		}
@@ -556,9 +558,9 @@
 			var type = StringUtils.trim(context.type).toLowerCase();
 
 			if (type != "") {
-				masterClass = session.viewMasters[type];
+				masterClass = session.viewMasters["_" + type];
 			} else {
-				masterClass = session.defaultMasterClass;
+				masterClass = session.defaultViewMasterClass;
 			}
 
 			if (masterClass) {
@@ -856,6 +858,129 @@
 
 
 	// ************************************************************************************************************
+	// COMMANDS
+	// ************************************************************************************************************
+
+
+	// *** COMMAND CLASS
+
+	var Command = function (context, request, session) {
+		this.id = context.id;
+		this.context = context;
+		this.request = request;
+		this.session = session;
+		// --
+		// Implementing:
+		// this.master = null;
+	};
+
+
+	// *** COMMAND BUILDER OBJECT
+
+	var CommandBuilder = {
+
+		// --- METHODS
+
+		createCommand: function(context, request, session) {
+			var command = new Command(context, request, session);
+			command.master = this._buildMaster(context, request, session);
+			return command;
+		},
+
+		_buildMaster: function(context, request, session) {
+
+			var masterClass, master;
+			var type = StringUtils.trim(context.type).toLowerCase();
+
+			if (type != "") {
+				masterClass = session.commandMasters["_" + type];
+			} else {
+				masterClass = session.defaultCommandMasterClass;
+			}
+
+			if (masterClass) {
+				if (typeof masterClass == "function") {
+					master = new masterClass(context, request, session);
+				} else {
+					Log.error("The type " + type + " in " + context.id + " cannot create a new command");
+				}
+			} else {
+				Log.error("The type " + type + " cannot be resolved in command: " + context.id);
+			}
+
+			return master;
+
+		}
+
+	};
+
+	
+	// *** COMMAND MASTERS OBJECT
+
+	var CommandMasters = {
+
+		// --- METHODS - Using init method to create class functions as CommandMasters members
+
+		init: function() {
+
+
+			// *** ABSTRACT MASTER CLASS
+
+			var AbstractMaster = function(context, request, session) {
+				this.context = context;
+				this.request = request;
+				this.session = session;
+				this.isExecuted = false;
+			};
+
+			AbstractMaster.prototype = {
+
+				execute: function() {
+					Log.debug("Initializing " + this.context.id);
+					//TODO: Decide wheteher we should merge props.
+//					PropsManager.apply(this.target, this.context.propContexts, this.session);
+				}
+
+			};
+
+
+			// *** FUNCTION MASTER CLASS
+
+			var FunctionMaster = function(context, request, session) {
+				AbstractMaster.call(this, context, request, session);
+				//TODO: See how to configure the master properties.
+			};
+
+			FunctionMaster.prototype = {
+
+				execute: function() {
+					AbstractMaster.prototype.execute.apply(this, arguments); // Call super
+					var f = ObjectUtils.find(this.context.target);
+					var args = [];
+					if (this.context.props._args && typeof this.context.props._args == "object" && this.context.props._args.length > 0)
+						args = this.context.props._args;
+					if (typeof f == "function")
+						f.apply(null, args); //TODO: Check the this context.
+					this.isExecuted = true;
+				}
+
+			};
+
+
+			// *** INIT - Initializing CommandMasters
+
+			this.AbstractMaster = AbstractMaster;
+			this.FunctionMaster = FunctionMaster;
+
+			ObjectUtils.extend(this.FunctionMaster, this.AbstractMaster);
+
+
+		}
+
+	};
+
+
+	// ************************************************************************************************************
 	// ZUMO
 	// ************************************************************************************************************
 
@@ -928,6 +1053,7 @@
 					pageBlockContext.depends = depends;
 			}
 			pageBlockContext.propContexts = this._parsePropContexts(conf, session);
+			pageBlockContext.props = this._getPropsFromPropContexts(pageBlockContext.propContexts);
 			//TODO: Set props (no prop contexts)
 			pageBlockContext.handlers = this._parseHandlers(conf, session);
 			return pageBlockContext;
@@ -947,7 +1073,9 @@
 				var commandNodes = commandsNodes[0].getElementsByTagName("command");
 				for (var i = 0; i < commandNodes.length; i++) {
 					var commandContext = {};
-					this._mergeAttributes(commandContext, commandNodes[i], ["id", "type"]);
+					this._mergeAttributes(commandContext, commandNodes[i], ["id", "type", "target"]);
+					commandContext.propContexts = this._parsePropContexts(commandNodes[i], session);
+					commandContext.props = this._getPropsFromPropContexts(commandContext.propContexts);
 					commandContext.handlers = this._parseHandlers(commandNodes[i], session);
 					commands.push(commandContext);
 				}
@@ -1046,6 +1174,13 @@
 
 			return propContext.value;
 
+		},
+
+		_getPropsFromPropContexts: function(propContexts) {
+			var props = {};
+			for (var i = 0; i < propContexts.length; i++)
+				props[propContexts[i].name] = propContexts[i].value;
+			return props;
 		},
 
 		_mergeAttributes: function(o, element, list) {
@@ -1313,12 +1448,16 @@
 		// --- PROPERTIES
 
 		_VIEW_MASTERS: {
-			dom: "DomMaster",
-			domclone: "DomCloneMaster",
-			loader: "LoaderMaster",
-			builder: "BuilderMaster"
+				_dom: "DomMaster",
+				_domclone: "DomCloneMaster",
+				_loader: "LoaderMaster",
+				_builder: "BuilderMaster"
 		},
-		_DEFAULT_VIEW_TYPE: "dom",
+		_DEFAULT_VIEW_TYPE: "_dom",
+		_COMMAND_MASTERS: {
+				_function: "FunctionMaster"
+		},
+		_DEFAULT_COMMAND_TYPE: "_function",
 		_DEFAULT_PROP_NAME: "innerHTML",
 		_PARAM_NAME_CALLER: "_caller",
 
@@ -1373,11 +1512,15 @@
 			this.session = {
 				id: this._params.id || this._createSessionId(),
 				root: root,
-				defaultMasterClass: null,
+				viewMasters: {},
+				defaultViewMasterClass: null,
+				commandMasters: {},
+				defaultCommandMasterClass: null,
 				defaultPropName: this._DEFAULT_PROP_NAME,
-				viewMasters: {}
+
 			};
 			this._initViewMasters();
+			this._initCommandMasters();
 
 			Log.info("New Zumo session created with id: " + this.session.id);
 
@@ -1419,7 +1562,7 @@
 
 			// Get the page from the conf
 			var pageContext = this.getPageContext(id);
-			if (typeof pageContext !== "object") {
+			if (!pageContext || typeof pageContext !== "object") {
 				Log.error("No page context found with id: " + id);
 				return;
 			}
@@ -1521,7 +1664,7 @@
 
 				// Get the block from the conf
 				var blockContext = this.getBlockContext(id);
-				if (typeof blockContext !== "object") {
+				if (!blockContext || typeof blockContext !== "object") {
 					Log.error("No block context found with id: " + id);
 					return;
 				}
@@ -1638,6 +1781,34 @@
 			this.session.viewMasters[name] = null;
 		},
 
+		execute: function(id, params) {
+
+			Log.info("Executing command " + id);
+
+			if (!this.isInit()) {
+				Log.warn("Cannot execute " + id + " - Zumo is not yet initalized");
+				return;
+			}
+
+			params = params || {};
+
+			// Get the command from the conf
+			var commandContext = this.getCommandContext(id);
+			if (!commandContext || typeof commandContext !== "object") {
+				Log.error("No command context found with id: " + id);
+				return;
+			}
+
+			var request = {
+				id: id,
+				params: params
+			};
+			var command = CommandBuilder.createCommand(commandContext, request, this.session);
+
+			command.master.execute(request);
+
+		},
+
 		getCommandContexts: function() {
 			return this._conf.commands;
 		},
@@ -1667,19 +1838,25 @@
 
 		},
 
-		execute: function(id) {
-
-			var commandContext = this.getCommandContext(id);
-
-			if (!commandContext) {
-				//TODO: Log warning
+		registerCommandMaster: function(name, master) {
+			if (StringUtils.trim(name) == "") {
+				Log.warn("Cannot register a command master with an empty name");
 				return;
 			}
+			if (typeof master != "function") {
+				Log.warn("Cannot register command master with name " + name + " - command is not a function");
+				return;
+			}
+			if (this.session.commandMasters[name] == null) {
+				this.session.commandMasters[name] = master;
+			} else {
+				Log.warn("Cannot register command master with name " + name + " - there is already registered a master" +
+						"with that name")
+			}
+		},
 
-			var o = ObjectUtils.find(commandContext.type);
-			if (typeof o == "function")
-				o();
-
+		unregisterCommandMaster: function(name) {
+			this.session.commandMasters[name] = null;
 		},
 
 		observe: function(fName, hook, priority) {
@@ -1696,7 +1873,16 @@
 				var masterName = this._VIEW_MASTERS[p];
 				this.registerViewMaster(p, ViewMasters[masterName]);
 			}
-			this.session.defaultMasterClass = this.session.viewMasters[this._DEFAULT_VIEW_TYPE];
+			this.session.defaultViewMasterClass = this.session.viewMasters[this._DEFAULT_VIEW_TYPE];
+		},
+
+		_initCommandMasters: function() {
+			CommandMasters.init();
+			for (var p in this._COMMAND_MASTERS) {
+				var masterName = this._COMMAND_MASTERS[p];
+				this.registerCommandMaster(p, CommandMasters[masterName]);
+			}
+			this.session.defaultCommandMasterClass = this.session.commandMasters[this._DEFAULT_COMMAND_TYPE];
 		},
 
 		_onConfLoaded: function(xmlHttp) {
