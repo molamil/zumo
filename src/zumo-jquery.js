@@ -9,7 +9,7 @@
 	// *** HANDLER MANAGER DECORATIONS
 
 	var bindHandler = function(type, handler, target) {
-		target = target || window;
+		target = target || $("body");
 		$(target).live(type, handler);
 	};
 

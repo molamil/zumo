@@ -64,7 +64,7 @@
 			if (this.level >= level) {
 				var fLevel = window.console[this.LEVELS[level]];
 				if (typeof fLevel == "function")
-					fLevel(message);
+					fLevel.call(window.console, message);
 			}
 
 		}
@@ -264,6 +264,21 @@
 	};
 
 
+	// *** DELEGATE OBJECT
+
+	var Delegate = {
+
+		// --- METHODS
+
+		create: function(f, context, args) {
+			return function () {
+				f.apply(context, args);
+			}
+		}
+
+	};
+
+
 	// *** STRING UTILS OBJECT
 
 	var StringUtils = {
@@ -321,6 +336,7 @@
 
 	var DomUtils = {
 
+		//TODO: FIXME: Does not work on Chrome.
 		getChildrenByName: function(o, name) {
 			var children;
 			if (typeof o.children == "object") {
@@ -624,6 +640,7 @@
 				init: function() {
 					Log.debug("Initializing " + this.context.id);
 					PropsManager.apply(this.target, this.context.propContexts, this.session);
+					ObjectUtils.merge(this.target, this.request.params);
 				}
 
 			};
@@ -1323,14 +1340,15 @@
 			var f;
 
 			var fGoto = function() {
-				//TODO: See if we can not call Zumo but app on the timeout
-				//TODO: Pass params
+				//TODO: Review params logic
+				var params = arguments[1];
 				var page = app.getCurrentPage();
 				if (!handlerContext.at || handlerContext.at == "" || handlerContext.at == page.id) {
 					if (pageContext.id == page.id) {
 						ParamsManager.apply(page.master.target, handlerContext.params, this.session);
 					} else {
-						setTimeout("Zumo.goto('" + pageContext.id + "')", 10);
+						var ft = Delegate.create(app.goto, app, [pageContext.id, params]);
+						setTimeout(ft, 10);
 					}
 				}
 			};
@@ -1353,13 +1371,14 @@
 			var f;
 
 			var fDisplay = function() {
+				//TODO: Review params logic
+				var params = arguments[1];
 				if (!handlerContext.at || handlerContext.at == "" || handlerContext.at == app.getCurrentPage().id) {
 					var block = app.getDisplayedBlock(blockContext.id);
 					if (block) {
 						ParamsManager.apply(block.master.target, handlerContext.params, this.session);
 					} else {
-						//TODO: Implement params on request
-						app.displayBlock(blockContext.id);
+						app.displayBlock(blockContext.id, params);
 					}
 				}
 			};
@@ -1516,8 +1535,7 @@
 				defaultViewMasterClass: null,
 				commandMasters: {},
 				defaultCommandMasterClass: null,
-				defaultPropName: this._DEFAULT_PROP_NAME,
-
+				defaultPropName: this._DEFAULT_PROP_NAME
 			};
 			this._initViewMasters();
 			this._initCommandMasters();
