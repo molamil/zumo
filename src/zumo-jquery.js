@@ -19,6 +19,15 @@
 	};
 
 	ZumoExt.addHandlerBinder(bindHandler, unbindHandler, true);
+
+
+	// *** SELECTOR DECORATIONS
+
+	var selector = function(selector, container) {
+		return $(selector, container)[0];
+	};
+
+	ZumoExt.setSelector(selector);
 	
 
 })();
