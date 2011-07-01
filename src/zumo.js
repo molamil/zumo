@@ -449,7 +449,7 @@
 			for(var i = 0; i < propContexts.length; i++) {
 				var propContext = propContexts[i];
 				if (propContext.target)
-					target = Selector.select(propContext.target);
+					target = session.selector(propContext.target, target);
 				var name = propContext.name || session.defaultPropName;
 				target[name] = propContext.value;
 			}
@@ -608,6 +608,7 @@
 			// *** ABSTRACT MASTER CLASS
 
 			var AbstractMaster = function(context, request, session) {
+
 				this.context = context;
 				this.request = request;
 				this.session = session;
@@ -615,6 +616,18 @@
 				this.isCleared = false;
 				this.target = null;
 				this.container = null;
+
+				if (this.context.mediator) {
+					var fMediator = ObjectUtils.find(this.context.mediator);
+					if (typeof fMediator == "function") {
+						this.fMediator = fMediator;
+					}
+				}
+
+				// --
+				// Implementing:
+				// this.mediator = null;
+				
 			};
 
 			AbstractMaster.prototype = {
@@ -623,7 +636,7 @@
 					Log.info("Displaying " + this.context.id + " with target " + this.context.target);
 					var containerName = StringUtils.trim(this.context.container);
 					if (containerName != "") {
-						this.container = Selector.select(this.context.container, this.session.root);
+						this.container = this.session.selector(this.context.container, this.session.root);
 						if (this.container == null)
 							Log.error("Invalid container for page " + this.context.id + ": " + this.context.container);
 					}
@@ -631,6 +644,8 @@
 
 				destroy: function() {
 					Log.info("Destroying " + this.context.id);
+					if (this.mediator && typeof this.mediator.destroy == "function")
+						this.mediator.destroy();
 				},
 
 				clear: function() {
@@ -641,6 +656,13 @@
 					Log.debug("Initializing " + this.context.id);
 					PropsManager.apply(this.target, this.context.propContexts, this.session);
 					ObjectUtils.merge(this.target, this.request.params);
+					if (this.target && this.fMediator) {
+						this.mediator = new this.fMediator(this.target);
+						PropsManager.apply(this.mediator, this.context.propContexts, this.session);
+						ObjectUtils.merge(this.mediator, this.request.params);
+						if (typeof this.mediator.init == "function")
+							this.mediator.init();
+					}
 				}
 
 			};
@@ -661,7 +683,7 @@
 				display: function() {
 					AbstractMaster.prototype.display.apply(this, arguments); // Call super
 					Log.debug("DomMaster display");
-					this.target = Selector.select(this.context.target);
+					this.target = this.session.selector(this.context.target);
 					if (this.target == null) {
 						Log.error("Invalid target for page " + this.context.id + ": " + this.context.target);
 						return;
@@ -739,11 +761,13 @@
 
 			};
 
+			
 			// *** BUILDER MASTER CLASS
 
 			var BuilderMaster = function(context, request, session) {
 				AbstractMaster.call(this, context, request, session);
 				this.fConstructor = null;
+				this.builder = null;
 				this.domContent = null;
 			};
 
@@ -757,26 +781,28 @@
 						Log.error("Invalid target for page " + this.context.id + ": " + this.context.target);
 						return;
 					}
-					this.target = new this.fConstructor();
+					this.builder = new this.fConstructor();
 					//TODO: Implement checks on build to make sure it is a function and it returns dom
-					this.domContent = this.target.build();
-					this.container.appendChild(this.domContent);
+					this.target = this.builder.build();
+					this.container.appendChild(this.target);
 					this.init();
-					if (typeof this.target.init == "function")
-						this.target.init();
+					if (typeof this.builder.init == "function")
+						this.builder.init();
 				},
 
 				destroy: function() {
 					AbstractMaster.prototype.destroy.apply(this, arguments); // Call super
 					Log.debug("BuilderMaster destroy");
-					if (typeof this.target.destroy == "function")
-						this.target.destroy();
-					if (this.domContent)
-						this.container.removeChild(this.domContent);
+					if (typeof this.builder.destroy == "function")
+						this.builder.destroy();
+					if (this.target)
+						this.container.removeChild(this.target);
 				},
 
 				init: function() {
 					AbstractMaster.prototype.init.apply(this, arguments); // Call super
+					PropsManager.apply(this.builder, this.context.propContexts, this.session);
+					ObjectUtils.merge(this.builder, this.request.params);
 				}
 
 			};
@@ -975,7 +1001,9 @@
 					var f = ObjectUtils.find(this.context.target);
 					var args = [];
 					if (this.context.props._args && typeof this.context.props._args == "object" && this.context.props._args.length > 0)
-						args = this.context.props._args;
+						args = this.context.props._args.slice(0);
+					for (var param in this.request.params)
+						args.push(this.request.params[param]);
 					if (typeof f == "function")
 						f.apply(null, args); //TODO: Check the this context.
 					this.isExecuted = true;
@@ -1062,7 +1090,7 @@
 
 		_parsePageBlock: function(conf, session) {
 			var pageBlockContext = {};
-			this._mergeAttributes(pageBlockContext, conf, ["id", "type", "target", "container"]);
+			this._mergeAttributes(pageBlockContext, conf, ["id", "type", "mediator", "target", "container"]);
 			var dependsValue = conf.attributes.getNamedItem("depends");
 			if (dependsValue) {
 				var depends = dependsValue.nodeValue.replace(" ", "").split(",");
@@ -1344,7 +1372,8 @@
 				var params = arguments[1];
 				var page = app.getCurrentPage();
 				if (!handlerContext.at || handlerContext.at == "" || handlerContext.at == page.id) {
-					if (pageContext.id == page.id) {
+					if (page && pageContext.id == page.id) {
+						Log.debug("Handler " + handlerContext.type + "trigger when already at " + page.id);
 						ParamsManager.apply(page.master.target, handlerContext.params, this.session);
 					} else {
 						var ft = Delegate.create(app.goto, app, [pageContext.id, params]);
@@ -1410,8 +1439,9 @@
 			var fExecute= function() {
 				var page = app.getCurrentPage();
 				if (!handlerContext.at || handlerContext.at == "" || handlerContext.at == page.id) {
-					//TODO: Pass params
-					app.execute(commandContext.id);
+					//TODO: Review params logic
+					var params = arguments[1];
+					app.execute(commandContext.id, params);
 				}
 			};
 
@@ -1482,7 +1512,13 @@
 
 		log: Log,
 		root: null,
-		session: {},
+		session: {
+			viewMasters: {},
+			defaultViewMasterClass: null,
+			commandMasters: {},
+			defaultCommandMasterClass: null,
+			selector: Selector.select
+		},
 
 		_conf: null,
 		_params: null,
@@ -1528,15 +1564,10 @@
 			this._handlerManager = new HandlerManager(this);
 
 			// Create the initial session
-			this.session = {
-				id: this._params.id || this._createSessionId(),
-				root: root,
-				viewMasters: {},
-				defaultViewMasterClass: null,
-				commandMasters: {},
-				defaultCommandMasterClass: null,
-				defaultPropName: this._DEFAULT_PROP_NAME
-			};
+			this.session.id = this._params.id || this._createSessionId();
+			this.session.root = root;
+			this.session.defaultPropName = this._DEFAULT_PROP_NAME;
+			
 			this._initViewMasters();
 			this._initCommandMasters();
 
@@ -2033,6 +2064,14 @@
 			//TODO: Implement setAsDefault
 			HandlerManager.prototype._bindHandler = bindFunction;
 			HandlerManager.prototype._unbindHandler = unbindFunction;
+		},
+
+		setSelector: function(selector) {
+			if (selector && typeof selector == "function") {
+				Zumo.session.selector = selector;
+			} else {
+				Log.warn("Could not create a selector function from " + selector);
+			}
 		}
 		
 	};
