@@ -336,14 +336,13 @@
 
 	var DomUtils = {
 
-		//TODO: FIXME: Does not work on Chrome.
-		getChildrenByName: function(o, name) {
+		getChildren: function(o, name) {
 			var children;
-			if (typeof o.children == "object") {
+			if (o && typeof o.childNodes == "object") {
 				children = [];
-				for (var i = 0; i < o.children.length; i++) {
-					var child = o.children[i];
-					if (child.nodeName == name)
+				for (var i = 0; i < o.childNodes.length; i++) {
+					var child = o.childNodes[i];
+					if (child.nodeType == 1 && (!name || child.nodeName == name))
 						children.push(child);
 				}
 			}
@@ -1132,7 +1131,7 @@
 
 		_parsePropContexts: function(conf, session) {
 
-			var propNodes = DomUtils.getChildrenByName(conf, "prop");
+			var propNodes = DomUtils.getChildren(conf, "prop");
 
 			var propContexts = [];
 			for (var i = 0; i < propNodes.length; i++) {
@@ -1165,9 +1164,9 @@
 			var propContext = {};
 			this._mergeAttributes(propContext, conf, ["name", "value"]);
 
-			var hasChildren = conf.children.length > 0;
-			var itemNodes = DomUtils.getChildrenByName(conf, "item");
-			var propNodes = DomUtils.getChildrenByName(conf, "prop");
+			var hasChildren = DomUtils.getChildren(conf).length > 0;
+			var itemNodes = DomUtils.getChildren(conf, "item");
+			var propNodes = DomUtils.getChildren(conf, "prop");
 
 			if (hasChildren) {
 
