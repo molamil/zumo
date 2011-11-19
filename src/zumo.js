@@ -4,7 +4,7 @@
 
  session:		{id:String, root:Object, defaultPropName:String, viewMasters:Array, defaultViewMasterClass:Object, commandMasters:Array, defaultCommandMasterClass:Object}
  request:		{id:String, params:Object}
- context:		{id:String, type:String, target:String, container:String, props: Object, propContexts:Array, handlers:Array, node:String}
+ context:		{id:String, type:String, target:String, container:String, props: Object, propContexts:Array, handlers:Array, node:String, title:String}
  propContext:	{name:String, value:*, target:String}
 
  */
@@ -85,14 +85,18 @@
 		/*
 		 * Usage:
 		 * - observe(fName, hook)
+		 * - observe(fName, hook, thisArg)
 		 * - observe(fName, hook, priority)
+		 * - observe(fName, hook, thisArg, priority)
 		 * - observe(o, fName, hook);
+		 * - observe(o, fName, hook, thisArg);
 		 * - observe(o, fName, hook, priority);
+		 * - observe(o, fName, hook, thisArg, priority);
 		 */
-		observe: function(arg1, arg2, arg3, arg4) {
+		observe: function() {
 
 			// Map the dynamic usage of the parameters and check for bad calls.
-			var request = this._buildRequest(arg1, arg2, arg3, arg4);
+			var request = this._buildRequest.apply(this, arguments);
 			if (!request.success)
 				return;
 
@@ -100,6 +104,7 @@
 			var o =  request.o;
 			var fName = request.fName;
 			var hook = request.hook;
+			var thisArg = request.thisArg;
 			var priority = request.priority;
 
 			// Check that the original function is either null or of type function
@@ -122,19 +127,21 @@
 			}
 			if (!proxyExists)
 				proxy = this._createProxy(o, fName);
-			this._addHook(proxy, hook, priority)
+			this._addHook(proxy, hook, thisArg, priority)
 
 		},
 
 		/*
 		 * Usage:
 		 * - ignore(fName, hook)
+		 * - ignore(fName, hook, thisArg)
 		 * - ignore(o, fName, hook);
+		 * - ignore(o, fName, hook, thisArg);
 		 */
-		ignore: function(arg1, arg2, arg3) {
+		ignore: function() {
 
 			// Map the dynamic usage of the parameters and check for bad calls.
-			var request = this._buildRequest(arg1, arg2, arg3);
+			var request = this._buildRequest.apply(this, arguments);
 			if (!request.success)
 				return;
 
@@ -161,27 +168,40 @@
 
 		},
 
-		_buildRequest: function(arg1, arg2, arg3, arg4) {
-
-			//TODO: Set log messages with ignore also, not just observe.
+		_buildRequest: function() {
 
 			// Check that the first parameter is either an object or a string.
-			if (typeof arg1 != "object" && typeof arg1 != "string") {
-				Zumo.log.warn("The first parameter to observe should be either an object (that holds the function " +
-						"to be observed) or a string (the function name to be obeserved, taking window as the " +
+			if (typeof arguments[0] != "object" && typeof arguments[0] != "string") {
+				Zumo.log.warn("The first parameter to observe/ignore should be either an object (that holds the function " +
+						"to be observed/ignored) or a string (the function name to be obeserved/ignored, taking window as the " +
 						"default object), no hook will be processed");
 				return;
 			}
 
 			// Map arguments.
-			var defaultsO = (typeof arg1 == "string");
+			var defaultsO = (typeof arguments[0] == "string");
 			var request = {
-				o: defaultsO ? window : arg1,
-				fName: defaultsO ? arg1 : arg2,
-				hook: defaultsO ? arg2 : arg3,
-				priority: defaultsO ? (arg3 || 0) : (arg4 || 0),
+				o: defaultsO ? window : arguments[0],
+				fName: defaultsO ? arguments[0] : arguments[1],
+				hook: defaultsO ? arguments[1] : arguments[2],
+				thisArg: null,
+				priority: 0,
 				success: true
+			};
+
+			if (arguments.length > (defaultsO ? 2 : 3)) {
+				var arg1 = defaultsO ? (arguments[2]) : (arguments[3]);
+				var arg2 = defaultsO ? (arguments[3]) : (arguments[4]);
+				if (arg1 && typeof arg1 == "object") {
+					request.thisArg = arg1;
+					if (arg2 && typeof arg2 == "number")
+						request.priority = arg2;
+				} else if (typeof arg1 == "number") {
+					request.priority = arg1;
+				}
 			}
+
+
 
 			// Check that we have an object.
 			if (typeof request.o != "object") {
@@ -220,12 +240,14 @@
 		_buildProxy: function(proxy) {
 			proxy.o[proxy.fName] = function() {
 				//TODO: Review the this context of the called function.
-				for (var i = proxy.hooks.length - 1; i >= 0; i--)
-					proxy.hooks[i].f.apply(this, arguments);
+				for (var i = proxy.hooks.length - 1; i >= 0; i--) {
+					var hook = proxy.hooks[i];
+					hook.f.apply(hook.thisArg || this, arguments);
+				}
 			}
 		},
 
-		_addHook: function(proxy, f, priority) {
+		_addHook: function(proxy, f, thisArg, priority) {
 
 			// Check whether there is a function member defined for the object.
 			if (!f)
@@ -252,6 +274,7 @@
 			} else {
 				var hook = {
 					f: f,
+					thisArg: thisArg,
 					priority: priority
 				};
 				proxy.hooks.splice(n, 0, hook);
@@ -550,7 +573,7 @@
 			//TODO: Implement state managers.
 
 			var page = new Page(context, request, session);
-			page.master = this._buildMaster(context, request, session);
+			page.master = this._buildMaster(context, request, session, this._buildStateManager(context, session));
 
 			return page;
 
@@ -561,13 +584,13 @@
 			//TODO: Implement state managers.
 
 			var block = new Block(context, request, session);
-			block.master = this._buildMaster(context, request, session);
+			block.master = this._buildMaster(context, request, session, this._buildStateManager(context, session));
 
 			return block;
 
 		},
 
-		_buildMaster: function(context, request, session) {
+		_buildMaster: function(context, request, session, stateManager) {
 
 			var masterClass, master;
 			var type = StringUtils.trim(context.type).toLowerCase();
@@ -580,7 +603,7 @@
 
 			if (masterClass) {
 				if (typeof masterClass == "function") {
-					master = new masterClass(context, request, session);
+					master = new masterClass(context, request, session, stateManager);
 				} else {
 					Log.error("The type " + type + " in " + context.id + " cannot create a new page");
 				}
@@ -589,6 +612,31 @@
 			}
 
 			return master;
+
+		},
+
+		_buildStateManager: function(context, session) {
+
+			var stateManagerClass, stateManager;
+			var manager = StringUtils.trim(context.manager).toLowerCase();
+
+			if (manager != "") {
+				stateManagerClass = session.stateManagers["_" + manager];
+			} else {
+				stateManagerClass = session.defaultStateManagerClass;
+			}
+
+			if (stateManagerClass) {
+				if (typeof stateManagerClass == "function") {
+					stateManager = new stateManagerClass(null, session);
+				} else {
+					Log.error("The manager " + manager + " in " + context.id + " cannot create a valid state manager");
+				}
+			} else {
+				Log.error("The manager " + manager + " cannot be resolved in: " + context.id);
+			}
+
+			return stateManager;
 
 		}
 
@@ -606,16 +654,16 @@
 
 			// *** ABSTRACT MASTER CLASS
 
-			var AbstractMaster = function(context, request, session) {
+			var AbstractMaster = function(context, request, session, stateManager) {
 
 				this.context = context;
 				this.request = request;
 				this.session = session;
+				this.stateManager = stateManager;
 				this.isDisplayed = false;
 				this.isCleared = false;
-				this.target = null;
-				this.container = null;
 
+				//TODO: Move this to PageBlockBuilder
 				if (this.context.mediator) {
 					var fMediator = ObjectUtils.find(this.context.mediator);
 					if (typeof fMediator == "function") {
@@ -625,8 +673,10 @@
 
 				// --
 				// Implementing:
+				// this.target = null;
+				// this.container = null;
 				// this.mediator = null;
-				
+
 			};
 
 			AbstractMaster.prototype = {
@@ -645,22 +695,54 @@
 					Log.info("Destroying " + this.context.id);
 					if (this.mediator && typeof this.mediator.destroy == "function")
 						this.mediator.destroy();
+					if (this.stateManager)
+						this.stateManager.destroy();
 				},
 
 				clear: function() {
 					Log.info("Clearing " + this.context.id);
+					if (this.stateManager)
+						this.stateManager.setState(StateManagers.STATE_OUT);
 				},
 
 				init: function() {
+
 					Log.debug("Initializing " + this.context.id);
+
 					PropsManager.apply(this.target, this.context.propContexts, this.session);
 					ObjectUtils.merge(this.target, this.request.params);
-					if (this.target && this.fMediator) {
-						this.mediator = new this.fMediator(this.target);
-						PropsManager.apply(this.mediator, this.context.propContexts, this.session);
-						ObjectUtils.merge(this.mediator, this.request.params);
-						if (typeof this.mediator.init == "function")
-							this.mediator.init();
+
+					if (this.target) {
+
+						if (this.fMediator) {
+							this.mediator = new this.fMediator(this.target);
+							PropsManager.apply(this.mediator, this.context.propContexts, this.session);
+							ObjectUtils.merge(this.mediator, this.request.params);
+							if (typeof this.mediator.init == "function")
+								this.mediator.init();
+						}
+
+						if (this.stateManager) {
+							this.stateManager.target = this.target;
+							Agent.observe(this.stateManager, "onStateChange", this.onStateChange, this);
+							//TODO: Merge props into state managers
+							this.stateManager.setState(StateManagers.STATE_IN);
+						}
+						
+					}
+
+				},
+
+				onStateChange: function(target, state) {
+					if (state == StateManagers.STATE_IN) {
+						//type = isPage() ? PagesEvent.PAGE_IN : PagesEvent.BLOCK_IN;
+					} else if (state == StateManagers.STATE_ON) {
+						//type = isPage() ? PagesEvent.PAGE_ON : PagesEvent.BLOCK_ON;
+					} else if (state == StateManagers.STATE_OUT) {
+						//type = isPage() ? PagesEvent.PAGE_OUT : PagesEvent.BLOCK_OUT;
+					} else if (state == StateManagers.STATE_OFF) {
+						//type = isPage() ? PagesEvent.PAGE_OFF : PagesEvent.BLOCK_OFF;
+						this.destroy();
 					}
 				}
 
@@ -669,8 +751,8 @@
 
 			// *** DOM MASTER CLASS
 
-			var DomMaster = function(context, request, session) {
-				AbstractMaster.call(this, context, request, session);
+			var DomMaster = function(context, request, session, stateManager) {
+				AbstractMaster.call(this, context, request, session, stateManager);
 				//TODO: See how to configure the master properties.
 				this.changeDisplay = true;
 				this.changeVisibility = true;
@@ -718,16 +800,16 @@
 
 			// *** DOM CLONE MASTER CLASS
 
-			var DomCloneMaster = function(context, request, session) {
-				DomMaster.call(this, context, request, session);
+			var DomCloneMaster = function(context, request, session, stateManager) {
+				DomMaster.call(this, context, request, session, stateManager);
 				this.cloneDom = true;
 			};
 
 
 			// *** LOADER CLASS
 
-			var LoaderMaster = function(context, request, session) {
-				AbstractMaster.call(this, context, request, session);
+			var LoaderMaster = function(context, request, session, stateManager) {
+				AbstractMaster.call(this, context, request, session, stateManager);
 				this.useXml = false;
 				this.loader = null;
 			};
@@ -763,8 +845,8 @@
 			
 			// *** BUILDER MASTER CLASS
 
-			var BuilderMaster = function(context, request, session) {
-				AbstractMaster.call(this, context, request, session);
+			var BuilderMaster = function(context, request, session, stateManager) {
+				AbstractMaster.call(this, context, request, session, stateManager);
 				this.fConstructor = null;
 				this.builder = null;
 				this.domContent = null;
@@ -818,7 +900,7 @@
 			ObjectUtils.extend(this.DomMaster, this.AbstractMaster);
 			ObjectUtils.extend(this.DomCloneMaster, this.DomMaster);
 			ObjectUtils.extend(this.LoaderMaster, this.AbstractMaster);
-			//ObjectUtils.extend(this.BuilderMaster, this.BuilderMaster);
+			ObjectUtils.extend(this.BuilderMaster, this.AbstractMaster);
 
 
 		}
@@ -830,6 +912,13 @@
 
 	var StateManagers = {
 
+		// --- PROPERTIES
+
+		STATE_IN: "IN",
+		STATE_ON: "ON",
+		STATE_OUT: "OUT",
+		STATE_OFF: "OFF",
+
 		// --- METHODS - Using init method to create class functions as StateManagers members
 
 		init: function() {
@@ -840,18 +929,13 @@
 			var BaseIo3Manager = function(target, session) {
 				this.target = target;
 				this.session = session;
-				this._state = false;
+				this._state = null;
 			};
 
 			BaseIo3Manager.prototype = {
 
-				STATE_IN: "IN",
-				STATE_ON: "ON",
-				STATE_OUT: "OUT",
-				STATE_OFF: "OFF",
-
 				destroy: function() {
-					//TODO: Implement
+					// Empty
 				},
 
 				getState: function() {
@@ -860,7 +944,7 @@
 
 				setState: function(state) {
 					state = state.toUpperCase();
-					if (state != this.STATE_IN && state != this.STATE_ON && state != this.STATE_OUT && state != this.STATE_OFF) {
+					if (state != StateManagers.STATE_IN && state != StateManagers.STATE_ON && state != StateManagers.STATE_OUT && state != StateManagers.STATE_OFF) {
 						Log.warn("Unknown state, returning without changing state for target " + this.target);
 						return;
 					}
@@ -871,11 +955,29 @@
 				},
 
 				_changeState: function() {
-					//TODO: Implement
+
+					this.onStateChange(this.target, this._state);
+
+					if (this._state == StateManagers.STATE_IN) {
+						this._doIn();
+					} else if (this._state == StateManagers.STATE_ON) {
+						this._doOn();
+					} else if (this._state == StateManagers.STATE_OUT) {
+						if (this.target != null) {
+							this._doOut();
+						} else {
+							Log.info("target is null when trying to set state to OUT, setting state to OFF instead of " +
+										"calling doOut to avoid errors.");
+							this._state = StateManagers.STATE_OFF;
+						}
+					} else if (this._state == StateManagers.STATE_OFF) {
+						this._doOff();
+					}
+
 				},
 
 				_doIn: function() {
-					this.setState(this.STATE_ON);
+					this.setState(StateManagers.STATE_ON);
 				},
 
 				_doOn: function() {
@@ -883,16 +985,23 @@
 				},
 
 				_doOut: function() {
-					this.setState(this.STATE_OFF);
+					this.setState(StateManagers.STATE_OFF);
 				},
 
 				_doOff: function() {
+					// Empty
+				},
+
+				onStateChange: function(target, state) {
 					// Empty
 				}
 
 			};
 
-			//TODO: Init and merge the state managers.
+
+			// *** INIT - Initializing StateManagers
+
+			this.BaseIo3Manager = BaseIo3Manager;
 
 		}
 
@@ -1089,7 +1198,7 @@
 
 		_parsePageBlock: function(conf, session) {
 			var pageBlockContext = {};
-			this._mergeAttributes(pageBlockContext, conf, ["id", "type", "mediator", "target", "container"]);
+			this._mergeAttributes(pageBlockContext, conf, ["id", "type", "mediator", "target", "container", "title"]);
 			var dependsValue = conf.attributes.getNamedItem("depends");
 			if (dependsValue) {
 				var depends = dependsValue.nodeValue.replace(" ", "").split(",");
@@ -1502,6 +1611,10 @@
 				_builder: "BuilderMaster"
 		},
 		_DEFAULT_VIEW_TYPE: "_dom",
+		_STATE_MANAGERS: {
+				_base: "BaseIo3Manager"
+		},
+		_DEFAULT_STATE_MANAGER: "_base",
 		_COMMAND_MASTERS: {
 				_function: "FunctionMaster"
 		},
@@ -1514,6 +1627,8 @@
 		session: {
 			viewMasters: {},
 			defaultViewMasterClass: null,
+			stateManagers: {},
+			defaultStateManagerClass: null,
 			commandMasters: {},
 			defaultCommandMasterClass: null,
 			selector: Selector.select
@@ -1568,6 +1683,7 @@
 			this.session.defaultPropName = this._DEFAULT_PROP_NAME;
 			
 			this._initViewMasters();
+			this._initStateManagers();
 			this._initCommandMasters();
 
 			Log.info("New Zumo session created with id: " + this.session.id);
@@ -1633,12 +1749,11 @@
 
 			// Clear the currently displayed page
 			if (this._currentPage != null)
-				this._currentPage.master.destroy(); //TODO: Implement clear
+				this._currentPage.master.clear();
 
 			page.master.display();
 			this._currentPage = page;
 
-			//TODO: Implement state managers
 			this._displayedPage = page;
 
 			this._displayDepends(page);
@@ -1829,6 +1944,27 @@
 			this.session.viewMasters[name] = null;
 		},
 
+		registerStateManager: function(name, manager) {
+			if (StringUtils.trim(name) == "") {
+				Log.warn("Cannot register a state manager with an empty name");
+				return;
+			}
+			if (typeof manager != "function") {
+				Log.warn("Cannot register state manager with name " + name + " - manager is not a function");
+				return;
+			}
+			if (this.session.stateManagers[name] == null) {
+				this.session.stateManagers[name] = manager;
+			} else {
+				Log.warn("Cannot register state manager with name " + name + " - there is already registered a manager" +
+						"with that name")
+			}
+		},
+
+		unregisterStateManager: function(name) {
+			this.session.stateManagers[name] = null;
+		},
+
 		execute: function(id, params) {
 
 			Log.info("Executing command " + id);
@@ -1922,6 +2058,15 @@
 				this.registerViewMaster(p, ViewMasters[masterName]);
 			}
 			this.session.defaultViewMasterClass = this.session.viewMasters[this._DEFAULT_VIEW_TYPE];
+		},
+
+		_initStateManagers: function() {
+			StateManagers.init();
+			for (var p in this._STATE_MANAGERS) {
+				var managerName = this._STATE_MANAGERS[p];
+				this.registerStateManager(p, StateManagers[managerName]);
+			}
+			this.session.defaultStateManagerClass = this.session.stateManagers[this._DEFAULT_STATE_MANAGER];
 		},
 
 		_initCommandMasters: function() {
