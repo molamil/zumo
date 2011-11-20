@@ -24,11 +24,26 @@ body {
 	padding: 0;
 	color: #666;
 	font-family: 'Andada', sans-serif;
+	font-size: 14px;
 }
 
 a {
 	color: #717279;
 	text-decoration: none;
+}
+
+h1 {
+	margin: 30px 0 10px 0;
+	font-size: 20px;
+}
+
+h2 {
+	margin: 0 0 5px 0;
+	font-size: 16px;
+}
+
+p {
+	margin: 0 0 10px 0;
 }
 
 
@@ -48,6 +63,7 @@ a {
 
 #site {
 	width: 900px;
+	height: 800px;
 	margin: 10px auto;
 }
 
@@ -56,6 +72,7 @@ a {
 }
 
 #header {
+	display: none;
 	border: 1px solid #FFF;
 }
 
@@ -93,8 +110,115 @@ a {
 	position: absolute;
 }
 
+.frontpage .reel {
+	width: 900px;
+	height: 150px;
+	margin-bottom: 20px;
+	padding-top: 60px;
+	color: #EEE;
+	background-color: #DDD;
+	text-align: center;
+	font-size: 75px;
+}
+
+.frontpage .about,
+.frontpage .services,
+.frontpage .news {
+	float: left;
+	width: 280px;
+	height: 110px;
+	border-bottom: 3px solid #DDD;
+	margin: 0 30px 20px 0;
+}
+
+.frontpage .news {
+	margin-right: 0;
+}
+
+.frontpage .story {
+	clear: both;
+	border-right: 280px solid #DDD;
+	padding-right: 30px;
+	margin-bottom: 20px;
+	color: #999;
+}
+
+.frontpage .closing {
+	clear: both;
+	height: 20px;
+	padding: 30px;
+	background-color: #EEE;
+	text-align: center;
+	font-size: 13px;
+}
+
+
 /*** 5.- WORK ***/
 
 .work {
 	position: absolute;
+}
+
+.work .story {
+	clear: both;
+	border-left: 280px solid #DDD;
+	padding-left: 30px;
+	margin-bottom: 20px;
+	color: #999;
+}
+
+.work .intro {
+	clear: both;
+	margin-bottom: 20px;
+	color: #999;
+}
+
+.work .sample {
+	height: 150px;
+	margin-bottom: 20px;
+	padding-top: 60px;
+	color: #EEE;
+	background-color: #DDD;
+	text-align: center;
+	font-size: 75px;
+}
+
+.work .more,
+.work .references {
+	float: left;
+	width: 280px;
+	height: 110px;
+	border-bottom: 3px solid #DDD;
+	margin: 0 30px 20px 0;
+}
+
+.work .image {
+	float: left;
+	width: 280px;
+	height: 113px;
+	margin-bottom: 20px;
+	background-color: #DDD;
+}
+
+
+/*** 6.- MOLAPEOPLE ***/
+
+.molapeople {
+	position: absolute;
+}
+
+.molapeople .story {
+	clear: both;
+	padding-right: 30px;
+	margin-bottom: 20px;
+	color: #999;
+}
+
+.molapeople .closing {
+	clear: both;
+	height: 20px;
+	padding: 30px;
+	background-color: #EEE;
+	text-align: center;
+	font-size: 13px;
 }
