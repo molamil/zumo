@@ -1,4 +1,4 @@
-(function() {
+(function(window) {
 
 
 	// Check for Zumo
@@ -28,6 +28,57 @@
 	};
 
 	ZumoExt.setSelector(selector);
+
+
+	// *** STATE MANAGERS
+
+	var StateManagers = {
+
+		init: function() {
+
+
+			// *** FADE CLASS
+
+			var Fade = function(target, session) {
+				Zumo.StateManagers.BaseIo3Manager.call(this, target, session);
+			};
+
+			Fade.prototype = {
+
+				_doIn: function() {
+					var that = this;
+					var $target = $(this.target);
+					$target.css("display", "none");
+					$target.fadeIn("slow", function() {
+						that.setState(Zumo.StateManagers.STATE_ON);
+					});
+				},
+
+				_doOut: function() {
+					var that = this;
+					$(this.target).fadeOut("slow", function() {
+						that.setState(Zumo.StateManagers.STATE_OFF);
+					});
+				}
+
+			};
+
+
+			// *** INIT
+
+			Zumo.ObjectUtils.extend(Fade, Zumo.StateManagers.BaseIo3Manager);
+			//TODO: Check whether it is possible to allow register managers not starting with _
+			Zumo.registerStateManager("_$fade", Fade);
+
+
+		}
+
+	}
+
+
+	// *** INIT
+
+	StateManagers.init();
 	
 
-})();
+})(this);
