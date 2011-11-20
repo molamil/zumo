@@ -1,0 +1,100 @@
+/********************************************
+
+GOURMANITY MASTER CSS
+
+Structure:
+1.- Defaults
+2.- Commons
+3.- Main
+4.- Frontpage
+
+Created by: www.molamil.com
+
+*********************************************/
+
+
+/*** 1.- DEFAULTS ***/
+
+html {
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	color: #666;
+	font-family: 'Andada', sans-serif;
+}
+
+a {
+	color: #717279;
+	text-decoration: none;
+}
+
+
+
+/*** 2.- COMMONS ***/
+
+
+/*** 3.- MAIN ***/
+
+#pages {
+	display: none;
+}
+
+#page {
+	position: relative;
+}
+
+#site {
+	width: 900px;
+	margin: 10px auto;
+}
+
+#logo {
+	float: left;
+}
+
+#header {
+	border: 1px solid #FFF;
+}
+
+#menu {
+	height: 20px;
+	margin: 77px 0 0 72px;
+	border-bottom: 3px solid #DDD;
+	list-style-type: none;
+	text-align: right;
+}
+
+#menu li {
+	cursor: pointer;
+	display: inline;
+	height: 20px;
+	padding: 0 5px;
+	list-style-type: none;
+	text-align: center;
+	font-size: 15px;
+}
+
+#menu li.over {
+	background-color: #DDD;
+}
+
+#menu li.active {
+	color: #FFF;
+	background-color: #DDD;
+}
+
+
+/*** 4.- FRONTPAGE ***/
+
+.frontpage {
+	position: absolute;
+}
+
+/*** 5.- WORK ***/
+
+.work {
+	position: absolute;
+}
