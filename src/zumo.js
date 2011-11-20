@@ -4,7 +4,7 @@
 
  session:		{id:String, root:Object, defaultPropName:String, viewMasters:Array, defaultViewMasterClass:Object, commandMasters:Array, defaultCommandMasterClass:Object}
  request:		{id:String, params:Object}
- context:		{id:String, type:String, target:String, container:String, props: Object, propContexts:Array, handlers:Array, node:String, title:String}
+ context:		{id:String, type:String, target:String, container:String, manager:String, title:String, props: Object, propContexts:Array, handlers:Array, node:String}
  propContext:	{name:String, value:*, target:String}
 
  */
@@ -683,6 +683,7 @@
 
 				display: function() {
 					Log.info("Displaying " + this.context.id + " with target " + this.context.target);
+					this.onDisplay(this);
 					var containerName = StringUtils.trim(this.context.container);
 					if (containerName != "") {
 						this.container = this.session.selector(this.context.container, this.session.root);
@@ -701,6 +702,7 @@
 
 				clear: function() {
 					Log.info("Clearing " + this.context.id);
+					this.onClear(this);
 					if (this.stateManager)
 						this.stateManager.setState(StateManagers.STATE_OUT);
 				},
@@ -731,20 +733,31 @@
 						
 					}
 
+					this.onInit(this);
+
 				},
 
 				onStateChange: function(target, state) {
 					if (state == StateManagers.STATE_IN) {
-						//type = isPage() ? PagesEvent.PAGE_IN : PagesEvent.BLOCK_IN;
+						this.onIn(this);
 					} else if (state == StateManagers.STATE_ON) {
-						//type = isPage() ? PagesEvent.PAGE_ON : PagesEvent.BLOCK_ON;
+						this.onOn(this);
 					} else if (state == StateManagers.STATE_OUT) {
-						//type = isPage() ? PagesEvent.PAGE_OUT : PagesEvent.BLOCK_OUT;
+						this.onOut(this);
 					} else if (state == StateManagers.STATE_OFF) {
-						//type = isPage() ? PagesEvent.PAGE_OFF : PagesEvent.BLOCK_OFF;
+						this.onOff(this);
 						this.destroy();
 					}
-				}
+				},
+
+				// Default event handlers
+				onDisplay: function(master) {},
+				onClear: function(master) {},
+				onInit: function(master) {},
+				onIn: function(master) {},
+				onOn: function(master) {},
+				onOut: function(master) {},
+				onOff: function(master) {}
 
 			};
 
@@ -924,7 +937,7 @@
 		init: function() {
 
 
-			// *** ABSTRACT MASTER CLASS
+			// *** BASE IO3 MANAGER CLASS
 
 			var BaseIo3Manager = function(target, session) {
 				this.target = target;
@@ -1002,6 +1015,7 @@
 			// *** INIT - Initializing StateManagers
 
 			this.BaseIo3Manager = BaseIo3Manager;
+
 
 		}
 
@@ -1198,7 +1212,7 @@
 
 		_parsePageBlock: function(conf, session) {
 			var pageBlockContext = {};
-			this._mergeAttributes(pageBlockContext, conf, ["id", "type", "mediator", "target", "container", "title"]);
+			this._mergeAttributes(pageBlockContext, conf, ["id", "type", "mediator", "target", "container", "manager", "title"]);
 			var dependsValue = conf.attributes.getNamedItem("depends");
 			if (dependsValue) {
 				var depends = dependsValue.nodeValue.replace(" ", "").split(",");
@@ -1604,6 +1618,10 @@
 
 		// --- PROPERTIES
 
+		ObjectUtils: ObjectUtils,
+		ViewMasters: ViewMasters,
+		StateManagers: StateManagers,
+
 		_VIEW_MASTERS: {
 				_dom: "DomMaster",
 				_domclone: "DomCloneMaster",
@@ -1643,6 +1661,12 @@
 
 		// --- METHODS
 
+		startup: function() {
+			this._initViewMasters();
+			this._initStateManagers();
+			this._initCommandMasters();
+		},
+
 		// Initializes the zumo object with the passed root parameter as the base DOM element to make selections on
 		init: function(root, conf, params) {
 
@@ -1681,10 +1705,6 @@
 			this.session.id = this._params.id || this._createSessionId();
 			this.session.root = root;
 			this.session.defaultPropName = this._DEFAULT_PROP_NAME;
-			
-			this._initViewMasters();
-			this._initStateManagers();
-			this._initCommandMasters();
 
 			Log.info("New Zumo session created with id: " + this.session.id);
 
@@ -1746,6 +1766,15 @@
 			// Check we have a proper page
 			if (page.master == null)
 				return;
+
+			// Hook events
+			Agent.observe(page.master, "onDisplay", this.onPageDisplay, this);
+			Agent.observe(page.master, "onClear", this.onPageClear, this);
+			Agent.observe(page.master, "onInit", this.onPageInit, this);
+			Agent.observe(page.master, "onIn", this.onPageIn, this);
+			Agent.observe(page.master, "onOn", this.onPageOn, this);
+			Agent.observe(page.master, "onOut", this.onPageOut, this);
+			Agent.observe(page.master, "onOff", this.onPageOff, this);
 
 			// Clear the currently displayed page
 			if (this._currentPage != null)
@@ -1841,9 +1870,20 @@
 				};
 				block = PageBlockBuilder.createBlock(blockContext, request, this.session);
 
+				this.onBlockRequest(pageContext, request);
+
 				// Check we have a proper block
 				if (block.master == null)
 					return;
+
+				// Hook events
+				Agent.observe(block.master, "onDisplay", this.onBlockDisplay, this);
+				Agent.observe(block.master, "onClear", this.onBlockClear, this);
+				Agent.observe(block.master, "onInit", this.onBlockInit, this);
+				Agent.observe(block.master, "onIn", this.onBlockIn, this);
+				Agent.observe(block.master, "onOn", this.onBlockOn, this);
+				Agent.observe(block.master, "onOut", this.onBlockOut, this);
+				Agent.observe(block.master, "onOff", this.onBlockOff, this);
 
 				// Add the caller
 				if (params[this._PARAM_NAME_CALLER]) {
@@ -2188,7 +2228,22 @@
 		// --- EVENTS
 
 		onConfLoaded: function() {},
-		onPageRequest: function(context, request) {}
+		onPageRequest: function(context, request) {},
+		onPageDisplay: function(master) {},
+		onPageClear: function(master) {},
+		onPageInit: function(master) {},
+		onPageIn: function(master) {},
+		onPageOn: function(master) {},
+		onPageOut: function(master) {},
+		onPageOff: function(master) {},
+		onBlockRequest: function(context, request) {},
+		onBlockDisplay: function(master) {},
+		onBlockClear: function(master) {},
+		onBlockInit: function(master) {},
+		onBlockIn: function(master) {},
+		onBlockOn: function(master) {},
+		onBlockOut: function(master) {},
+		onBlockOff: function(master) {}
 
 	};
 
@@ -2225,8 +2280,7 @@
 	// INIT
 	// ************************************************************************************************************
 
-
-	// Expose the global Zumo objects
+	Zumo.startup();
 	window.Zumo = Zumo;
 	window.ZumoExt = ZumoExt;
 	window.ZumoAgent = Agent;
