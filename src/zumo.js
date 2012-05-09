@@ -360,9 +360,8 @@
 	var DomUtils = {
 
 		getChildren: function(o, name) {
-			var children;
-			if (o && typeof o.childNodes == "object") {
-				children = [];
+			var children = [];
+			if (o && o.childNodes.length) {
 				for (var i = 0; i < o.childNodes.length; i++) {
 					var child = o.childNodes[i];
 					if (child.nodeType == 1 && (!name || child.nodeName == name))
@@ -372,7 +371,7 @@
 			return children;
 		}
 
-	}
+	};
 
 
 	// *** SELECTOR OBJECT
@@ -467,13 +466,17 @@
 
 			//TODO: Add checks
 
+			var nTarget;
+
 			// Merge the props
 			for(var i = 0; i < propContexts.length; i++) {
 				var propContext = propContexts[i];
 				if (propContext.target)
-					target = session.selector(propContext.target, target);
-				var name = propContext.name || session.defaultPropName;
-				target[name] = propContext.value;
+					nTarget = session.selector(propContext.target, target);
+				if (nTarget) {
+					var name = propContext.name || session.defaultPropName;
+					nTarget[name] = propContext.value;
+				}
 			}
 
 		}
@@ -767,7 +770,7 @@
 			var DomMaster = function(context, request, session, stateManager) {
 				AbstractMaster.call(this, context, request, session, stateManager);
 				//TODO: See how to configure the master properties.
-				this.changeDisplay = true;
+				this.changeDisplay = false;
 				this.changeVisibility = true;
 				this.cloneDom = false;
 			};
@@ -806,7 +809,24 @@
 
 				init: function() {
 					AbstractMaster.prototype.init.apply(this, arguments); // Call super
-				}
+				},
+
+				clear: function() {
+					AbstractMaster.prototype.clear.apply(this, arguments); // Call super
+				},
+
+				onStateChange: function(target, state) {
+					AbstractMaster.prototype.onStateChange.apply(this, arguments); // Call super
+				},
+
+				// Default event handlers
+				onDisplay: function(master) {},
+				onClear: function(master) {},
+				onInit: function(master) {},
+				onIn: function(master) {},
+				onOn: function(master) {},
+				onOut: function(master) {},
+				onOff: function(master) {}
 
 			};
 
@@ -816,6 +836,39 @@
 			var DomCloneMaster = function(context, request, session, stateManager) {
 				DomMaster.call(this, context, request, session, stateManager);
 				this.cloneDom = true;
+			};
+
+			DomCloneMaster.prototype = {
+
+				display: function() {
+					DomMaster.prototype.display.apply(this, arguments); // Call super
+				},
+
+				destroy: function() {
+					DomMaster.prototype.destroy.apply(this, arguments); // Call super
+				},
+
+				init: function() {
+					DomMaster.prototype.init.apply(this, arguments); // Call super
+				},
+
+				clear: function() {
+					DomMaster.prototype.clear.apply(this, arguments); // Call super
+				},
+
+				onStateChange: function(target, state) {
+					DomMaster.prototype.onStateChange.apply(this, arguments); // Call super
+				},
+
+				// Default event handlers
+				onDisplay: function(master) {},
+				onClear: function(master) {},
+				onInit: function(master) {},
+				onIn: function(master) {},
+				onOn: function(master) {},
+				onOut: function(master) {},
+				onOff: function(master) {}
+
 			};
 
 
@@ -910,10 +963,10 @@
 			this.LoaderMaster = LoaderMaster;
 			this.BuilderMaster = BuilderMaster;
 
-			ObjectUtils.extend(this.DomMaster, this.AbstractMaster);
-			ObjectUtils.extend(this.DomCloneMaster, this.DomMaster);
-			ObjectUtils.extend(this.LoaderMaster, this.AbstractMaster);
-			ObjectUtils.extend(this.BuilderMaster, this.AbstractMaster);
+			//ObjectUtils.extend(this.DomMaster, this.AbstractMaster);
+			//ObjectUtils.extend(this.DomCloneMaster, this.DomMaster);
+			//ObjectUtils.extend(this.LoaderMaster, this.AbstractMaster);
+			//ObjectUtils.extend(this.BuilderMaster, this.AbstractMaster);
 
 
 		}
@@ -1139,7 +1192,7 @@
 			this.AbstractMaster = AbstractMaster;
 			this.FunctionMaster = FunctionMaster;
 
-			ObjectUtils.extend(this.FunctionMaster, this.AbstractMaster);
+			//ObjectUtils.extend(this.FunctionMaster, this.AbstractMaster);
 
 
 		}
@@ -1422,6 +1475,7 @@
 	var HandlerManager = function(app) {
 		this.app = app;
 		this._activeHandlers = []; // of {handlerContext:Object, context:Object, contextType:String, f:Function}
+		this._bindings = []; // of {type:String, f:Function, target:String}
 	};
 
 	HandlerManager.prototype = {
@@ -1450,6 +1504,13 @@
 				this._registerHandlersFromContext(commandContext, "command");
 			}
 
+            //TODO: XXX: Check performance of reevaluating the bindings so often.
+            //TODO: XXX: Maybe we can use event bubbling, add all listeners to the body/root and check for target match.
+            Agent.observe(this.app, "onPageInit", this.onViewInit, this);
+            Agent.observe(this.app, "onBlockInit", this.onViewInit, this);
+
+            this._updateBindings();
+
 		},
 
 		unregisterHandlers: function() {
@@ -1458,6 +1519,8 @@
 				var activeHandler = this._activeHandlers.pop();
 				this._removePageBlockHandlerAction(activeHandler);
 			}
+            Agent.ignore(this.app, "onPageInit", this.onViewInit);
+            Agent.ignore(this.app, "onBlockInit", this.onViewInit);
 		},
 
 		_registerHandlersFromContext: function(context, contextType) {
@@ -1510,7 +1573,7 @@
 				Log.warn("Could not resolve handler action: " + handlerContext.action);
 			}
 
-			this._bindHandler(handlerContext.type, f, handlerContext.target);
+			this._registerBinding(handlerContext.type, f, handlerContext.target);
 
 			return f;
 
@@ -1547,7 +1610,7 @@
 				Log.warn("Could not resolve handler action: " + handlerContext.action);
 			}
 
-			this._bindHandler(handlerContext.type, f, handlerContext.target);
+			this._registerBinding(handlerContext.type, f, handlerContext.target);
 
 			return f;
 
@@ -1573,7 +1636,7 @@
 				Log.warn("Could not resolve handler action: " + handlerContext.action);
 			}
 
-			this._bindHandler(handlerContext.type, f, handlerContext.target);
+			this._registerBinding(handlerContext.type, f, handlerContext.target);
 
 			return f;
 
@@ -1597,15 +1660,35 @@
 			//TODO: Implement _removeBlockHandlerAction
 		},
 
+        _registerBinding: function(type, handler, target) {
+            this._bindings.push({type: type, f: handler, target: target});
+        },
+
 		_bindHandler: function(type, handler, target) {
 			Log.info("There is no handler binder implemented");
-			//TODO: Implement _bindHandler
 		},
 
 		_unbindHandler: function(type, handler, target) {
 			Log.info("There is no handler unbinder implemented");
-			//TODO: Implement _unbindHandler
-		}
+		},
+
+        _updateBindings: function() {
+
+            var binding,
+                i;
+
+            for (i = 0; i < this._bindings.length; i++) {
+                binding = this._bindings[i];
+                //TODO: XXX: See whether it is necessary to remove the existing bindings.
+                this._unbindHandler(binding.type, binding.f, binding.target);
+                this._bindHandler(binding.type, binding.f, binding.target);
+            }
+
+        },
+
+        onViewInit: function() {
+            this._updateBindings();
+        }
 
 	};
 
@@ -1870,7 +1953,7 @@
 				};
 				block = PageBlockBuilder.createBlock(blockContext, request, this.session);
 
-				this.onBlockRequest(pageContext, request);
+				this.onBlockRequest(blockContext, request);
 
 				// Check we have a proper block
 				if (block.master == null)
@@ -2202,6 +2285,18 @@
 				depends = o.context.depends;
 			if (!depends)
 				return [];
+
+			//TODO: XXX: Move this elsewhere
+			if(!Array.indexOf){
+				Array.prototype.indexOf = function(obj){
+					for(var i=0; i<this.length; i++){
+						if(this[i]==obj){
+							return i;
+						}
+					}
+					return -1;
+				}
+			}
 
 
 			// Iterate through all depends in this context.

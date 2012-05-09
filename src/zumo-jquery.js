@@ -10,12 +10,13 @@
 
 	var bindHandler = function(type, handler, target) {
 		target = target || $("body");
-		$(target).live(type, handler);
+        var $target = $(target);
+		$(target).on(type, handler);
 	};
 
 	var unbindHandler = function(type, handler, target) {
 		target = target || window;
-		$(target).die(type, handler);
+		$(target).off(type, handler);
 	};
 
 	ZumoExt.addHandlerBinder(bindHandler, unbindHandler, true);
