@@ -1,7 +1,14 @@
 (function(window) {
 
 
-	// *** STATE MANAGERS
+	// *** SESSION OBJECT
+
+	var Session = {
+		style: null
+	};
+
+
+	// *** STATE MANAGERS OBJECT
 
 	var StateManagers = {
 
@@ -12,10 +19,12 @@
 
 			var Cascade = function(target, session) {
 				Zumo.StateManagers.BaseIo3Manager.call(this, target, session);
-				this.inDelay = 300;
+				this.inDelay = 200;
 				this.delay = 90;
 				this.timeIn = 200;
 				this.timeOut = 200;
+				this.timeSlide = 300;
+				this.offsetSlide = 150;
 			};
 
 			Cascade.prototype = {
@@ -34,20 +43,31 @@
 						$thisDiv.css("display", "none");
 						$thisDiv.delay(i * that.delay + that.inDelay).fadeIn(that.timeIn, callback);
 					}
+					if (Session.style == "vertical") {
+						var $target = $(that.target);
+						$target.css("left", that.offsetSlide);
+						$target.delay(100).animate({left: 0}, that.timeSlide);
+					}
 				},
 
 				_doOut: function() {
 					var that = this;
-					var $div = $("div", this.target);
-					for (var i = 0; i < $div.length; i++) {
-						var $thisDiv = $($div[i]);
-						var callback;
-						if (i == $div.length - 1) {
-							callback = function() {
-								that.setState(Zumo.StateManagers.STATE_OFF);
+					if (Session.style == "vertical") {
+						var $target = $(that.target);
+						$target.css("left", 0);
+						$target.animate({left: -that.offsetSlide, opacity: 0}, that.timeSlide);
+					} else {
+						var $div = $("div", this.target);
+						for (var i = 0; i < $div.length; i++) {
+							var $thisDiv = $($div[i]);
+							var callback;
+							if (i == $div.length - 1) {
+								callback = function() {
+									that.setState(Zumo.StateManagers.STATE_OFF);
+								}
 							}
+							$thisDiv.delay(($div.length - 1 - i) * that.delay).fadeOut(that.timeOut * 2, callback);
 						}
-						$thisDiv.delay(($div.length - 1 - i) * that.delay).fadeOut(that.timeOut * 2, callback);
 					}
 				}
 
@@ -77,6 +97,14 @@
 
 			$("#header").fadeIn("fast");
 
+			// Check for style
+
+			var styleParams = new RegExp('[\\?&]style=([^&#]*)').exec(window.location.href);
+			if (styleParams && styleParams[1])
+				Session.style = styleParams[1];
+			if (Session.style == "vertical")
+				$("head").append('<link rel="stylesheet" href="styles/vertical.css" type="text/css" />');
+			
 			// Rollovers
 
 			$("#menu li").mouseover(function() {

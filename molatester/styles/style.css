@@ -1,6 +1,6 @@
 /********************************************
 
-GOURMANITY MASTER CSS
+MOLA MASTER CSS
 
 Structure:
 1.- Defaults
@@ -59,6 +59,7 @@ p {
 
 #page {
 	position: relative;
+	width: 900px;
 }
 
 #site {
@@ -108,6 +109,7 @@ p {
 
 .frontpage {
 	position: absolute;
+	width: 900px;
 }
 
 .frontpage .reel {
@@ -157,6 +159,7 @@ p {
 
 .work {
 	position: absolute;
+	width: 900px;
 }
 
 .work .story {
@@ -205,6 +208,7 @@ p {
 
 .molapeople {
 	position: absolute;
+	width: 900px;
 }
 
 .molapeople .story {
