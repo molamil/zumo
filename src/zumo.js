@@ -554,9 +554,17 @@
 				this._callers.splice(i, 1);
 		},
 
-		existsCaller: function(id) {
-			return this._callers.indexOf(id) != -1;
-		},
+        existsCaller: function(id) {
+            var contains = false,
+                i;
+            for (i = 0; i < this._callers; i++) {
+                if (this._callers[i] == id) {
+                    contains = true;
+                    break;
+                }
+            }
+            return contains;
+        },
 
 		getCallers: function() {
 			return this._callers;
@@ -770,8 +778,8 @@
 			var DomMaster = function(context, request, session, stateManager) {
 				AbstractMaster.call(this, context, request, session, stateManager);
 				//TODO: See how to configure the master properties.
-				this.changeDisplay = false;
-				this.changeVisibility = true;
+				this.changeDisplay = true;
+				this.changeVisibility = false;
 				this.cloneDom = false;
 			};
 
@@ -789,8 +797,8 @@
 						this.target = this.target.cloneNode(true);
 						this.container.appendChild(this.target);
 					}
-					if (this.changeDisplay)
-						this.target.style.display = "block";
+                    if (this.changeDisplay)
+						this.target.style.display = "inherit";
 					if (this.changeVisibility)
 						this.target.style.visibility = "visible";
 					this.init();
@@ -1214,7 +1222,6 @@
 		parse: function(conf, session) {
 			// TODO: Check for XML
 			// TODO: Parse top level props
-			Log.debug("Parsing conf: " + conf);
 			var confObject = {};
 			confObject.views = this._parseViews(conf, session);
 			confObject.commands = this._parseCommands(conf, session);
@@ -1268,7 +1275,7 @@
 			this._mergeAttributes(pageBlockContext, conf, ["id", "type", "mediator", "target", "container", "manager", "title"]);
 			var dependsValue = conf.attributes.getNamedItem("depends");
 			if (dependsValue) {
-				var depends = dependsValue.nodeValue.replace(" ", "").split(",");
+				var depends = dependsValue.nodeValue.replace(/\s/g, "").split(",");
 				if (!(depends.length == 1 && depends[0] == ""))
 					pageBlockContext.depends = depends;
 			}
@@ -1687,7 +1694,8 @@
         },
 
         onViewInit: function() {
-            this._updateBindings();
+            //TODO: FIXME. It seems to accumulate bindings when using "dom" as master.
+//            this._updateBindings();
         }
 
 	};
