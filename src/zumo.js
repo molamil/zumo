@@ -593,8 +593,6 @@
 
 		createBlock: function(context, request, session) {
 
-			//TODO: Implement state managers.
-
 			var block = new Block(context, request, session);
 			block.master = this._buildMaster(context, request, session, this._buildStateManager(context, session));
 
@@ -780,7 +778,7 @@
 				AbstractMaster.call(this, context, request, session, stateManager);
 				//TODO: See how to configure the master properties.
 				this.changeDisplay = true;
-				this.changeVisibility = false;
+				this.changeVisibility = true;
 				this.cloneDom = false;
 			};
 
@@ -2053,6 +2051,10 @@
 				}
 			}
 			return block;
+		},
+
+		getDisplayedBlocks: function(id) {
+			return this._displayedBlocks;
 		},
 
 		registerViewMaster: function(name, master) {
