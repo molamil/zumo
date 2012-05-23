@@ -467,14 +467,16 @@
 
             //TODO: Add checks
 
+            var nTarget = target;
+
             // Merge the props
             for(var i = 0; i < propContexts.length; i++) {
                 var propContext = propContexts[i];
                 if (propContext.target)
-                    target = session.selector(propContext.target, target);
-                if (target) {
+                    nTarget = session.selector(propContext.target, target);
+                if (nTarget) {
                     var name = propContext.name || session.defaultPropName;
-                    target[name] = propContext.value;
+                    nTarget[name] = propContext.value;
                 }
             }
 
