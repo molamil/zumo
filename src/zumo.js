@@ -465,9 +465,10 @@
 
         apply: function(target, propContexts, session) {
 
-            //TODO: Add checks
-
             var nTarget = target;
+
+            if (!target || !propContexts)
+                return;
 
             // Merge the props
             for(var i = 0; i < propContexts.length; i++) {
@@ -1739,7 +1740,8 @@
 			defaultStateManagerClass: null,
 			commandMasters: {},
 			defaultCommandMasterClass: null,
-			selector: Selector.select
+			selector: Selector.select,
+            confParsers: []
 		},
 
 		_conf: null,
@@ -1760,41 +1762,24 @@
 		// Initializes the zumo object with the passed root parameter as the base DOM element to make selections on
 		init: function(root, conf, params) {
 
-			Log.info("Initializing Zumo object with root " + root);
+            root = root || document;
+            conf = conf || root;
+            this._params = params || {};
+            //TODO: Merge conf with params.
+            this.root = root;
 
-			// Checking for root
-			if (typeof root !== "object") {
-				Log.error("No root passed when initializing Zumo");
-				return;
-			}
-			this.root = root;
+			Log.info("Initializing Zumo object with root " + root);
 
 			this._displayedBlocks = [];
 
-			// Checking for conf
-			if (typeof conf == "string") {
-				Log.info("Initializing with remote configuration: " + conf);
-				var confLoader = new Loader();
-				//TODO: Check that conf looks like a URL
-				confLoader.load(conf, this._onConfLoaded, this);
-			} else if (typeof conf == "object") {
-				Log.info("Initializing with object configuration");
-				this._conf = conf;
-			} else {
-				Log.error("No conf passed when initializing Zumo");
-				return;
-			}
+            // Create the initial session
+            this.session.id = this._params.id || this._createSessionId();
+            this.session.root = root;
+            this.session.defaultPropName = this._DEFAULT_PROP_NAME;
+            this.session.confParsers.push(this._parseConf);
 
-			// Setting the params
-			this._params = params || {};
-			//TODO: Merge conf with params.
-
-			this._handlerManager = new HandlerManager(this);
-
-			// Create the initial session
-			this.session.id = this._params.id || this._createSessionId();
-			this.session.root = root;
-			this.session.defaultPropName = this._DEFAULT_PROP_NAME;
+            this._handlerManager = new HandlerManager(this);
+			this._initConf(conf);
 
 			Log.info("New Zumo session created with id: " + this.session.id);
 
@@ -2185,6 +2170,16 @@
 			Agent.ignore(this, fName, hook);
 		},
 
+        _initConf: function(conf) {
+            if (typeof conf == "string") {
+                Log.info("Initializing with remote configuration: " + conf);
+                var confLoader = new Loader();
+                confLoader.load(conf, this._onConfLoaded, this);
+            } else {
+                this._processConf(conf)
+            }
+        },
+
 		_initViewMasters: function() {
 			ViewMasters.init();
 			for (var p in this._VIEW_MASTERS) {
@@ -2210,16 +2205,6 @@
 				this.registerCommandMaster(p, CommandMasters[masterName]);
 			}
 			this.session.defaultCommandMasterClass = this.session.commandMasters[this._DEFAULT_COMMAND_TYPE];
-		},
-
-		_onConfLoaded: function(xmlHttp) {
-			Log.info("Conf was loaded");
-			Log.debug(xmlHttp);
-			//TODO: Check whether it is XML or JSON, etc.
-			this._conf = XmlConfParser.parse(xmlHttp.responseXML, this.session);
-			//TODO: Check for error
-			this._handlerManager.registerHandlers();
-			this.onConfLoaded();
 		},
 
 		_createSessionId: function() {
@@ -2331,6 +2316,30 @@
 
 		},
 
+        _processConf: function(source) {
+
+            var i,
+                confParser,
+                parsedConf;
+
+            for (i = 0; i < this.session.confParsers.length; i++) {
+                confParser = this.session.confParsers[i];
+                if ((typeof confParser == "function") && (parsedConf = confParser(source)))
+                    break;
+            }
+
+            this._conf = parsedConf;
+
+            this._handlerManager.registerHandlers();
+            this.onConfLoaded();
+
+        },
+
+        _parseConf: function(source) {
+            //TODO: Check whether it is XML or JSON, etc.
+            return XmlConfParser.parse(source, this.session);
+        },
+
 		// --- EVENTS
 
 		onConfLoaded: function() {},
@@ -2349,7 +2358,12 @@
 		onBlockIn: function(master) {},
 		onBlockOn: function(master) {},
 		onBlockOut: function(master) {},
-		onBlockOff: function(master) {}
+		onBlockOff: function(master) {},
+
+        _onConfLoaded: function(xmlHttp) {
+            Log.info("Conf was loaded");
+            this._processConf(xmlHttp.responseXML);
+        }
 
 	};
 
@@ -2377,7 +2391,11 @@
 			} else {
 				Log.warn("Could not create a selector function from " + selector);
 			}
-		}
+		},
+
+        addConfParser: function(confParser) {
+            Zumo.session.confParsers.unshift(confParser);
+        }
 		
 	};
 

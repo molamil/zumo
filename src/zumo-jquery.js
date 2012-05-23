@@ -74,12 +74,87 @@
 
 		}
 
-	}
-
-
-	// *** INIT
+	};
 
 	StateManagers.init();
+
+
+    // *** CONF PARSERS
+
+    var domConfParser = function(source) {
+
+        var conf = {},
+            mergeAttributes,
+            parsePageBlock;
+
+        if (typeof source != "object" || typeof source.getElementsByTagName != "function" || (source.firstChild && source.firstChild.nodeName == "zumo"))
+            return null;
+
+        mergeAttributes = function(o, element, list) {
+            for (var i = 0; i < list.length; i++) {
+                var name = list[i];
+                var value = $(element).attr("data-" + name);
+                if (value)
+                    o[name] = value;
+            }
+        };
+
+        parsePageBlock = function(element) {
+
+            var $element = $(element),
+                context = {},
+                depends,
+                handlers,
+                handlerList,
+                i;
+
+            mergeAttributes(context, element, ["type", "mediator", "container", "manager", "title"]);
+            context.target = element;
+
+            depends = $element.attr("data-depends");
+            if (depends) {
+                context.depends = depends.replace(/\s/g, " ").split(" ");
+            } else {
+                context.depends = [];
+            }
+
+            context.handlers = [];
+            handlers = $element.attr("data-handlers");
+            if (handlers) {
+                handlerList = handlers.replace(/\s/g, " ").split(" ");
+                for (i = 0; i < handlerList.length; i++)
+                    context.handlers.push({type: handlerList[i]});
+            }
+
+            return context;
+
+        };
+
+        conf.views = {
+            pages: [],
+            blocks: []
+        };
+        conf.commands = [];
+
+        $("*[data-page]", source).each(function() {
+            var context = parsePageBlock(this);
+            context.id = $(this).attr("data-page");
+            context.node = "page";
+            conf.views.pages.push(context);
+        });
+
+        $("*[data-block]", source).each(function() {
+            var context = parsePageBlock(this);
+            context.id = $(this).attr("data-block");
+            context.node = "block";
+            conf.views.blocks.push(context);
+        });
+
+        return conf;
+
+    };
+
+    ZumoExt.addConfParser(domConfParser);
 	
 
 })(this);
