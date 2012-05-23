@@ -459,30 +459,28 @@
 
 	// *** PROPS MANAGER OBJECT
 
-	var PropsManager = {
+    var PropsManager = {
 
-		// --- METHODS
+        // --- METHODS
 
-		apply: function(target, propContexts, session) {
+        apply: function(target, propContexts, session) {
 
-			//TODO: Add checks
+            //TODO: Add checks
 
-			var nTarget;
+            // Merge the props
+            for(var i = 0; i < propContexts.length; i++) {
+                var propContext = propContexts[i];
+                if (propContext.target)
+                    target = session.selector(propContext.target, target);
+                if (target) {
+                    var name = propContext.name || session.defaultPropName;
+                    target[name] = propContext.value;
+                }
+            }
 
-			// Merge the props
-			for(var i = 0; i < propContexts.length; i++) {
-				var propContext = propContexts[i];
-				if (propContext.target)
-					nTarget = session.selector(propContext.target, target);
-				if (nTarget) {
-					var name = propContext.name || session.defaultPropName;
-					nTarget[name] = propContext.value;
-				}
-			}
+        }
 
-		}
-
-	};
+    };
 
 
 	// ************************************************************************************************************
