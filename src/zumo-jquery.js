@@ -106,6 +106,8 @@
                 depends,
                 handlers,
                 handlerList,
+                handlerValues,
+                handler,
                 i;
 
             mergeAttributes(context, element, ["type", "mediator", "container", "manager", "title"]);
@@ -121,9 +123,21 @@
             context.handlers = [];
             handlers = $element.attr("data-handlers");
             if (handlers) {
-                handlerList = handlers.replace(/\s/g, " ").split(" ");
-                for (i = 0; i < handlerList.length; i++)
-                    context.handlers.push({type: handlerList[i]});
+                handlerList = handlers.split(",");
+                for (i = 0; i < handlerList.length; i++) {
+                    handlerValues = handlerList[i].replace(/\s/g, "").split(":");
+                    if (handlerValues.length > 1) {
+                        handler = {
+                            target: handlerValues[0],
+                            type: handlerValues[1]
+                        }
+                    } else {
+                        handler = {
+                            type: handlerValues[0]
+                        }
+                    }
+                    context.handlers.push(handler);
+                }
             }
 
             return context;
