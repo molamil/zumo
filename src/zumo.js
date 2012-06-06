@@ -1187,8 +1187,11 @@
 						args = this.context.props._args.slice(0);
 					for (var param in this.request.params)
 						args.push(this.request.params[param]);
-					if (typeof f == "function")
+					if (typeof f == "function") {
 						f.apply(null, args); //TODO: Check the this context.
+                    } else {
+                        Log.warn("There is no function to execute for command '" + this.context.id + "' and target '" + this.context.target + "'.");
+                    }
 					this.isExecuted = true;
 				}
 
