@@ -1,0 +1,316 @@
+/********************************************
+
+Molaboard MASTER CSS
+
+Structure:
+1.- Defaults
+2.- Commons
+3.- Main
+4.- Header
+5.- Footer
+6.- Login
+7.- Navigation
+8.- Practical info
+
+*********************************************/
+
+
+/*** 1.- DEFAULTS ***/
+
+html {
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	color: #444;
+	background: #E0E0E0 url("../images/bg.png") repeat-x top;
+	font-family: Calibri, sans-serif;
+	font-size: 11pt;
+}
+
+a {
+	color: #ff9999;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #ff0000;
+}
+
+a img {
+	border: 1px solid transparent;
+}
+
+a:hover img {
+	border: 1px solid #f6dbe7;
+}
+
+h2 {
+	color: #333;
+	font: italic normal 26px Georgia, serif;
+	text-shadow: #FFF 0 1px 0;
+}
+
+h3 {
+	margin: 2px 0;
+	color: #333;
+	font: italic normal 16px Georgia, serif;
+	text-shadow: #FFF 0 1px 0;
+}
+
+textarea {
+    font-size: 13px;
+    line-height: 18px;
+    padding: 10px;
+    resize: none;
+}
+
+fieldset {
+    background: #FFF;
+    border: solid 1px #CCC;
+}
+
+
+/*** 2.- COMMON ***/
+
+#dashboard {
+	display: none;
+	height: 100%;
+}
+
+#login {
+	display: none;
+}
+
+#pageLoader {
+	display: none;
+}
+
+#pageLoader img {
+	display: block;
+	margin-top: 25px;
+}
+
+.info {
+	margin: 0 0 20px 0;
+}
+
+.info p {
+	margin: 0 0 5px 0;
+}
+
+
+/*** 3.- MAIN ***/
+
+#main {
+    position: absolute;
+    float: left;
+    width: auto;
+    top: 60px;
+    left: 280px;
+    right: 40px;
+}
+
+#templates {
+    display: none;
+}
+
+
+/*** 4.- HEADER ***/
+
+#header {
+	position: absolute;
+	width: 100%;
+	height: 45px;
+	top: 0;
+	border-top: 2px solid #ff0000;
+	background: #F8F8F8 url("../images/headerBg.png") repeat-x;
+}
+
+#header .logo {
+    display: none;
+	float: left;
+	margin-left: 20px;
+}
+
+#header h1 {
+	float: left;
+	margin: 17px 0 0 10px;
+	color: #A1A1A1;
+	font: italic normal 15px Georgia, serif;
+}
+
+#header .logout {
+	float: right;
+	margin: 17px 20px 0 0;
+	font-size: 12px;
+}
+
+
+
+/*** 5.- FOOTER ***/
+
+#footer {
+	position: absolute;
+	height: 19px;
+	padding: 6px 20px 0 20px;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	border-top: 1px solid #999;
+	background-color: #333;
+	text-align: right;
+	color: #666;
+	font-size: 10px;
+}
+
+#footer a {
+	color: #777;
+}
+#footer a:hover {
+	color: #999;
+}
+
+
+/*** 6.- LOGIN ***/
+
+#login {
+	position: relative;
+	width: 300px;
+	margin: 50px auto 0 auto;
+	padding: 0 30px;
+	border-top: 2px solid #ff0000;
+	background-color: #FFF;
+}
+
+#login h2 {
+	margin-top: 10px;
+}
+
+#login p {
+	color: #999;
+}
+
+#login form {
+	padding-bottom: 40px;
+}
+
+#login fieldset {
+	margin: 5px 0;
+	padding: 0;
+	border: 0;
+}
+
+#login label {
+	float: left;
+	width: 75px;
+	padding-top: 4px;
+	font-family: Georgia, serif;
+}
+
+#login input.textfield {
+	float: left;
+	width: 210px;
+	padding: 5px 3px;
+	border: 1px solid #EEE;
+}
+
+#login input.submit {
+	float: right;
+	margin: 10px 3px 0 0;
+}
+
+/*** 7.- NAVIGATION ***/
+
+#navigation {
+	position: absolute;
+	float: left;
+	width: 220px;
+	height: auto;
+	top: 65px;
+	left: 20px;
+	padding: 12px 0;
+	border-right: 1px solid #ff0000;
+}
+
+#menu {
+    border-top: 1px solid #d7d7d7;
+}
+
+#menu a {
+	display: block;
+	height: 26px;
+	padding: 9px 0 0 41px;
+    border-bottom: 1px solid #d7d7d7;
+	color: #ff9999;
+	font: normal 13px Georgia, serif;
+}
+
+#menu a:hover {
+	color: #ff0000;
+}
+
+#menu a.stats {
+	background: #fff url("../images/iconPieChart.png") no-repeat center left;
+}
+
+#menu a.users {
+	background: #fff url("../images/iconUsers.png") no-repeat center left;
+}
+
+#menu a.settings {
+	background: #fff url("../images/iconSettings.png") no-repeat center left;
+}
+
+
+
+
+/*** SETTINGS ***/
+
+#main .settings {}
+
+#main .settings h2 {
+	background: transparent url("../images/bgIconSettings.png") no-repeat left;
+}
+
+#formSettings label {
+    clear: both;
+    float: left;
+    width: 180px;
+    margin-top: 10px;
+    padding: 3px;
+}
+
+#formSettings fieldset {
+    border-width: 0;
+    background-color: transparent;
+}
+
+
+#formSettings input,
+#formSettings textarea {
+    border: 1px solid #999;
+    margin-top: 10px;
+    padding: 3px;
+}
+
+#formSettings textarea {
+    width: 400px;
+    height: 150px;
+}
+
+#formSettings #save-settings {
+    float: left;
+    font-weight: bold;
+    padding: 10px;
+    margin-left: 200px;
+}
+
+
+
+.radio {
+    width: auto !important;
+    height: auto !important;
+}

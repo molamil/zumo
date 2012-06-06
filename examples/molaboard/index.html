@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+    <title>Molaboard</title>
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>
+    <script type="text/javascript" src="../../src/zumo.js"></script>
+    <script type="text/javascript" src="../../src/zumo-jquery.js"></script>
+    <script type="text/javascript" src="mb/scripts/molaboard.js"></script>
+
+    <link href="mb/styles/molaboard.css" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+<div id="login">
+    <h2>Login</h2>
+    <p>Please enter your username and password:</p>
+    <form id="loginForm" action="javascript: void(0);">
+        <fieldset>
+            <label for="loginUsername">Username</label>
+            <input id="loginUsername" class="textfield" name="loginUsername" type="text" />
+        </fieldset>
+        <fieldset>
+            <label for="loginPassword">Password</label>
+            <input id="loginPassword" class="textfield" name="loginPassword" type="password" />
+        </fieldset>
+        <input id="loginSubmit" class="submit" name="loginSubmit" type="submit" value="LOGIN" />
+    </form>
+</div>
+
+<div id="dashboard">
+
+    <div id="header">
+        <img class="logo" src="" />
+        <h1>Molaboard</h1>
+        <a id="logout" class="logout" href="javascript: void(0);">Log Out</a>
+    </div>
+
+    <div id="navigation">
+    </div>
+
+    <div id="main">
+
+        <div id="pageLoader"><img src="images/loader.gif" /></div>
+
+    </div>
+
+</div>
+
+<div id="templates">
+
+    <div class="simple">
+        <h2></h2>
+        <p></p>
+    </div>
+
+    <div class="info">
+        <h2></h2>
+        <p></p>
+
+    </div>
+
+    <div class="settings">
+        <h2>Settings</h2>
+
+        <form id="formSettings">
+            <fieldset>
+                <label for="rateMonth">Variable rente:</label>
+                <input type="text" name="rateMonth" id="rateMonth" />
+                <em>Variable rente angives som x.xxx.  3,75% indtastes derfor som 0.0375</em>
+            </fieldset>
+            <fieldset class="loanCost">
+                <label for="rateTotal">Loan cost:</label>
+                <input type="text" name="rateTotal" id="rateTotal" />
+            </fieldset>
+            <fieldset>
+                <label for="legalPc">Pligttekst (PC):</label>
+                <textarea name="legalPc" id="legalPc"></textarea>
+            </fieldset>
+            <fieldset>
+                <label for="legalMobile">Pligttekst (Mobile):</label>
+                <textarea name="legalMobile" id="legalMobile"></textarea>
+            </fieldset>
+            <input type="button" value="SAVE" id="save-settings" />
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>
