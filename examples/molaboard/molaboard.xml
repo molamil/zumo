@@ -14,7 +14,18 @@
             <handler type="loggedIn" />
         </page>
 
-		<page id="stats" type="domclone" target=".simple" container="#main">
+		<page id="stats" type="domclone" target=".simple" container="#main" mediator="Molaboard.Views.SimpleMediator">
+            <prop target="h2">Stats</prop>
+            <prop name="decorations">
+                <item>
+                    <prop name="name" value="totalUsers" />
+                    <prop name="label"><![CDATA[Users in total]]></prop>
+                </item>
+                <item>
+                    <prop name="name" value="todayUsers" />
+                    <prop name="label"><![CDATA[Users today]]></prop>
+                </item>
+            </prop>
 			<handler type="statsLoaded" />
 		</page>
 
@@ -73,9 +84,13 @@
 			<handler target="#logout" type="click" />
 		</command>
 
-        <command id="getStats" type="function" target="Molaboard.Commands.getStats">
+        <command id="getStats" type="function" target="Molaboard.Commands.ajax">
             <prop name="_args">
-                <item value="mb/services-mock-up/get-stats.json" />
+                <item>
+                    <prop name="url" value="mb/services-mock-up/get-stats.json" />
+                    <prop name="successEvent" value="statsLoaded" />
+                    <prop name="dataWrapper" value="data" />
+                </item>
             </prop>
             <handler type="loggedIn" />
             <handler type="statsClicked" />
