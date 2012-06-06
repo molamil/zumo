@@ -465,14 +465,13 @@
 
         apply: function(target, propContexts, session) {
 
-            var nTarget = target;
-
             if (!target || !propContexts)
                 return;
 
             // Merge the props
             for(var i = 0; i < propContexts.length; i++) {
                 var propContext = propContexts[i];
+                var nTarget = target;
                 if (propContext.target)
                     nTarget = session.selector(propContext.target, target);
                 if (nTarget) {
@@ -722,10 +721,10 @@
 
 					Log.debug("Initializing " + this.context.id);
 
-					PropsManager.apply(this.target, this.context.propContexts, this.session);
-					ObjectUtils.merge(this.target, this.request.params);
-
 					if (this.target) {
+
+                        PropsManager.apply(this.target, this.context.propContexts, this.session);
+                        ObjectUtils.merge(this.target, this.request.params);
 
 						if (this.fMediator) {
 							this.mediator = new this.fMediator(this.target);
