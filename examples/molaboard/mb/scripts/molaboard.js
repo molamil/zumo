@@ -70,6 +70,9 @@
 
     var SimpleMediator = Views.SimpleMediator = function(dom) {
         this.dom = dom;
+        // -- Implementing:
+        // this.data = null;
+        // this.decorations = null;
     };
 
     SimpleMediator.prototype = {
@@ -78,13 +81,31 @@
 
             var $dom = $(this.dom),
                 $table,
-                p;
+                i,
+                p,
+                decoration,
+                decoratedLabel,
+                label;
 
             if (this.data) {
                 $dom.append("<table class='data'></table>");
                 $table = $("table", $dom);
-                for (p in this.data)
-                    $table.append("<tr><td class='caption'>" + Utils.humanize(p) + ":</td><td class='value'>" + this.data[p] + "</td></tr>");
+                for (p in this.data) {
+                    decoratedLabel = null;
+                    if (this.decorations) {
+                        for (i = 0; i < this.decorations.length; i++) {
+                            decoration = this.decorations[i];
+                            if (decoration.name == p)
+                                decoratedLabel = decoration.label;
+                        }
+                    }
+                    if (decoratedLabel) {
+                        label = decoratedLabel;
+                    } else {
+                        label = Utils.humanize(p);
+                    }
+                    $table.append("<tr><td class='caption'>" + label + ":</td><td class='value'>" + this.data[p] + "</td></tr>");
+                }
             }
 
         }
