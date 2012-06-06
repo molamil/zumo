@@ -28,6 +28,13 @@
 
         trigger: function(event) {
             $("body").trigger(event);
+        },
+
+        humanize: function(s) {
+            s = s.replace(/([A-Z])/g, " $1").toLowerCase();
+            s = s.replace(/_/g, " ");
+            s = s.charAt(0).toUpperCase() + s.substr(1);
+            return s;
         }
 
     };
@@ -56,6 +63,33 @@
 
 
     var Views = Molaboard.Views = {};
+
+
+    // *** SIMPLE MEDIATOR CONSTRUCTOR
+
+
+    var SimpleMediator = Views.SimpleMediator = function(dom) {
+        this.dom = dom;
+    };
+
+    SimpleMediator.prototype = {
+
+        init: function() {
+
+            var $dom = $(this.dom),
+                $table,
+                p;
+
+            if (this.data) {
+                $dom.append("<table class='data'></table>");
+                $table = $("table", $dom);
+                for (p in this.data)
+                    $table.append("<tr><td class='caption'>" + Utils.humanize(p) + ":</td><td class='value'>" + this.data[p] + "</td></tr>");
+            }
+
+        }
+
+    };
 
 
     // *** SETTINGS MEDIATOR CONSTRUCTOR
@@ -152,17 +186,21 @@
 
     var Commands = Molaboard.Commands = {
 
-        login: function(url) {
+        login: function(url, data, dataType) {
 
-            var data = {
+            data = data || {};
+
+            data = {
                 username: $("#loginUsername").val(),
                 password: $("#loginPassword").val()
             };
 
+            dataType = dataType || "json";
+
             $.ajax({
                 url: url,
                 data: data,
-                dataType: "json",
+                dataType: dataType,
                 success: function(data) {
                     session.userLoggedIn = data;
 					if (!data.success) {
@@ -183,7 +221,37 @@
             window.location = ".";
         },
 
-        getSettings : function(url){
+        ajax: function(conf) {
+
+            var url = conf.url,
+                data = conf.data || null,
+                dataType = conf.dataType || "json",
+                dataWrapper = conf.dataWrapper || null,
+                successEvent = conf.successEvent || "success",
+                errorEvent = conf.errorEvent || "error";
+
+            $.ajax({
+                url: url,
+                data: data,
+                dataType: dataType,
+                success: function(data) {
+                    var eventData;
+                    if (dataWrapper) {
+                        eventData = {};
+                        eventData[dataWrapper] = data;
+                    } else {
+                        eventData = data;
+                    }
+                    $("body").trigger(successEvent, eventData);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    $("body").trigger(errorEvent);
+                }
+            });
+
+        },
+
+        getSettings: function(url){
 
             var data = {
                 service: "getconf"

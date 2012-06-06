@@ -10,7 +10,7 @@ Structure:
 5.- Footer
 6.- Login
 7.- Navigation
-8.- Practical info
+8.- Simple
 
 *********************************************/
 
@@ -72,6 +72,14 @@ fieldset {
     border: solid 1px #CCC;
 }
 
+table {
+    border: 0;
+}
+
+td {
+    padding: 0 10px 5px 0;
+}
+
 
 /*** 2.- COMMON ***/
 
@@ -99,6 +107,11 @@ fieldset {
 
 .info p {
 	margin: 0 0 5px 0;
+}
+
+table .caption {
+    color: #888;
+    font-style: italic;
 }
 
 
@@ -138,7 +151,7 @@ fieldset {
 #header h1 {
 	float: left;
 	margin: 17px 0 0 10px;
-	color: #A1A1A1;
+	color: #888;
 	font: italic normal 15px Georgia, serif;
 }
 
@@ -190,7 +203,7 @@ fieldset {
 }
 
 #login p {
-	color: #999;
+	color: #888;
 }
 
 #login form {
