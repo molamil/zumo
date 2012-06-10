@@ -1502,6 +1502,7 @@
 		this.app = app;
 		this._activeHandlers = []; // of {handlerContext:Object, context:Object, contextType:String, f:Function}
 		this._bindings = []; // of {type:String, f:Function, target:String}
+        this.updateBindings = false;
 	};
 
 	HandlerManager.prototype = {
@@ -1530,12 +1531,16 @@
 				this._registerHandlersFromContext(commandContext, "command");
 			}
 
-            //TODO: XXX: Check performance of reevaluating the bindings so often.
-            //TODO: XXX: Maybe we can use event bubbling, add all listeners to the body/root and check for target match.
-            Agent.observe(this.app, "onPageInit", this.onViewInit, this);
-            Agent.observe(this.app, "onBlockInit", this.onViewInit, this);
+            this.updateBindings = this._updateBindings();
 
-            this._updateBindings();
+            Log.debug("Will update bindings? " + this.updateBindings);
+
+            if (this.updateBindings) {
+                //TODO: XXX: Check performance of reevaluating the bindings so often.
+                //TODO: XXX: Maybe we can use event bubbling, add all listeners to the body/root and check for target match.
+                Agent.observe(this.app, "onPageInit", this.onViewInit, this);
+                Agent.observe(this.app, "onBlockInit", this.onViewInit, this);
+            }
 
 		},
 
@@ -1692,29 +1697,38 @@
 
 		_bindHandler: function(type, handler, target) {
 			Log.info("There is no handler binder implemented");
+            return true;
 		},
 
 		_unbindHandler: function(type, handler, target) {
 			Log.info("There is no handler unbinder implemented");
+            return true;
 		},
 
-        _updateBindings: function() {
+        _updateBindings: function(shallow) {
 
             var binding,
-                i;
+                i,
+                needsUpdate = false;
 
             for (i = 0; i < this._bindings.length; i++) {
                 binding = this._bindings[i];
                 //TODO: XXX: See whether it is necessary to remove the existing bindings.
-                this._unbindHandler(binding.type, binding.f, binding.target);
-                this._bindHandler(binding.type, binding.f, binding.target);
+                // Only update handlers with target.
+                if (!shallow || binding.target) {
+                    this._unbindHandler(binding.type, binding.f, binding.target);
+                    if (!this._bindHandler(binding.type, binding.f, binding.target))
+                        needsUpdate = true;
+                }
             }
+
+            return needsUpdate;
 
         },
 
         onViewInit: function() {
-            //TODO: FIXME. It seems to accumulate bindings when using "dom" as master.
-//            this._updateBindings();
+            //TODO: FIXME: It seems to accumulate bindings when using "dom" as master.
+            this._updateBindings(true);
         }
 
 	};
