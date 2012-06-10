@@ -777,39 +777,48 @@
 			var DomMaster = function(context, request, session, stateManager) {
 				AbstractMaster.call(this, context, request, session, stateManager);
 				//TODO: See how to configure the master properties.
-				this.changeDisplay = true;
-				this.changeVisibility = true;
 				this.cloneDom = false;
+                // --
+                // Implementing:
+                // this.originalDisplay = null;
+                // this.originalVisibility = null;
 			};
 
 			DomMaster.prototype = {
 				
 				display: function() {
+
 					AbstractMaster.prototype.display.apply(this, arguments); // Call super
-					Log.debug("DomMaster display");
+
+					Log.debug("DomMaster display: " + this.context.id);
+
 					this.target = this.session.selector(this.context.target);
 					if (this.target == null) {
 						Log.error("Invalid target for page " + this.context.id + ": " + this.context.target);
 						return;
 					}
+
 					if (this.cloneDom) {
 						this.target = this.target.cloneNode(true);
 						this.container.appendChild(this.target);
 					}
-                    if (this.changeDisplay)
+
+                    this.originalDisplay = this._getStyle(this.target, "display");
+                    this.originalVisibility = this._getStyle(this.target, "visibility");
+                    if (this.originalDisplay == "none")
 						this.target.style.display = "inherit";
-					if (this.changeVisibility)
+					if (this.originalVisibility == "hidden")
 						this.target.style.visibility = "visible";
+
 					this.init();
+
 				},
 
 				destroy: function() {
 					AbstractMaster.prototype.destroy.apply(this, arguments); // Call super
-					Log.debug("DomMaster destroy");
-					if (this.changeDisplay)
-						this.target.style.display = "none";
-					if (this.changeVisibility)
-						this.target.style.visibility = "hidden";
+					Log.debug("DomMaster destroy: " + this.context.id);
+					this.target.style.display = this.originalDisplay;
+					this.target.style.visibility = this.originalVisibility;
 					if (this.cloneDom)
 						this.container.removeChild(this.target);
 				},
@@ -825,6 +834,19 @@
 				onStateChange: function(target, state) {
 					AbstractMaster.prototype.onStateChange.apply(this, arguments); // Call super
 				},
+
+                _getStyle: function(target, style) {
+                    var value,
+                        computedStyle;
+                    if (target.currentStyle) {
+                        value = target.currentStyle[style];
+                    } else if (window.getComputedStyle) {
+                        computedStyle = window.getComputedStyle(target, null);
+                        if (computedStyle)
+                            value = computedStyle.getPropertyValue(style);
+                    }
+                    return value;
+                },
 
 				// Default event handlers
 				onDisplay: function(master) {},
@@ -865,6 +887,10 @@
 
 				onStateChange: function(target, state) {
 					DomMaster.prototype.onStateChange.apply(this, arguments); // Call super
+				},
+
+                _getStyle: function(target, style) {
+					return DomMaster.prototype._getStyle.apply(this, arguments); // Call super
 				},
 
 				// Default event handlers
