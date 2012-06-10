@@ -5,7 +5,7 @@
 
 		<page id="one" target="#frontpage" depends="teaser"/>
 
-		<page id="two" type="dom" target="#about" depends="teaser">
+		<page id="two" type="dom" target="#about">
 			<prop target="#content"><![CDATA[I am a nice header]]></prop>
 		</page>
 

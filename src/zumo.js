@@ -911,7 +911,24 @@
 
 				init: function() {
 					AbstractMaster.prototype.init.apply(this, arguments); // Call super
-				}
+				},
+
+                clear: function() {
+                    DomMaster.prototype.clear.apply(this, arguments); // Call super
+                },
+
+                onStateChange: function(target, state) {
+                    DomMaster.prototype.onStateChange.apply(this, arguments); // Call super
+                },
+
+                // Default event handlers
+                onDisplay: function(master) {},
+                onClear: function(master) {},
+                onInit: function(master) {},
+                onIn: function(master) {},
+                onOn: function(master) {},
+                onOut: function(master) {},
+                onOff: function(master) {}
 
 			};
 
