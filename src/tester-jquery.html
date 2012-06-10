@@ -21,7 +21,7 @@
 			Zumo.init(window.document, "conf-jquery.xml");
 
 			Zumo.onConfLoaded = function() {
-				Zumo.goto("one");
+				$("body").trigger("startup");
 			}
 
 		});
@@ -33,11 +33,13 @@
 		body {
 			font-family: Candara, sans-serif;
 			font-size: 10pt;
+            margin: 0;
+            padding: 0;
 		}
 
 		a {
+            cursor: pointer;
 			color: #666666;
-			font-weight: bold;
 			text-decoration: none;
 		}
 
@@ -51,28 +53,34 @@
 
 		#menu {
 			float: left;
-			width: 100px;
+			width: 130px;
+            padding: 10px;
 		}
 
-		#pages {
+		#pages,
+		#templates {
 			float: left;
 		}
 
-		#pages div {
+		#pages div,
+		#templates div {
 			display: none;
+            position: relative;
 			width: 300px;
 			height: 300px;
 			padding: 25px;
 		}
 
-		#news {
+		#white {
 			display: block !important;
+            position: absolute !important;
+            top: 0;
 		}
 
-		#teaser {
+		#brown {
 			position: absolute;
 			top: 0;
-			left: 108px;
+			left: 150px;
 			width: 350px;
 			height: 10px;
 			background-color: #996600;
@@ -85,22 +93,27 @@
 <body>
 
 <div id="menu">
-	<a id="linkFrontpage" href="javascript: void(0);">FRONTPAGE</a><br />
-	<a id="linkAbout" href="javascript: void(0);">ABOUT</a><br />
-	<a id="linkNews" href="javascript: void(0);">NEWS</a>
+	<a id="linkGrey"><strong>GREY</strong> (dom)</a><br />
+	<a id="linkPurple"><strong>PURPLE</strong> (dom)</a><br />
+	<a id="linkOrange"><strong>ORANGE</strong> (domclone)</a><br />
+	<a id="linkWhite"><strong>WHITE</strong> (loader)</a>
 	<hr />
-	<a id="linkTeaser" href="javascript: void(0);">TEASER</a> <a id="clearTeaser" href="javascript: void(0);">(clear)</a>
+	<a id="linkBrown" href="javascript: void(0);"><strong>BROWN</strong> (block)</a> - <a id="clearBrown" href="javascript: void(0);">clear</a>
 </div>
 
 <div id="pages">
-	<div id="frontpage" style="background-color: #cccccc;"></div>
-	<div id="about" style="background-color: #ff00ff;">
+	<div id="grey" style="background-color: #cccccc;"></div>
+	<div id="purple" style="background-color: #da00ff;">
 		<p id="content"></p>
 	</div>
-	<div id="news"></div>
+	<div id="white"></div>
 </div>
 
-<div id="teaser"></div>
+<div id="brown"></div>
+
+<div id="templates">
+    <div class="orange" style="background-color: #c69642;"></div>
+</div>
 
 </body>
 </html>

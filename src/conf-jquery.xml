@@ -3,22 +3,28 @@
 
 	<views>
 
-		<page id="one" target="#frontpage">
-			<handler target="#linkFrontpage" type="click"/>
+		<page id="grey" target="#grey">
+			<handler type="startup"/>
+			<handler target="#linkGrey" type="click"/>
+			<handler target="#pages .orange" type="click"/>
 		</page>
 
-		<page id="two" type="dom" target="#about">
+		<page id="purple" type="dom" target="#purple" depends="brown">
 			<prop target="#content"><![CDATA[I am a nice header]]></prop>
-			<handler target="#linkAbout" type="click" at="one"/>
+			<handler target="#linkPurple" type="click" at="grey"/>
 		</page>
 
-		<page id="three" type="loader" target="news.txt" container="#news">
-			<handler target="#linkNews" type="click"/>
+		<page id="orange" type="domclone" target="#templates .orange" container="#pages">
+			<handler target="#linkOrange" type="click"/>
 		</page>
 
-		<block id="teaser" target="#teaser">
-			<handler target="#linkTeaser" type="click"/>
-			<handler target="#clearTeaser" type="click" action="clearBlock"/>
+		<page id="white" type="loader" target="news.txt" container="#white">
+			<handler target="#linkWhite" type="click"/>
+		</page>
+
+		<block id="brown" target="#brown">
+			<handler target="#linkBrown" type="click"/>
+			<handler target="#clearBrown" type="click" action="clearBlock"/>
 		</block>
 
 	</views>
