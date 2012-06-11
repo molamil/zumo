@@ -29,4 +29,26 @@
 
 	</views>
 
+    <commands>
+
+        <command id="alert" target="alert">
+            <prop name="_args">
+                <item>Hello!</item>
+            </prop>
+            <handler target="#linkAlert" type="click"/>
+            <handler type="hello"/>
+        </command>
+
+        <command id="trigger" target="commands.trigger">
+            <prop name="type" value="hello"/>
+            <prop name="data">
+                <prop name="_args">
+                    <item>Hello from trigger command!</item>
+                </prop>
+            </prop>
+            <handler target="#linkTrigger" type="click"/>
+        </command>
+
+    </commands>
+
 </zumo>

@@ -337,8 +337,24 @@
 		},
 
 		merge: function(target, origin) {
-			for (var prop in origin)
-				target[prop] = origin[prop];
+
+            var i,
+                l = 0,
+                p,
+                o;
+
+            if (!target || !origin)
+                return;
+
+            if (origin.length)
+                l = origin.length;
+
+            for (i = 0; i < l; i++) {
+                o = (l > 0) ? origin[i] : origin;
+                for (p in o)
+                    target[p] = o[p];
+            }
+
         },
 
 		find: function(target, container) {
@@ -350,7 +366,23 @@
 					break;
 			}
 			return o;
-		}
+		},
+
+        isEmpty: function(o) {
+            var p;
+            if (o) {
+                if (typeof o == "object") {
+                    for (p in o)
+                        return false;
+                } else if (typeof o == "string") {
+                    return StringUtils.trim(o) == "";
+                } else {
+                    return false;
+                }
+            } else {
+                return true;
+            }
+        }
 
 	};
 
@@ -1205,8 +1237,6 @@
 
 				execute: function() {
 					Log.debug("Initializing " + this.context.id);
-					//TODO: Decide wheteher we should merge props.
-//					PropsManager.apply(this.target, this.context.propContexts, this.session);
 				}
 
 			};
@@ -1223,12 +1253,14 @@
 
 				execute: function() {
 					AbstractMaster.prototype.execute.apply(this, arguments); // Call super
-					var f = ObjectUtils.find(this.context.target);
-					var args = [];
-					if (this.context.props._args && typeof this.context.props._args == "object" && this.context.props._args.length > 0)
-						args = this.context.props._args.slice(0);
-					for (var param in this.request.params)
-						args.push(this.request.params[param]);
+					var f = ObjectUtils.find(this.context.target),
+					    args = [],
+                        data = {};
+                    ObjectUtils.merge(data, [this.context.props, this.request.params]);
+					if (data._args && data._args.length)
+						args = data._args.slice(0);
+					if (!ObjectUtils.isEmpty(data))
+						args.push(data);
 					if (typeof f == "function") {
 						f.apply(null, args); //TODO: Check the this context.
                     } else {

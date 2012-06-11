@@ -26,6 +26,14 @@
 
 		});
 
+        // COMMANDS
+
+        var commands = {};
+
+        commands.trigger = function(data) {
+            $("body").trigger(data.type, data.data);
+        }
+
 	</script>
 
 	<style type="text/css">
@@ -98,7 +106,10 @@
 	<a id="linkOrange"><strong>ORANGE</strong> (domclone)</a><br />
 	<a id="linkWhite"><strong>WHITE</strong> (loader)</a>
 	<hr />
-	<a id="linkBrown" href="javascript: void(0);"><strong>BROWN</strong> (block)</a> - <a id="clearBrown" href="javascript: void(0);">clear</a>
+	<a id="linkBrown"><strong>BROWN</strong> (block)</a> - <a id="clearBrown" href="javascript: void(0);">clear</a>
+    <hr />
+    <a id="linkAlert"><strong>ALERT</strong> (command)</a>
+    <a id="linkTrigger"><strong>TRIGGER</strong> (command)</a>
 </div>
 
 <div id="pages">
