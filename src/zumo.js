@@ -339,7 +339,7 @@
 		merge: function(target, origin) {
 
             var i,
-                l = 0,
+                l = 1,
                 p,
                 o;
 
@@ -350,7 +350,7 @@
                 l = origin.length;
 
             for (i = 0; i < l; i++) {
-                o = (l > 0) ? origin[i] : origin;
+                o = (origin.length) ? origin[i] : origin;
                 for (p in o)
                     target[p] = o[p];
             }
