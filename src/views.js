@@ -70,10 +70,11 @@
 
 		createPage: function(context, request, session) {
 
-			//TODO: Implement state managers.
+			var page = new Page(context, request, session),
+                stateManager = this._buildStateManager(context, session);
 
-			var page = new Page(context, request, session);
-			page.master = this._buildMaster(context, request, session, this._buildStateManager(context, session));
+			page.master = this._buildMaster(context, request, session, stateManager);
+            stateManager.master = page.master;
 
 			return page;
 
@@ -81,8 +82,11 @@
 
 		createBlock: function(context, request, session) {
 
-			var block = new Block(context, request, session);
-			block.master = this._buildMaster(context, request, session, this._buildStateManager(context, session));
+			var block = new Block(context, request, session),
+                stateManager = this._buildStateManager(context, session);
+
+			block.master = this._buildMaster(context, request, session, stateManager);
+            stateManager.master = block.master;
 
 			return block;
 
