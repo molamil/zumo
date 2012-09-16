@@ -42,6 +42,61 @@
 	ZumoExt.setSelector(selector);
 
 
+	// *** VIEW MASTERS
+
+    var $Loader = function(context, request, session, stateManager) {
+        Zumo.ViewMasters.AbstractMaster.call(this, context, request, session, stateManager); // Call super
+        // --
+        // Implementing:
+        // this.$container = null;
+    };
+
+    $Loader.prototype = {
+
+        display: function() {
+
+            Zumo.ViewMasters.AbstractMaster.prototype.display.apply(this, arguments); // Call super
+
+            var that = this;
+
+            this.$container = $(this.container);
+            this.$container.load(this.context.target, function() {
+                that.init();
+            });
+
+        },
+
+        destroy: function() {
+            Zumo.ViewMasters.AbstractMaster.prototype.destroy.apply(this, arguments); // Call super
+            this.$container.clear();
+        },
+
+        init: function() {
+            Zumo.ViewMasters.AbstractMaster.prototype.init.apply(this, arguments); // Call super
+        },
+
+        clear: function() {
+            Zumo.ViewMasters.AbstractMaster.prototype.clear.apply(this, arguments); // Call super
+        },
+
+        onStateChange: function(target, state) {
+            Zumo.ViewMasters.AbstractMaster.prototype.onStateChange.apply(this, arguments); // Call super
+        },
+
+        // Default event handlers
+        onDisplay: function(master) {},
+        onClear: function(master) {},
+        onInit: function(master) {},
+        onIn: function(master) {},
+        onOn: function(master) {},
+        onOut: function(master) {},
+        onOff: function(master) {}
+
+    };
+
+    Zumo.registerViewMaster("_$loader", $Loader);
+
+
 	// *** STATE MANAGERS
 
 	var StateManagers = {
