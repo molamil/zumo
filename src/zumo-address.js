@@ -1,39 +1,55 @@
 (function(window) {
 
 
-	// Check for Zumo
-	if (!Zumo || !ZumoExt)
-		return;
+    // Check for Zumo and jquery
+    if (!Zumo || !ZumoExt || !$ || !$.address)
+        return;
 
 
     // *** ADDRESS MANAGER
 
-	var AddressManager = {
+    var AddressManager = {
 
-		init: function() {
+        defaultPage: null,
 
-            if (!Zumo || !$ || !$.address)
-                return;
+        init: function() {
+
+            var that = this;
 
             $.address.change(function(event) {
-                if (Zumo.isInit())
-                    Zumo.goto($.address.value().substr(1));
+                that.go();
             });
 
-            // TODO: FIXME: Set observe instead: Zumo.observe(Zumo, "onPageDisplay", function() {});
-            Zumo.onPageDisplay = function(master) {
+            ZumoAgent.observe(Zumo, "onConfLoaded", function() {
+                that.go();
+            }, -1);
+
+            ZumoAgent.observe(Zumo, "onPageDisplay", function(master) {
                 if (master.context.props._deepLink != "false")
                     $.address.value(master.context.id);
-            };
+            });
+
+        },
+
+        go: function() {
+
+            var id = $.address.value().substr(1);
+
+            if (Zumo.isInit()) {
+                if (id == "" || !Zumo.getPageContext(id))
+                    id = this.defaultPage;
+                Zumo.goto(id);
+            }
 
         }
 
-	};
+    };
 
 
-	// *** INIT
+    // *** INIT
 
+    window.ZumoAddress = AddressManager;
     AddressManager.init();
-	
+
 
 })(this);
