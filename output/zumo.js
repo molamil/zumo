@@ -1472,9 +1472,11 @@
         _mergeAttributes: function(o, element, list) {
             for (var i = 0; i < list.length; i++) {
                 var name = list[i];
-                var value = element.attributes.getNamedItem(name);
-                if (value)
-                    o[name] = value.nodeValue;
+                if (name && StringUtils.trim(name) != "") {
+                    var value = element.attributes.getNamedItem(name);
+                    if (value)
+                        o[name] = value.nodeValue;
+                }
             }
         },
 
