@@ -32,7 +32,7 @@
 
 
 	<!-- BUILD -->
-	<target name="build" description="Build and copy to output directory" depends="clean">
+	<target name="build" description="Build and copy to output directory">
 
 		<echo>Building ${project.name}...</echo>
 
