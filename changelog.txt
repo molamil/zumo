@@ -1,0 +1,9 @@
+ZUMO FRAMEWORK Change-log
+
+
+-------------------------------------------------------------------------
+ZUMO 0.1 (23-09-2012)
+
+[Initial release]
+
+*  Initial release, already used on several production-ready projects.
