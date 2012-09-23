@@ -38,7 +38,7 @@
             if (Zumo.isInit()) {
                 if (id == "" || !Zumo.getPageContext(id))
                     id = this.defaultPage;
-                Zumo.goto(id);
+                Zumo.go(id);
             }
 
         }

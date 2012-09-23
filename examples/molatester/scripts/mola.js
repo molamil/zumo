@@ -126,7 +126,7 @@
 				$li.css("display", "none");
 				$li.delay((pageContexts.length - i) * 200).fadeIn("slow");
 				$li.click({id: pageContext.id}, function(event) {
-					Zumo.goto(event.data.id);
+					Zumo.go(event.data.id);
 				});
 				$("#menu").append($li);
 			}
@@ -154,7 +154,7 @@ $(function() {
 
 	Zumo.onConfLoaded = function() {
 		Mola.init();
-		Zumo.goto("frontpage");
+		Zumo.go("frontpage");
 	}
 
 });

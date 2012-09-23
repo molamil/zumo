@@ -66,7 +66,7 @@
 
         _parsePageBlock: function(conf, session) {
             var pageBlockContext = {};
-            this._mergeAttributes(pageBlockContext, conf, ["id", "type", "mediator", "target", "container", "manager", "title",]);
+            this._mergeAttributes(pageBlockContext, conf, ["id", "type", "mediator", "target", "container", "manager", "title"]);
             var dependsValue = conf.attributes.getNamedItem("depends");
             if (dependsValue) {
                 var depends = dependsValue.nodeValue.replace(/\s/g, "").split(",");
@@ -360,7 +360,7 @@
             var app = this.app;
             var f;
 
-            var fGoto = function() {
+            var fGo = function() {
                 //TODO: Review params logic
                 var params = arguments[1];
                 var page = app.getCurrentPage();
@@ -369,14 +369,14 @@
                         Log.debug("Handler " + handlerContext.type + "trigger when already at " + page.id);
                         ParamsManager.apply(page.master.target, handlerContext.params, this.session);
                     } else {
-                        var ft = Delegate.create(app.goto, app, [pageContext.id, params]);
+                        var ft = Delegate.create(app.go, app, [pageContext.id, params]);
                         setTimeout(ft, 10);
                     }
                 }
             };
 
-            if (handlerContext.action == "goto" || handlerContext.action == "call" || handlerContext.action == "" || handlerContext.action == null) {
-                f = fGoto;
+            if (handlerContext.action == "go" || handlerContext.action == "go" || handlerContext.action == "call" || handlerContext.action == "" || handlerContext.action == null) {
+                f = fGo;
             } else {
                 Log.warn("Could not resolve handler action: " + handlerContext.action);
             }
@@ -564,9 +564,14 @@
         // --- METHODS
 
         startup: function() {
+
+            // Add alias for go as goto, for compatibility.
+            this["goto"] = this.go;
+
             this._initViewMasters();
             this._initStateManagers();
             this._initCommandMasters();
+
         },
 
         // Initializes the zumo object with the passed root parameter as the base DOM element to make selections on
@@ -608,12 +613,12 @@
         },
 
         // Displays a specific page by id, taking out the page currently displayed
-        goto: function(id, params) {
+        go: function(id, params) {
 
             Log.info("Going to page " + id);
 
             if (!this.isInit()) {
-                Log.warn("Cannot goto " + id + " - Zumo is not yet initalized");
+                Log.warn("Cannot go " + id + " - Zumo is not yet initalized");
                 return;
             }
 
@@ -622,7 +627,7 @@
             if (this._currentPage != null) {
                 Log.debug("currentPage id = " + this._currentPage.id);
                 if (id == this._currentPage.context.id) {
-                    Log.info("No page to goto - we are already in " + id);
+                    Log.info("No page to go - we are already in " + id);
                     return;
                 }
             } else {

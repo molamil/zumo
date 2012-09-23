@@ -19,7 +19,7 @@
 			Zumo.init(window.document, "conf.xml");
 
 			Zumo.observe("onConfLoaded", function() {
-					Zumo.goto("one");
+					Zumo.go("one");
 				}
 			);
 
@@ -105,9 +105,9 @@
 <body>
 
 <div id="menu">
-	<a href="javascript: Zumo.goto('one');">FRONTPAGE</a><br />
-	<a href="javascript: Zumo.goto('two');">ABOUT</a><br />
-	<a href="javascript: Zumo.goto('three');">NEWS</a>
+	<a href="javascript: Zumo.go('one');">FRONTPAGE</a><br />
+	<a href="javascript: Zumo.go('two');">ABOUT</a><br />
+	<a href="javascript: Zumo.go('three');">NEWS</a>
 	<hr />
 	<a href="javascript: Zumo.displayBlock('teaser');">TEASER</a> <a href="javascript: Zumo.clearBlock('teaser');">(clear)</a>
 </div>
