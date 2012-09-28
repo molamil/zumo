@@ -42,7 +42,6 @@
 		<copy file="${src.dir}/${input.file}" tofile="${output.dir}/${output.file}"/>
         <tempfile property="temp.file" createfile="true"/>
         <concat destFile="${temp.file}">
-            <file file="${src.dir}/log.js"/>
             <file file="${src.dir}/agent.js"/>
             <file file="${src.dir}/utils.js"/>
             <file file="${src.dir}/selector.js"/>
@@ -50,8 +49,11 @@
             <file file="${src.dir}/props.js"/>
             <file file="${src.dir}/params.js"/>
             <file file="${src.dir}/views.js"/>
+            <file file="${src.dir}/view-masters.js"/>
             <file file="${src.dir}/state-managers.js"/>
             <file file="${src.dir}/commands.js"/>
+            <file file="${src.dir}/conf-parsers.js"/>
+            <file file="${src.dir}/handlers.js"/>
             <file file="${src.dir}/main.js"/>
         </concat>
         <loadfile property="code" srcFile="${temp.file}"/>

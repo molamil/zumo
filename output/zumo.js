@@ -11,58 +11,10 @@
 (function(window) {
 
     var _NAME = "Zumo";
-    var _VERSION = "0.1";
+    var _VERSION = "0.2";
 
-    	// *** LOG OBJECT
+    
 
-	var Log = {
-
-		// --- PROPERTIES
-
-		LEVELS: ["error", "warn", "info", "debug"],
-		level: 2,
-		prefix: _NAME.toUpperCase() + " - ",
-
-		// --- METHODS
-
-		debug: function(message) {
-			if (typeof message == "string")
-				message = this.prefix + message;
-			this._log(message, 3);
-		},
-
-		info: function(message) {
-			this._log(this.prefix + message, 2);
-		},
-
-		warn: function(message) {
-			this._log(this.prefix + message, 1);
-		},
-
-		error: function(message) {
-			this._log(this.prefix + message, 0);
-		},
-
-		// Default Firebug console logging implemented.
-		_log: function(message, level) {
-
-			// Check that Firebug is enabled.
-			if (!window.console)
-				return;
-
-			// Set level as default if not passed.
-			if (level == null)
-				level = this.level;
-
-			if (this.level >= level) {
-				var fLevel = window.console[this.LEVELS[level]];
-				if (typeof fLevel == "function")
-					fLevel.call(window.console, message);
-			}
-
-		}
-
-	};
 	// *** AGENT OBJECT
 
 	var Agent = {
@@ -275,7 +227,61 @@
 		}
 
 
-	};	// *** DELEGATE OBJECT
+	};
+
+	// *** LOG OBJECT
+
+	var Log = {
+
+		// --- PROPERTIES
+
+		LEVELS: ["error", "warn", "info", "debug"],
+		level: 2,
+		prefix: _NAME.toUpperCase() + " - ",
+
+		// --- METHODS
+
+		debug: function(message) {
+			if (typeof message == "string")
+				message = this.prefix + message;
+			this._log(message, 3);
+		},
+
+		info: function(message) {
+			this._log(this.prefix + message, 2);
+		},
+
+		warn: function(message) {
+			this._log(this.prefix + message, 1);
+		},
+
+		error: function(message) {
+			this._log(this.prefix + message, 0);
+		},
+
+		// Default Firebug console logging implemented.
+		_log: function(message, level) {
+
+			// Check that Firebug is enabled.
+			if (!window.console)
+				return;
+
+			// Set level as default if not passed.
+			if (level == null)
+				level = this.level;
+
+			if (this.level >= level) {
+				var fLevel = window.console[this.LEVELS[level]];
+				if (typeof fLevel == "function")
+					fLevel.call(window.console, message);
+			}
+
+		}
+
+	};
+
+
+	// *** DELEGATE OBJECT
 
 	var Delegate = {
 
@@ -377,9 +383,6 @@
 
 	// *** DOM UTILS OBJECT
 
-	// *** SELECTOR OBJECT
-
-
     var DomUtils = {
 
         getChildren: function(o, name) {
@@ -395,6 +398,7 @@
         }
 
     };
+
 	// *** SELECTOR OBJECT
 
 	var Selector = {
@@ -408,6 +412,7 @@
 		}
 
 	};
+
 	// *** LOADER CLASS
 
 	var Loader = function() {
@@ -469,10 +474,6 @@
 		}
 
 	};
-	// ************************************************************************************************************
-	// PROPS
-	// ************************************************************************************************************
-
 
 	// *** PROPS MANAGER OBJECT
 
@@ -500,10 +501,6 @@
         }
 
     };
-	// ************************************************************************************************************
-	// PARAMS
-	// ************************************************************************************************************
-
 
 	// *** PARAMS MANAGER OBJECT
 
@@ -524,10 +521,6 @@
 		}
 
 	};
-	// ************************************************************************************************************
-	// VIEWS
-	// ************************************************************************************************************
-
 
 	// *** PAGE CLASS
 
@@ -668,7 +661,6 @@
 		}
 
 	};
-
 
 	// *** VIEW MASTERS OBJECT
 
@@ -1039,6 +1031,7 @@
 		}
 
 	};
+
 	// *** STATE MANAGERS OBJECT
 
 	var StateManagers = {
@@ -1138,10 +1131,6 @@
 		}
 
 	};
-	// ************************************************************************************************************
-	// COMMANDS
-	// ************************************************************************************************************
-
 
 	// *** COMMAND CLASS
 
@@ -1260,13 +1249,9 @@
 
 			//ObjectUtils.extend(this.FunctionMaster, this.AbstractMaster);
 
-
 		}
 
-	};    // ************************************************************************************************************
-    // ZUMO
-    // ************************************************************************************************************
-
+	};
 
     // *** XML CONF PARSER OBJECT
 
@@ -1537,7 +1522,6 @@
 
     };
 
-
     // *** HANDLER MANAGER CLASS
 
     var HandlerManager = function(app) {
@@ -1774,7 +1758,6 @@
         }
 
     };
-
 
     // *** ZUMO OBJECT
 
