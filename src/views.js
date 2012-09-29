@@ -90,8 +90,9 @@
 
 		_buildMaster: function(context, request, session, stateManager) {
 
-			var masterClass, master;
-			var type = StringUtils.trim(context.type).toLowerCase();
+			var masterClass,
+				master,
+				type = StringUtils.trim(context.type).toLowerCase();
 
 			if (type != "") {
 				masterClass = session.viewMasters["_" + type];
@@ -115,11 +116,12 @@
 
 		_buildStateManager: function(context, session) {
 
-			var stateManagerClass, stateManager;
-			var manager = StringUtils.trim(context.manager).toLowerCase();
+			var stateManagerClass,
+				stateManager,
+				manager = StringUtils.trim(context.manager).toLowerCase();
 
 			if (manager != "") {
-				stateManagerClass = session.stateManagers["_" + manager];
+				stateManagerClass = session.stateManagers[manager];
 			} else {
 				stateManagerClass = session.defaultStateManagerClass;
 			}

@@ -330,6 +330,18 @@
 			child.prototype.__proto__ = supertype.prototype;
 		},
 
+		mix: function() {
+			var arg,
+				prop,
+				child = {};
+			for (arg = 0; arg < arguments.length; arg++) {
+				for (prop in arguments[arg]) {
+					if (arguments[arg].hasOwnProperty(prop))
+						child[prop] = arguments[arg][prop];
+				}
+			}
+		},
+
 		merge: function(target, origin) {
 
             var i,
@@ -612,8 +624,9 @@
 
 		_buildMaster: function(context, request, session, stateManager) {
 
-			var masterClass, master;
-			var type = StringUtils.trim(context.type).toLowerCase();
+			var masterClass,
+				master,
+				type = StringUtils.trim(context.type).toLowerCase();
 
 			if (type != "") {
 				masterClass = session.viewMasters["_" + type];
@@ -637,11 +650,12 @@
 
 		_buildStateManager: function(context, session) {
 
-			var stateManagerClass, stateManager;
-			var manager = StringUtils.trim(context.manager).toLowerCase();
+			var stateManagerClass,
+				stateManager,
+				manager = StringUtils.trim(context.manager).toLowerCase();
 
 			if (manager != "") {
-				stateManagerClass = session.stateManagers["_" + manager];
+				stateManagerClass = session.stateManagers[manager];
 			} else {
 				stateManagerClass = session.defaultStateManagerClass;
 			}
@@ -1779,9 +1793,9 @@
         },
         _DEFAULT_VIEW_TYPE: "_dom",
         _STATE_MANAGERS: {
-            _base: "BaseIo3Manager"
+            base: "BaseIo3Manager"
         },
-        _DEFAULT_STATE_MANAGER: "_base",
+        _DEFAULT_STATE_MANAGER: "base",
         _COMMAND_MASTERS: {
             _function: "FunctionMaster"
         },
@@ -2165,6 +2179,10 @@
         unregisterStateManager: function(name) {
             this.session.stateManagers[name] = null;
         },
+
+		createStateManager: function(name, conf, parent) {
+
+		},
 
         execute: function(id, params) {
 

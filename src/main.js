@@ -20,9 +20,9 @@
         },
         _DEFAULT_VIEW_TYPE: "_dom",
         _STATE_MANAGERS: {
-            _base: "BaseIo3Manager"
+            base: "BaseIo3Manager"
         },
-        _DEFAULT_STATE_MANAGER: "_base",
+        _DEFAULT_STATE_MANAGER: "base",
         _COMMAND_MASTERS: {
             _function: "FunctionMaster"
         },
@@ -407,6 +407,10 @@
             this.session.stateManagers[name] = null;
         },
 
+		createStateManager: function(name, conf, parent) {
+
+		},
+
         execute: function(id, params) {
 
             Log.info("Executing command " + id);
@@ -485,10 +489,12 @@
             this.session.commandMasters[name] = null;
         },
 
+		//TODO: Use mix function instead of the verbose proxy.
         observe: function(fName, hook, priority) {
             Agent.observe(this, fName, hook, priority);
         },
 
+		//TODO: Use mix function instead of the verbose proxy.
         ignore: function(fName, hook) {
             Agent.ignore(this, fName, hook);
         },
