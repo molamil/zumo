@@ -29,7 +29,7 @@
 
 			Cascade.prototype = {
 
-				_doIn: function() {
+				doIn: function() {
 					var that = this;
 					var $div = $("div", this.target);
 					for (var i = 0; i < $div.length; i++) {
@@ -50,7 +50,7 @@
 					}
 				},
 
-				_doOut: function() {
+				doOut: function() {
 					var that = this;
 					if (Session.style == "vertical") {
 						var $target = $(that.target);

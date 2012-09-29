@@ -128,6 +128,7 @@
 
             for (i = 0; i < l; i++) {
                 o = (origin.length) ? origin[i] : origin;
+				//TODO: Consider using hasOwnProperty.
                 for (p in o)
                     target[p] = o[p];
             }

@@ -112,7 +112,7 @@
 
 			Fade.prototype = {
 
-				_doIn: function() {
+				doIn: function() {
 					var that = this;
 					var $target = $(this.target);
 					$target.css("display", "none");
@@ -121,7 +121,7 @@
 					});
 				},
 
-				_doOut: function() {
+				doOut: function() {
 					var that = this;
 					$(this.target).fadeOut("slow", function() {
 						that.setState(Zumo.StateManagers.STATE_OFF);

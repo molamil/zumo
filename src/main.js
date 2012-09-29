@@ -407,7 +407,14 @@
             this.session.stateManagers[name] = null;
         },
 
-		createStateManager: function(name, conf, parent) {
+		createStateManager: function(name) {
+
+			// Proxy to StateManagers.createStateManager with the arguments passed without name, and register.
+			var stateManager = StateManagers.createStateManager.apply(StateManagers, [].slice.call(arguments, 1));
+
+			this.registerStateManager(name, stateManager);
+
+			return stateManager;
 
 		},
 

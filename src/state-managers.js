@@ -36,7 +36,8 @@
 
 				setState: function(state) {
 					state = state.toUpperCase();
-					if (state != StateManagers.STATE_IN && state != StateManagers.STATE_ON && state != StateManagers.STATE_OUT && state != StateManagers.STATE_OFF) {
+					if (state != StateManagers.STATE_IN && state != StateManagers.STATE_ON &&
+						state != StateManagers.STATE_OUT && state != StateManagers.STATE_OFF) {
 						Log.warn("Unknown state, returning without changing state for target " + this.target);
 						return;
 					}
@@ -46,42 +47,42 @@
 					}
 				},
 
+				doIn: function() {
+					this.setState(StateManagers.STATE_ON);
+				},
+
+				doOn: function() {
+					// Empty
+				},
+
+				doOut: function() {
+					this.setState(StateManagers.STATE_OFF);
+				},
+
+				doOff: function() {
+					// Empty
+				},
+
 				_changeState: function() {
 
 					this.onStateChange(this.target, this._state);
 
 					if (this._state == StateManagers.STATE_IN) {
-						this._doIn();
+						this.doIn();
 					} else if (this._state == StateManagers.STATE_ON) {
-						this._doOn();
+						this.doOn();
 					} else if (this._state == StateManagers.STATE_OUT) {
 						if (this.target != null) {
-							this._doOut();
+							this.doOut();
 						} else {
-							Log.info("target is null when trying to set state to OUT, setting state to OFF instead of " +
-										"calling doOut to avoid errors.");
+							Log.info("target is null when trying to set state to OUT, setting state to OFF instead " +
+								"of calling doOut to avoid errors.");
 							this._state = StateManagers.STATE_OFF;
 						}
 					} else if (this._state == StateManagers.STATE_OFF) {
-						this._doOff();
+						this.doOff();
 					}
 
-				},
-
-				_doIn: function() {
-					this.setState(StateManagers.STATE_ON);
-				},
-
-				_doOn: function() {
-					// Empty
-				},
-
-				_doOut: function() {
-					this.setState(StateManagers.STATE_OFF);
-				},
-
-				_doOff: function() {
-					// Empty
 				},
 
 				onStateChange: function(target, state) {
@@ -95,6 +96,39 @@
 
 			this.BaseIo3Manager = BaseIo3Manager;
 
+
+		},
+
+		createStateManager: function() {
+
+			var stateManager,
+				useConfArgument = typeof arguments[0] == "object",
+				conf = useConfArgument ? arguments[0] : {},
+				parent = useConfArgument ? arguments[1] : arguments[2];
+
+			// Set default parent for the manager if not provided.
+			parent = parent || this.BaseIo3Manager;
+
+			if (!useConfArgument) {
+				if ((typeof arguments[0] == "function") && (typeof arguments[1] == "function")) {
+					conf.doIn = arguments[0];
+					conf.doOut = arguments[1];
+				} else {
+					Log.warn("Malformed call to createStateManager - either createStateManager(conf, [parent]) or " +
+						"createStateManager(doIn, doOut, [parent]) are allowed.");
+				}
+			}
+
+			// Constructor function, calling parent with arguments.
+			stateManager = function() {
+				parent.apply(this, arguments)
+			};
+
+			// Extending.
+			stateManager.prototype = new parent();
+			ObjectUtils.merge(stateManager.prototype, conf);
+
+			return stateManager;
 
 		}
 

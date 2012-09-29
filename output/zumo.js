@@ -357,6 +357,7 @@
 
             for (i = 0; i < l; i++) {
                 o = (origin.length) ? origin[i] : origin;
+				//TODO: Consider using hasOwnProperty.
                 for (p in o)
                     target[p] = o[p];
             }
@@ -1082,7 +1083,8 @@
 
 				setState: function(state) {
 					state = state.toUpperCase();
-					if (state != StateManagers.STATE_IN && state != StateManagers.STATE_ON && state != StateManagers.STATE_OUT && state != StateManagers.STATE_OFF) {
+					if (state != StateManagers.STATE_IN && state != StateManagers.STATE_ON &&
+						state != StateManagers.STATE_OUT && state != StateManagers.STATE_OFF) {
 						Log.warn("Unknown state, returning without changing state for target " + this.target);
 						return;
 					}
@@ -1092,42 +1094,42 @@
 					}
 				},
 
+				doIn: function() {
+					this.setState(StateManagers.STATE_ON);
+				},
+
+				doOn: function() {
+					// Empty
+				},
+
+				doOut: function() {
+					this.setState(StateManagers.STATE_OFF);
+				},
+
+				doOff: function() {
+					// Empty
+				},
+
 				_changeState: function() {
 
 					this.onStateChange(this.target, this._state);
 
 					if (this._state == StateManagers.STATE_IN) {
-						this._doIn();
+						this.doIn();
 					} else if (this._state == StateManagers.STATE_ON) {
-						this._doOn();
+						this.doOn();
 					} else if (this._state == StateManagers.STATE_OUT) {
 						if (this.target != null) {
-							this._doOut();
+							this.doOut();
 						} else {
-							Log.info("target is null when trying to set state to OUT, setting state to OFF instead of " +
-										"calling doOut to avoid errors.");
+							Log.info("target is null when trying to set state to OUT, setting state to OFF instead " +
+								"of calling doOut to avoid errors.");
 							this._state = StateManagers.STATE_OFF;
 						}
 					} else if (this._state == StateManagers.STATE_OFF) {
-						this._doOff();
+						this.doOff();
 					}
 
-				},
-
-				_doIn: function() {
-					this.setState(StateManagers.STATE_ON);
-				},
-
-				_doOn: function() {
-					// Empty
-				},
-
-				_doOut: function() {
-					this.setState(StateManagers.STATE_OFF);
-				},
-
-				_doOff: function() {
-					// Empty
 				},
 
 				onStateChange: function(target, state) {
@@ -1141,6 +1143,36 @@
 
 			this.BaseIo3Manager = BaseIo3Manager;
 
+
+		},
+
+		createStateManager: function() {
+
+			var stateManager,
+				useConfArgument = typeof arguments[0] == "object",
+				conf = useConfArgument ? arguments[0] : {},
+				parent = useConfArgument ? arguments[1] : arguments[2];
+
+			parent = parent || this.BaseIo3Manager;
+
+			if (!useConfArgument) {
+				if ((typeof arguments[0] == "function") && (typeof arguments[1] == "function")) {
+					conf.doIn = arguments[0];
+					conf.doOut = arguments[1];
+				} else {
+					Log.warn("Malformed call to createStateManager - either createStateManager(conf, [parent]) or " +
+						"createStateManager(doIn, doOut, [parent]) are allowed.");
+				}
+			}
+
+			stateManager = function() {
+				parent.apply(this, arguments)
+			};
+
+			stateManager.prototype = new parent();
+			ObjectUtils.merge(stateManager.prototype, conf);
+
+			return stateManager;
 
 		}
 
@@ -2180,7 +2212,14 @@
             this.session.stateManagers[name] = null;
         },
 
-		createStateManager: function(name, conf, parent) {
+		createStateManager: function(name) {
+
+			// Proxy to StateManagers.createStateManager with the arguments passed without name, and register.
+			var stateManager = StateManagers.createStateManager.apply(StateManagers, [].slice.call(arguments, 1));
+
+			this.registerStateManager(name, stateManager);
+
+			return stateManager;
 
 		},
 
@@ -2262,10 +2301,12 @@
             this.session.commandMasters[name] = null;
         },
 
+		//TODO: Use mix function instead of the verbose proxy.
         observe: function(fName, hook, priority) {
             Agent.observe(this, fName, hook, priority);
         },
 
+		//TODO: Use mix function instead of the verbose proxy.
         ignore: function(fName, hook) {
             Agent.ignore(this, fName, hook);
         },
@@ -2647,7 +2688,7 @@
 
 			Fade.prototype = {
 
-				_doIn: function() {
+				doIn: function() {
 					var that = this;
 					var $target = $(this.target);
 					$target.css("display", "none");
@@ -2656,7 +2697,7 @@
 					});
 				},
 
-				_doOut: function() {
+				doOut: function() {
 					var that = this;
 					$(this.target).fadeOut("slow", function() {
 						that.setState(Zumo.StateManagers.STATE_OFF);
