@@ -1153,6 +1153,7 @@
 				conf = useConfArgument ? arguments[0] : {},
 				parent = useConfArgument ? arguments[1] : arguments[2];
 
+			// Set default parent for the manager if not provided.
 			parent = parent || this.BaseIo3Manager;
 
 			if (!useConfArgument) {
@@ -1165,10 +1166,12 @@
 				}
 			}
 
+			// Constructor function, calling parent with arguments.
 			stateManager = function() {
 				parent.apply(this, arguments)
 			};
 
+			// Extending.
 			stateManager.prototype = new parent();
 			ObjectUtils.merge(stateManager.prototype, conf);
 
@@ -2182,7 +2185,7 @@
             if (this.session.viewMasters[name] == null) {
                 this.session.viewMasters[name] = master;
             } else {
-                Log.warn("Cannot register view master with name " + name + " - there is already registered a master" +
+                Log.warn("Cannot register view master with name " + name + " - there is already registered a master " +
                     "with that name")
             }
         },
@@ -2203,8 +2206,8 @@
             if (this.session.stateManagers[name] == null) {
                 this.session.stateManagers[name] = manager;
             } else {
-                Log.warn("Cannot register state manager with name " + name + " - there is already registered a manager" +
-                    "with that name")
+                Log.warn("Cannot register state manager with name " + name + " - there is already registered a " +
+					"manager with that name")
             }
         },
 
@@ -2292,8 +2295,8 @@
             if (this.session.commandMasters[name] == null) {
                 this.session.commandMasters[name] = master;
             } else {
-                Log.warn("Cannot register command master with name " + name + " - there is already registered a master" +
-                    "with that name")
+                Log.warn("Cannot register command master with name " + name + " - there is already registered a " +
+					"master with that name")
             }
         },
 

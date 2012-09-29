@@ -377,7 +377,7 @@
             if (this.session.viewMasters[name] == null) {
                 this.session.viewMasters[name] = master;
             } else {
-                Log.warn("Cannot register view master with name " + name + " - there is already registered a master" +
+                Log.warn("Cannot register view master with name " + name + " - there is already registered a master " +
                     "with that name")
             }
         },
@@ -398,8 +398,8 @@
             if (this.session.stateManagers[name] == null) {
                 this.session.stateManagers[name] = manager;
             } else {
-                Log.warn("Cannot register state manager with name " + name + " - there is already registered a manager" +
-                    "with that name")
+                Log.warn("Cannot register state manager with name " + name + " - there is already registered a " +
+					"manager with that name")
             }
         },
 
@@ -487,8 +487,8 @@
             if (this.session.commandMasters[name] == null) {
                 this.session.commandMasters[name] = master;
             } else {
-                Log.warn("Cannot register command master with name " + name + " - there is already registered a master" +
-                    "with that name")
+                Log.warn("Cannot register command master with name " + name + " - there is already registered a " +
+					"master with that name")
             }
         },
 
