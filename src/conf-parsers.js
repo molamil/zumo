@@ -18,16 +18,16 @@
         _parseViews: function(conf, session) {
 
             var viewNodes = conf.getElementsByTagName("views"),
-				views = {
-					pages: [],
-					blocks: []
-				},
-				nodeName,
-				pageNodes,
-				blockNodes,
-				pageContext,
-				blockContext,
-				i;
+                views = {
+                    pages: [],
+                    blocks: []
+                },
+                nodeName,
+                pageNodes,
+                blockNodes,
+                pageContext,
+                blockContext,
+                i;
 
             if (viewNodes.length > 1) {
                 Log.warn("There can only be zero or one views nodes on the XML configuration, there were " +
