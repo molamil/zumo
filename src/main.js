@@ -104,6 +104,10 @@
         // Displays a specific page by id, taking out the page currently displayed
         go: function(id, params) {
 
+            var pageContext,
+                request,
+                page;
+
             Log.info("Going to page " + id);
 
             if (!this.isInit()) {
@@ -124,7 +128,7 @@
             }
 
             // Get the page from the conf
-            var pageContext = this.getPageContext(id);
+            pageContext = this.getPageContext(id);
             if (!pageContext || typeof pageContext !== "object") {
                 Log.error("No page context found with id: " + id);
                 return;
@@ -133,12 +137,12 @@
             //TODO: Implement aliases
             //TODO: Check wether that page is already being requested
 
-            var request = {
+            request = {
                 id: id,
                 params: params,
                 referrer: this._currentPage
             };
-            var page = PageBlockBuilder.createPage(pageContext, request, this.session);
+            page = PageBlockBuilder.createPage(pageContext, request, this.session);
 
             this.onPageRequest(pageContext, request);
 
@@ -168,19 +172,22 @@
 
         getPageContext: function(id) {
 
+            var pageContext,
+                i,
+                iPageContext;
+
             if (!this.isInit()) {
                 Log.warn("Cannot get page context (" + id + ")- Zumo is not yet initalized");
-                return;
+                return null;
             }
 
             if (this._conf.views == null) {
                 Log.info("Cannot get page context since there are no views configured");
-                return;
+                return null;
             }
 
-            var pageContext;
-            for (var i = 0; i < this._conf.views.pages.length; i++) {
-                var iPageContext = this._conf.views.pages[i];
+            for (i = 0; i < this._conf.views.pages.length; i++) {
+                iPageContext = this._conf.views.pages[i];
                 if (iPageContext.id == id) {
                     pageContext = iPageContext;
                     break;
@@ -197,9 +204,10 @@
 
         getPageContextsAt: function(level) {
             var a = [],
-                i;
+                i,
+                pageContext;
             for (i = 0; i < this._conf.views.pages.length; i++) {
-                var pageContext = this._conf.views.pages[i];
+                pageContext = this._conf.views.pages[i];
                 if (pageContext.level == level)
                     a.push(pageContext);
             }
@@ -225,6 +233,10 @@
         // Displays a specific block by id
         displayBlock: function(id, params) {
 
+            var block,
+                request,
+                blockContext;
+
             Log.info("Displaying block " + id);
 
             if (!this.isInit()) {
@@ -234,7 +246,7 @@
 
             params = params || {};
 
-            var block = this.getDisplayedBlock(id);
+            block = this.getDisplayedBlock(id);
 
             // Check whether the block is already displayed
             if (block) {
@@ -251,7 +263,7 @@
             } else {
 
                 // Get the block from the conf
-                var blockContext = this.getBlockContext(id);
+                blockContext = this.getBlockContext(id);
                 if (!blockContext || typeof blockContext !== "object") {
                     Log.error("No block context found with id: " + id);
                     return;
@@ -260,7 +272,7 @@
                 //TODO: Implement aliases
                 //TODO: Check wether that block is already being requested
 
-                var request = {
+                request = {
                     id: id,
                     params: params
                 };
@@ -323,19 +335,22 @@
 
         getBlockContext: function(id) {
 
+            var blockContext,
+                i,
+                iBlockContext;
+
             if (!this.isInit()) {
                 Log.warn("Cannot get block context (" + id + ")- Zumo is not yet initalized");
-                return;
+                return null;
             }
 
             if (this._conf.views == null) {
                 Log.info("Cannot get block context since there are no views configured");
-                return;
+                return null;
             }
 
-            var blockContext;
-            for (var i = 0; i < this._conf.views.blocks.length; i++) {
-                var iBlockContext = this._conf.views.blocks[i];
+            for (i = 0; i < this._conf.views.blocks.length; i++) {
+                iBlockContext = this._conf.views.blocks[i];
                 if (iBlockContext.id == id) {
                     blockContext = iBlockContext;
                     break;
@@ -351,8 +366,9 @@
         },
 
         getDisplayedBlock: function(id) {
-            var block;
-            for (var i = 0; i < this._displayedBlocks.length; i++) {
+            var block,
+                i;
+            for (i = 0; i < this._displayedBlocks.length; i++) {
                 if (this._displayedBlocks[i].id == id) {
                     block = this._displayedBlocks[i];
                     break;
@@ -399,7 +415,7 @@
                 this.session.stateManagers[name] = manager;
             } else {
                 Log.warn("Cannot register state manager with name " + name + " - there is already registered a " +
-					"manager with that name")
+                         "manager with that name")
             }
         },
 
@@ -407,18 +423,22 @@
             this.session.stateManagers[name] = null;
         },
 
-		createStateManager: function(name) {
+        createStateManager: function(name) {
 
-			// Proxy to StateManagers.createStateManager with the arguments passed without name, and register.
-			var stateManager = StateManagers.createStateManager.apply(StateManagers, [].slice.call(arguments, 1));
+            // Proxy to StateManagers.createStateManager with the arguments passed without name, and register.
+            var stateManager = StateManagers.createStateManager.apply(StateManagers, [].slice.call(arguments, 1));
 
-			this.registerStateManager(name, stateManager);
+            this.registerStateManager(name, stateManager);
 
-			return stateManager;
+            return stateManager;
 
-		},
+        },
 
         execute: function(id, params) {
+
+            var commandContext,
+                request,
+                command;
 
             Log.info("Executing command " + id);
 
@@ -430,17 +450,17 @@
             params = params || {};
 
             // Get the command from the conf
-            var commandContext = this.getCommandContext(id);
+            commandContext = this.getCommandContext(id);
             if (!commandContext || typeof commandContext !== "object") {
                 Log.error("No command context found with id: " + id);
                 return;
             }
 
-            var request = {
+            request = {
                 id: id,
                 params: params
             };
-            var command = CommandBuilder.createCommand(commandContext, request, this.session);
+            command = CommandBuilder.createCommand(commandContext, request, this.session);
 
             command.master.execute(request);
 
@@ -452,6 +472,10 @@
 
         getCommandContext: function(id) {
 
+            var commandContext,
+                i,
+                iCommandContext;
+
             if (!this.isInit()) {
                 Log.warn("Cannot get command context (" + id + ")- Zumo is not yet initalized");
                 return;
@@ -462,9 +486,8 @@
                 return;
             }
 
-            var commandContext;
-            for (var i = 0; i < this._conf.commands.length; i++) {
-                var iCommandContext = this._conf.commands[i];
+            for (i = 0; i < this._conf.commands.length; i++) {
+                iCommandContext = this._conf.commands[i];
                 if (iCommandContext.id == id) {
                     commandContext = iCommandContext;
                     break;
@@ -507,9 +530,10 @@
         },
 
         _initConf: function(conf) {
+            var confLoader;
             if (typeof conf == "string") {
                 Log.info("Initializing with remote configuration: " + conf);
-                var confLoader = new Loader();
+                confLoader = new Loader();
                 confLoader.load(conf, this._onConfLoaded, this);
             } else {
                 this._processConf(conf)
@@ -517,27 +541,33 @@
         },
 
         _initViewMasters: function() {
+            var p,
+                masterName;
             ViewMasters.init();
-            for (var p in this._VIEW_MASTERS) {
-                var masterName = this._VIEW_MASTERS[p];
+            for (p in this._VIEW_MASTERS) {
+                masterName = this._VIEW_MASTERS[p];
                 this.registerViewMaster(p, ViewMasters[masterName]);
             }
             this.session.defaultViewMasterClass = this.session.viewMasters[this._DEFAULT_VIEW_TYPE];
         },
 
         _initStateManagers: function() {
+            var p,
+                managerName;
             StateManagers.init();
-            for (var p in this._STATE_MANAGERS) {
-                var managerName = this._STATE_MANAGERS[p];
+            for (p in this._STATE_MANAGERS) {
+                managerName = this._STATE_MANAGERS[p];
                 this.registerStateManager(p, StateManagers[managerName]);
             }
             this.session.defaultStateManagerClass = this.session.stateManagers[this._DEFAULT_STATE_MANAGER];
         },
 
         _initCommandMasters: function() {
+            var p,
+                masterName;
             CommandMasters.init();
-            for (var p in this._COMMAND_MASTERS) {
-                var masterName = this._COMMAND_MASTERS[p];
+            for (p in this._COMMAND_MASTERS) {
+                masterName = this._COMMAND_MASTERS[p];
                 this.registerCommandMaster(p, CommandMasters[masterName]);
             }
             this.session.defaultCommandMasterClass = this.session.commandMasters[this._DEFAULT_COMMAND_TYPE];
@@ -566,22 +596,27 @@
 
         _displayDepends: function(pageBlock) {
 
-            Log.debug("Displaying depends for " + pageBlock.id)
+            var a,
+                params,
+                prevPage,
+                i;
+
+            Log.debug("Displaying depends for " + pageBlock.id);
 
             if (!pageBlock)
                 return;
 
-            var a = this._getFlattenedDepends(pageBlock);
+            a = this._getFlattenedDepends(pageBlock);
 
-            for (var i = 0; i < a.length; i++) {
-                var params = {};
+            for (i = 0; i < a.length; i++) {
+                params = {};
                 params[this._PARAM_NAME_CALLER] = pageBlock.id;
                 this.displayBlock(a[i], params);
             }
 
             // If the caller is a page, remove the previous page's obsolete depends.
             if (pageBlock.context.node == "page") {
-                var prevPage = pageBlock.request.referrer;
+                prevPage = pageBlock.request.referrer;
                 if (prevPage != null)
                     this._clearDepends(prevPage);
             }
@@ -590,15 +625,19 @@
 
         _clearDepends: function(pageBlock) {
 
+            var a,
+                i,
+                block;
+
             Log.debug("Clearing depends for " + pageBlock.id)
 
             if (!pageBlock)
                 return;
 
-            var a = this._getFlattenedDepends(pageBlock);
+            a = this._getFlattenedDepends(pageBlock);
 
-            for (var i = 0; i < a.length; i++) {
-                var block = this.getDisplayedBlock(a[i]);
+            for (i = 0; i < a.length; i++) {
+                block = this.getDisplayedBlock(a[i]);
                 if (!block)
                     continue;
                 block.removeCaller(pageBlock.id);
@@ -611,8 +650,12 @@
         _getFlattenedDepends: function(o, aInit) {
 
             // Create the array containing depends names or set it to an initial one.
-            var a = aInit || [];
-            var depends = o.depends;
+            var a = aInit || [],
+                depends = o.depends,
+                i,
+                id,
+                blockContext;
+
             if (!depends && o.context)
                 depends = o.context.depends;
             if (!depends)
@@ -620,9 +663,9 @@
 
             //TODO: XXX: Move this elsewhere
             if(!Array.indexOf){
-                Array.prototype.indexOf = function(obj){
-                    for(var i=0; i<this.length; i++){
-                        if(this[i]==obj){
+                Array.prototype.indexOf = function(obj) {
+                    for(var i = 0; i < this.length; i++) {
+                        if(this[i] == obj){
                             return i;
                         }
                     }
@@ -632,10 +675,10 @@
 
 
             // Iterate through all depends in this context.
-            for (var i = 0; i < depends.length; i++) {
+            for (i = 0; i < depends.length; i++) {
 
                 // Get the name.
-                var id = depends[i];
+                id = depends[i];
 
                 // If it's already in the array, continue.
                 if (a.indexOf(id) != -1)
@@ -643,7 +686,7 @@
 
                 // Add the depends and subdepends to the array.
                 a.push(id);
-                var blockContext = this.getBlockContext(id);
+                blockContext = this.getBlockContext(id);
                 this._getFlattenedDepends(blockContext, a);
 
             }
@@ -675,11 +718,12 @@
         _processParenting: function() {
             var pages = this.getPageContexts(),
                 i,
-                context;
+                context,
+                parent;
             for (i = 0; i < pages.length; i++) {
                 context = pages[i];
                 if (context.parentId) {
-                    var parent = this.getPageContext(context.parentId);
+                    parent = this.getPageContext(context.parentId);
                     if (!parent) {
                         Log.warn("Parent node '" + context.parentId + "' cannot be found for '" + context.id + "'");
                         continue;

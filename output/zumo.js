@@ -426,67 +426,68 @@
 
 	};
 
-	// *** LOADER CLASS
+    // *** LOADER CLASS
 
-	var Loader = function() {
-		this.method = "GET";
-		// --
-		// Implementing:
-		// this.xmlHttp = null;
-		// this.callback= null;
-		// this.callbackObject = null;
-	};
+    var Loader = function() {
+        this.method = "GET";
+        // --
+        // Implementing:
+        // this.xmlHttp = null;
+        // this.callback= null;
+        // this.callbackObject = null;
+    };
 
-	Loader.prototype = {
+    Loader.prototype = {
 
-		load: function(url, onLoaded, callbackObject) {
+        load: function(url, onLoaded, callbackObject) {
 
-			this.callback = onLoaded;
-			this.callbackObject = callbackObject;
-			var onState = this.onState;
-			var thisObject = this;
+            var onState = this.onState,
+                thisObject = this;
 
-			if (window.XMLHttpRequest) {
-				this.xmlHttp = new XMLHttpRequest();
-				this.xmlHttp.onreadystatechange = function() {
-					thisObject.onState.call(thisObject);
-				};
-				this.xmlHttp.open(this.method, url, true);
-				this.xmlHttp.send(null);
-			} else if (window.ActiveXObject) {
-				Log.info("Loader using ActiveX");
-				this.xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
-				if (this.xmlHttp) {
-					this.xmlHttp.onreadystatechange = function() {
-						thisObject.onState.call(thisObject);
-					};
-					this.xmlHttp.open(this.method, url, true);
-					this.xmlHttp.send();
-				}
-			}
+            this.callback = onLoaded;
+            this.callbackObject = callbackObject;
 
-			if (!this.xmlHttp)
-				Log.error("Loader could not create an XML HTTP object");
+            if (window.XMLHttpRequest) {
+                this.xmlHttp = new XMLHttpRequest();
+                this.xmlHttp.onreadystatechange = function() {
+                    thisObject.onState.call(thisObject);
+                };
+                this.xmlHttp.open(this.method, url, true);
+                this.xmlHttp.send(null);
+            } else if (window.ActiveXObject) {
+                Log.info("Loader using ActiveX");
+                this.xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+                if (this.xmlHttp) {
+                    this.xmlHttp.onreadystatechange = function() {
+                        thisObject.onState.call(thisObject);
+                    };
+                    this.xmlHttp.open(this.method, url, true);
+                    this.xmlHttp.send();
+                }
+            }
 
-		},
+            if (!this.xmlHttp)
+                Log.error("Loader could not create an XML HTTP object");
 
-		onState: function() {
-			if (this.xmlHttp.readyState == 4) {
-				if (this.xmlHttp.status == 200 || this.xmlHttp.status == 0) {
-					this.onLoaded(this.xmlHttp);
-				} else {
-					Log.warn("The server returned an error when trying to load: " + this.xmlHttp.responseXML);
-				}
-			}
-		},
+        },
 
-		onLoaded: function(xmlHttp) {
-			Log.debug("The server returned content from Loader");
-			if (typeof this.callback == "function")
-				this.callback.call(this.callbackObject, xmlHttp);
-		}
+        onState: function() {
+            if (this.xmlHttp.readyState == 4) {
+                if (this.xmlHttp.status == 200 || this.xmlHttp.status == 0) {
+                    this.onLoaded(this.xmlHttp);
+                } else {
+                    Log.warn("The server returned an error when trying to load: " + this.xmlHttp.responseXML);
+                }
+            }
+        },
 
-	};
+        onLoaded: function(xmlHttp) {
+            Log.debug("The server returned content from Loader");
+            if (typeof this.callback == "function")
+                this.callback.call(this.callbackObject, xmlHttp);
+        }
+
+    };
 
 	// *** PROPS MANAGER OBJECT
 
@@ -1181,128 +1182,128 @@
 
 	};
 
-	// *** COMMAND CLASS
+    // *** COMMAND CLASS
 
-	var Command = function (context, request, session) {
-		this.id = context.id;
-		this.context = context;
-		this.request = request;
-		this.session = session;
-		// --
-		// Implementing:
-		// this.master = null;
-	};
-
-
-	// *** COMMAND BUILDER OBJECT
-
-	var CommandBuilder = {
-
-		// --- METHODS
-
-		createCommand: function(context, request, session) {
-			var command = new Command(context, request, session);
-			command.master = this._buildMaster(context, request, session);
-			return command;
-		},
-
-		_buildMaster: function(context, request, session) {
-
-			var masterClass,
-				master,
-				type = StringUtils.trim(context.type).toLowerCase();
-
-			if (type != "") {
-				masterClass = session.commandMasters["_" + type];
-			} else {
-				masterClass = session.defaultCommandMasterClass;
-			}
-
-			if (masterClass) {
-				if (typeof masterClass == "function") {
-					master = new masterClass(context, request, session);
-				} else {
-					Log.error("The type " + type + " in " + context.id + " cannot create a new command");
-				}
-			} else {
-				Log.error("The type " + type + " cannot be resolved in command: " + context.id);
-			}
-
-			return master;
-
-		}
-
-	};
-
-	
-	// *** COMMAND MASTERS OBJECT
-
-	var CommandMasters = {
-
-		// --- METHODS - Using init method to create class functions as CommandMasters members
-
-		init: function() {
+    var Command = function (context, request, session) {
+        this.id = context.id;
+        this.context = context;
+        this.request = request;
+        this.session = session;
+        // --
+        // Implementing:
+        // this.master = null;
+    };
 
 
-			// *** ABSTRACT MASTER CLASS
+    // *** COMMAND BUILDER OBJECT
 
-			var AbstractMaster = function(context, request, session) {
-				this.context = context;
-				this.request = request;
-				this.session = session;
-				this.isExecuted = false;
-			};
+    var CommandBuilder = {
 
-			AbstractMaster.prototype = {
+        // --- METHODS
 
-				execute: function() {
-					Log.debug("Initializing " + this.context.id);
-				}
+        createCommand: function(context, request, session) {
+            var command = new Command(context, request, session);
+            command.master = this._buildMaster(context, request, session);
+            return command;
+        },
 
-			};
+        _buildMaster: function(context, request, session) {
+
+            var masterClass,
+                master,
+                type = StringUtils.trim(context.type).toLowerCase();
+
+            if (type != "") {
+                masterClass = session.commandMasters["_" + type];
+            } else {
+                masterClass = session.defaultCommandMasterClass;
+            }
+
+            if (masterClass) {
+                if (typeof masterClass == "function") {
+                    master = new masterClass(context, request, session);
+                } else {
+                    Log.error("The type " + type + " in " + context.id + " cannot create a new command");
+                }
+            } else {
+                Log.error("The type " + type + " cannot be resolved in command: " + context.id);
+            }
+
+            return master;
+
+        }
+
+    };
 
 
-			// *** FUNCTION MASTER CLASS
+    // *** COMMAND MASTERS OBJECT
 
-			var FunctionMaster = function(context, request, session) {
-				AbstractMaster.call(this, context, request, session);
-				//TODO: See how to configure the master properties.
-			};
+    var CommandMasters = {
 
-			FunctionMaster.prototype = {
+        // --- METHODS - Using init method to create class functions as CommandMasters members
 
-				execute: function() {
-					AbstractMaster.prototype.execute.apply(this, arguments); // Call super
-					var f = ObjectUtils.find(this.context.target),
-					    args = [],
+        init: function() {
+
+
+            // *** ABSTRACT MASTER CLASS
+
+            var AbstractMaster = function(context, request, session) {
+                this.context = context;
+                this.request = request;
+                this.session = session;
+                this.isExecuted = false;
+            };
+
+            AbstractMaster.prototype = {
+
+                execute: function() {
+                    Log.debug("Initializing " + this.context.id);
+                }
+
+            };
+
+
+            // *** FUNCTION MASTER CLASS
+
+            var FunctionMaster = function(context, request, session) {
+                AbstractMaster.call(this, context, request, session);
+                //TODO: See how to configure the master properties.
+            };
+
+            FunctionMaster.prototype = {
+
+                execute: function() {
+                    AbstractMaster.prototype.execute.apply(this, arguments); // Call super
+                    var f = ObjectUtils.find(this.context.target),
+                        args = [],
                         data = {};
                     ObjectUtils.merge(data, [this.context.props, this.request.params]);
-					if (data._args && data._args.length)
-						args = data._args.slice(0);
-					if (!ObjectUtils.isEmpty(data))
-						args.push(data);
-					if (typeof f == "function") {
-						f.apply(null, args); //TODO: Check the this context.
+                    if (data._args && data._args.length)
+                        args = data._args.slice(0);
+                    if (!ObjectUtils.isEmpty(data))
+                        args.push(data);
+                    if (typeof f == "function") {
+                        f.apply(null, args); //TODO: Check the this context.
                     } else {
                         Log.warn("There is no function to execute for command '" + this.context.id + "' and target '" +
-							     this.context.target + "'.");
+                            this.context.target + "'.");
                     }
-					this.isExecuted = true;
-				}
+                    this.isExecuted = true;
+                }
 
-			};
+            };
 
 
-			// *** INIT - Initializing CommandMasters
+            // *** INIT - Initializing CommandMasters
 
-			this.AbstractMaster = AbstractMaster;
-			this.FunctionMaster = FunctionMaster;
+            this.AbstractMaster = AbstractMaster;
+            this.FunctionMaster = FunctionMaster;
 
-			//ObjectUtils.extend(this.FunctionMaster, this.AbstractMaster);
+            //ObjectUtils.extend(this.FunctionMaster, this.AbstractMaster);
 
-		}
+        }
 
-	};
+    };
 
     // *** XML CONF PARSER OBJECT
 
@@ -1322,16 +1323,16 @@
         _parseViews: function(conf, session) {
 
             var viewNodes = conf.getElementsByTagName("views"),
-				views = {
-					pages: [],
-					blocks: []
-				},
-				nodeName,
-				pageNodes,
-				blockNodes,
-				pageContext,
-				blockContext,
-				i;
+                views = {
+                    pages: [],
+                    blocks: []
+                },
+                nodeName,
+                pageNodes,
+                blockNodes,
+                pageContext,
+                blockContext,
+                i;
 
             if (viewNodes.length > 1) {
                 Log.warn("There can only be zero or one views nodes on the XML configuration, there were " +
@@ -1619,23 +1620,28 @@
 
             //TODO: Consider sorting on priorities
 
+            var pageContexts = this.app.getPageContexts(),
+                blockContexts = this.app.getBlockContexts(),
+                commandContexts = this.app.getCommandContexts(),
+                pageContext,
+                blockContext,
+                commandContext,
+                i;
+
             this.unregisterHandlers();
 
-            var pageContexts = this.app.getPageContexts();
-            for (var i = 0; i < pageContexts.length; i++) {
-                var pageContext = pageContexts[i];
+            for (i = 0; i < pageContexts.length; i++) {
+                pageContext = pageContexts[i];
                 this._registerHandlersFromContext(pageContext, "page");
             }
 
-            var blockContexts = this.app.getBlockContexts();
             for (i = 0; i < blockContexts.length; i++) {
-                var blockContext = blockContexts[i];
+                blockContext = blockContexts[i];
                 this._registerHandlersFromContext(blockContext, "block");
             }
 
-            var commandContexts = this.app.getCommandContexts();
             for (i = 0; i < commandContexts.length; i++) {
-                var commandContext = commandContexts[i];
+                commandContext = commandContexts[i];
                 this._registerHandlersFromContext(commandContext, "command");
             }
 
@@ -1645,7 +1651,7 @@
 
             if (this.updateBindings) {
                 //TODO: XXX: Check performance of reevaluating the bindings so often.
-                //TODO: XXX: Maybe we can use event bubbling, add all listeners to the body/root and check for target match.
+                //TODO: XXX: Maybe we can use event bubbling, add all listeners to the body/root and check target match.
                 Agent.observe(this.app, "onPageInit", this.onViewInit, this);
                 Agent.observe(this.app, "onBlockInit", this.onViewInit, this);
             }
@@ -1654,8 +1660,9 @@
 
         unregisterHandlers: function() {
             //TODO: Test
+            var activeHandler;
             while (this._activeHandlers.length > 0) {
-                var activeHandler = this._activeHandlers.pop();
+                activeHandler = this._activeHandlers.pop();
                 this._removePageBlockHandlerAction(activeHandler);
             }
             Agent.ignore(this.app, "onPageInit", this.onViewInit);
@@ -1663,8 +1670,10 @@
         },
 
         _registerHandlersFromContext: function(context, contextType) {
-            for (var i = 0; i < context.handlers.length; i++) {
-                var activeHandler = {
+            var activeHandler,
+                i;
+            for (i = 0; i < context.handlers.length; i++) {
+                activeHandler = {
                     handlerContext: context.handlers[i],
                     context: context,
                     contextType: contextType,
@@ -1688,25 +1697,26 @@
 
         _createPageHandlerAction: function(handlerContext, pageContext) {
 
-            var app = this.app;
-            var f;
-
-            var fGo = function() {
-                //TODO: Review params logic
-                var params = arguments[1];
-                var page = app.getCurrentPage();
-                if (!handlerContext.at || handlerContext.at == "" || handlerContext.at == page.id) {
-                    if (page && pageContext.id == page.id) {
-                        Log.debug("Handler " + handlerContext.type + "trigger when already at " + page.id);
-                        ParamsManager.apply(page.master.target, handlerContext.params, this.session);
-                    } else {
-                        var ft = Delegate.create(app.go, app, [pageContext.id, params]);
-                        setTimeout(ft, 10);
+            var app = this.app,
+                f,
+                fGo = function() {
+                    //TODO: Review params logic
+                    var params = arguments[1],
+                        page = app.getCurrentPage(),
+                        ft;
+                    if (!handlerContext.at || handlerContext.at == "" || handlerContext.at == page.id) {
+                        if (page && pageContext.id == page.id) {
+                            Log.debug("Handler " + handlerContext.type + "trigger when already at " + page.id);
+                            ParamsManager.apply(page.master.target, handlerContext.params, this.session);
+                        } else {
+                            ft = Delegate.create(app.go, app, [pageContext.id, params]);
+                            setTimeout(ft, 10);
+                        }
                     }
-                }
-            };
+                };
 
-            if (handlerContext.action == "go" || handlerContext.action == "go" || handlerContext.action == "call" || handlerContext.action == "" || handlerContext.action == null) {
+            if (handlerContext.action == "go" || handlerContext.action == "go" || handlerContext.action == "call" ||
+                handlerContext.action == "" || handlerContext.action == null) {
                 f = fGo;
             } else {
                 Log.warn("Could not resolve handler action: " + handlerContext.action);
@@ -1720,30 +1730,30 @@
 
         _createBlockHandlerAction: function(handlerContext, blockContext) {
 
-            var app = this.app;
-            var f;
-
-            var fDisplay = function() {
-                //TODO: Review params logic
-                var params = arguments[1];
-                if (!handlerContext.at || handlerContext.at == "" || handlerContext.at == app.getCurrentPage().id) {
-                    var block = app.getDisplayedBlock(blockContext.id);
-                    if (block) {
-                        ParamsManager.apply(block.master.target, handlerContext.params, this.session);
-                    } else {
-                        app.displayBlock(blockContext.id, params);
+            var app = this.app,
+                f,
+                fDisplay = function() {
+                    //TODO: Review params logic
+                    var params = arguments[1],
+                        block;
+                    if (!handlerContext.at || handlerContext.at == "" || handlerContext.at == app.getCurrentPage().id) {
+                        block = app.getDisplayedBlock(blockContext.id);
+                        if (block) {
+                            ParamsManager.apply(block.master.target, handlerContext.params, this.session);
+                        } else {
+                            app.displayBlock(blockContext.id, params);
+                        }
                     }
-                }
-            };
-
-            var fClear = function() {
-                if (!handlerContext.at || handlerContext.at == "" || handlerContext.at == app.getCurrentPage().id)
-                    app.clearBlock(blockContext.id);
-            };
+                },
+                fClear = function() {
+                    if (!handlerContext.at || handlerContext.at == "" || handlerContext.at == app.getCurrentPage().id)
+                        app.clearBlock(blockContext.id);
+                };
 
             if (handlerContext.action == "clearBlock") {
                 f = fClear;
-            } else if (handlerContext.action == "displayBlock" || handlerContext.action == "call" || handlerContext.action == "" || handlerContext.action == null) {
+            } else if (handlerContext.action == "displayBlock" || handlerContext.action == "call" ||
+                       handlerContext.action == "" || handlerContext.action == null) {
                 f = fDisplay;
             } else {
                 Log.warn("Could not resolve handler action: " + handlerContext.action);
@@ -1757,17 +1767,17 @@
 
         _createCommandHandlerAction: function(handlerContext, commandContext) {
 
-            var app = this.app;
-            var f;
-
-            var fExecute= function() {
-                var page = app.getCurrentPage();
-                if (!handlerContext.at || handlerContext.at == "" || handlerContext.at == page.id) {
-                    //TODO: Review params logic
-                    var params = arguments[1];
-                    app.execute(commandContext.id, params);
-                }
-            };
+            var app = this.app,
+                f,
+                fExecute= function() {
+                    var page = app.getCurrentPage(),
+                        params;
+                    if (!handlerContext.at || handlerContext.at == "" || handlerContext.at == page.id) {
+                        //TODO: Review params logic
+                        params = arguments[1];
+                        app.execute(commandContext.id, params);
+                    }
+                };
 
             if (handlerContext.action == "execute" || handlerContext.action == "" || handlerContext.action == null) {
                 f = fExecute;
@@ -1945,6 +1955,10 @@
         // Displays a specific page by id, taking out the page currently displayed
         go: function(id, params) {
 
+            var pageContext,
+                request,
+                page;
+
             Log.info("Going to page " + id);
 
             if (!this.isInit()) {
@@ -1965,7 +1979,7 @@
             }
 
             // Get the page from the conf
-            var pageContext = this.getPageContext(id);
+            pageContext = this.getPageContext(id);
             if (!pageContext || typeof pageContext !== "object") {
                 Log.error("No page context found with id: " + id);
                 return;
@@ -1974,12 +1988,12 @@
             //TODO: Implement aliases
             //TODO: Check wether that page is already being requested
 
-            var request = {
+            request = {
                 id: id,
                 params: params,
                 referrer: this._currentPage
             };
-            var page = PageBlockBuilder.createPage(pageContext, request, this.session);
+            page = PageBlockBuilder.createPage(pageContext, request, this.session);
 
             this.onPageRequest(pageContext, request);
 
@@ -2009,19 +2023,22 @@
 
         getPageContext: function(id) {
 
+            var pageContext,
+                i,
+                iPageContext;
+
             if (!this.isInit()) {
                 Log.warn("Cannot get page context (" + id + ")- Zumo is not yet initalized");
-                return;
+                return null;
             }
 
             if (this._conf.views == null) {
                 Log.info("Cannot get page context since there are no views configured");
-                return;
+                return null;
             }
 
-            var pageContext;
-            for (var i = 0; i < this._conf.views.pages.length; i++) {
-                var iPageContext = this._conf.views.pages[i];
+            for (i = 0; i < this._conf.views.pages.length; i++) {
+                iPageContext = this._conf.views.pages[i];
                 if (iPageContext.id == id) {
                     pageContext = iPageContext;
                     break;
@@ -2038,9 +2055,10 @@
 
         getPageContextsAt: function(level) {
             var a = [],
-                i;
+                i,
+                pageContext;
             for (i = 0; i < this._conf.views.pages.length; i++) {
-                var pageContext = this._conf.views.pages[i];
+                pageContext = this._conf.views.pages[i];
                 if (pageContext.level == level)
                     a.push(pageContext);
             }
@@ -2066,6 +2084,10 @@
         // Displays a specific block by id
         displayBlock: function(id, params) {
 
+            var block,
+                request,
+                blockContext;
+
             Log.info("Displaying block " + id);
 
             if (!this.isInit()) {
@@ -2075,7 +2097,7 @@
 
             params = params || {};
 
-            var block = this.getDisplayedBlock(id);
+            block = this.getDisplayedBlock(id);
 
             // Check whether the block is already displayed
             if (block) {
@@ -2092,7 +2114,7 @@
             } else {
 
                 // Get the block from the conf
-                var blockContext = this.getBlockContext(id);
+                blockContext = this.getBlockContext(id);
                 if (!blockContext || typeof blockContext !== "object") {
                     Log.error("No block context found with id: " + id);
                     return;
@@ -2101,7 +2123,7 @@
                 //TODO: Implement aliases
                 //TODO: Check wether that block is already being requested
 
-                var request = {
+                request = {
                     id: id,
                     params: params
                 };
@@ -2164,19 +2186,22 @@
 
         getBlockContext: function(id) {
 
+            var blockContext,
+                i,
+                iBlockContext;
+
             if (!this.isInit()) {
                 Log.warn("Cannot get block context (" + id + ")- Zumo is not yet initalized");
-                return;
+                return null;
             }
 
             if (this._conf.views == null) {
                 Log.info("Cannot get block context since there are no views configured");
-                return;
+                return null;
             }
 
-            var blockContext;
-            for (var i = 0; i < this._conf.views.blocks.length; i++) {
-                var iBlockContext = this._conf.views.blocks[i];
+            for (i = 0; i < this._conf.views.blocks.length; i++) {
+                iBlockContext = this._conf.views.blocks[i];
                 if (iBlockContext.id == id) {
                     blockContext = iBlockContext;
                     break;
@@ -2192,8 +2217,9 @@
         },
 
         getDisplayedBlock: function(id) {
-            var block;
-            for (var i = 0; i < this._displayedBlocks.length; i++) {
+            var block,
+                i;
+            for (i = 0; i < this._displayedBlocks.length; i++) {
                 if (this._displayedBlocks[i].id == id) {
                     block = this._displayedBlocks[i];
                     break;
@@ -2240,7 +2266,7 @@
                 this.session.stateManagers[name] = manager;
             } else {
                 Log.warn("Cannot register state manager with name " + name + " - there is already registered a " +
-					"manager with that name")
+                         "manager with that name")
             }
         },
 
@@ -2248,18 +2274,22 @@
             this.session.stateManagers[name] = null;
         },
 
-		createStateManager: function(name) {
+        createStateManager: function(name) {
 
-			// Proxy to StateManagers.createStateManager with the arguments passed without name, and register.
-			var stateManager = StateManagers.createStateManager.apply(StateManagers, [].slice.call(arguments, 1));
+            // Proxy to StateManagers.createStateManager with the arguments passed without name, and register.
+            var stateManager = StateManagers.createStateManager.apply(StateManagers, [].slice.call(arguments, 1));
 
-			this.registerStateManager(name, stateManager);
+            this.registerStateManager(name, stateManager);
 
-			return stateManager;
+            return stateManager;
 
-		},
+        },
 
         execute: function(id, params) {
+
+            var commandContext,
+                request,
+                command;
 
             Log.info("Executing command " + id);
 
@@ -2271,17 +2301,17 @@
             params = params || {};
 
             // Get the command from the conf
-            var commandContext = this.getCommandContext(id);
+            commandContext = this.getCommandContext(id);
             if (!commandContext || typeof commandContext !== "object") {
                 Log.error("No command context found with id: " + id);
                 return;
             }
 
-            var request = {
+            request = {
                 id: id,
                 params: params
             };
-            var command = CommandBuilder.createCommand(commandContext, request, this.session);
+            command = CommandBuilder.createCommand(commandContext, request, this.session);
 
             command.master.execute(request);
 
@@ -2293,6 +2323,10 @@
 
         getCommandContext: function(id) {
 
+            var commandContext,
+                i,
+                iCommandContext;
+
             if (!this.isInit()) {
                 Log.warn("Cannot get command context (" + id + ")- Zumo is not yet initalized");
                 return;
@@ -2303,9 +2337,8 @@
                 return;
             }
 
-            var commandContext;
-            for (var i = 0; i < this._conf.commands.length; i++) {
-                var iCommandContext = this._conf.commands[i];
+            for (i = 0; i < this._conf.commands.length; i++) {
+                iCommandContext = this._conf.commands[i];
                 if (iCommandContext.id == id) {
                     commandContext = iCommandContext;
                     break;
@@ -2348,9 +2381,10 @@
         },
 
         _initConf: function(conf) {
+            var confLoader;
             if (typeof conf == "string") {
                 Log.info("Initializing with remote configuration: " + conf);
-                var confLoader = new Loader();
+                confLoader = new Loader();
                 confLoader.load(conf, this._onConfLoaded, this);
             } else {
                 this._processConf(conf)
@@ -2358,27 +2392,33 @@
         },
 
         _initViewMasters: function() {
+            var p,
+                masterName;
             ViewMasters.init();
-            for (var p in this._VIEW_MASTERS) {
-                var masterName = this._VIEW_MASTERS[p];
+            for (p in this._VIEW_MASTERS) {
+                masterName = this._VIEW_MASTERS[p];
                 this.registerViewMaster(p, ViewMasters[masterName]);
             }
             this.session.defaultViewMasterClass = this.session.viewMasters[this._DEFAULT_VIEW_TYPE];
         },
 
         _initStateManagers: function() {
+            var p,
+                managerName;
             StateManagers.init();
-            for (var p in this._STATE_MANAGERS) {
-                var managerName = this._STATE_MANAGERS[p];
+            for (p in this._STATE_MANAGERS) {
+                managerName = this._STATE_MANAGERS[p];
                 this.registerStateManager(p, StateManagers[managerName]);
             }
             this.session.defaultStateManagerClass = this.session.stateManagers[this._DEFAULT_STATE_MANAGER];
         },
 
         _initCommandMasters: function() {
+            var p,
+                masterName;
             CommandMasters.init();
-            for (var p in this._COMMAND_MASTERS) {
-                var masterName = this._COMMAND_MASTERS[p];
+            for (p in this._COMMAND_MASTERS) {
+                masterName = this._COMMAND_MASTERS[p];
                 this.registerCommandMaster(p, CommandMasters[masterName]);
             }
             this.session.defaultCommandMasterClass = this.session.commandMasters[this._DEFAULT_COMMAND_TYPE];
@@ -2407,22 +2447,27 @@
 
         _displayDepends: function(pageBlock) {
 
-            Log.debug("Displaying depends for " + pageBlock.id)
+            var a,
+                params,
+                prevPage,
+                i;
+
+            Log.debug("Displaying depends for " + pageBlock.id);
 
             if (!pageBlock)
                 return;
 
-            var a = this._getFlattenedDepends(pageBlock);
+            a = this._getFlattenedDepends(pageBlock);
 
-            for (var i = 0; i < a.length; i++) {
-                var params = {};
+            for (i = 0; i < a.length; i++) {
+                params = {};
                 params[this._PARAM_NAME_CALLER] = pageBlock.id;
                 this.displayBlock(a[i], params);
             }
 
             // If the caller is a page, remove the previous page's obsolete depends.
             if (pageBlock.context.node == "page") {
-                var prevPage = pageBlock.request.referrer;
+                prevPage = pageBlock.request.referrer;
                 if (prevPage != null)
                     this._clearDepends(prevPage);
             }
@@ -2431,15 +2476,19 @@
 
         _clearDepends: function(pageBlock) {
 
+            var a,
+                i,
+                block;
+
             Log.debug("Clearing depends for " + pageBlock.id)
 
             if (!pageBlock)
                 return;
 
-            var a = this._getFlattenedDepends(pageBlock);
+            a = this._getFlattenedDepends(pageBlock);
 
-            for (var i = 0; i < a.length; i++) {
-                var block = this.getDisplayedBlock(a[i]);
+            for (i = 0; i < a.length; i++) {
+                block = this.getDisplayedBlock(a[i]);
                 if (!block)
                     continue;
                 block.removeCaller(pageBlock.id);
@@ -2452,8 +2501,12 @@
         _getFlattenedDepends: function(o, aInit) {
 
             // Create the array containing depends names or set it to an initial one.
-            var a = aInit || [];
-            var depends = o.depends;
+            var a = aInit || [],
+                depends = o.depends,
+                i,
+                id,
+                blockContext;
+
             if (!depends && o.context)
                 depends = o.context.depends;
             if (!depends)
@@ -2461,9 +2514,9 @@
 
             //TODO: XXX: Move this elsewhere
             if(!Array.indexOf){
-                Array.prototype.indexOf = function(obj){
-                    for(var i=0; i<this.length; i++){
-                        if(this[i]==obj){
+                Array.prototype.indexOf = function(obj) {
+                    for(var i = 0; i < this.length; i++) {
+                        if(this[i] == obj){
                             return i;
                         }
                     }
@@ -2473,10 +2526,10 @@
 
 
             // Iterate through all depends in this context.
-            for (var i = 0; i < depends.length; i++) {
+            for (i = 0; i < depends.length; i++) {
 
                 // Get the name.
-                var id = depends[i];
+                id = depends[i];
 
                 // If it's already in the array, continue.
                 if (a.indexOf(id) != -1)
@@ -2484,7 +2537,7 @@
 
                 // Add the depends and subdepends to the array.
                 a.push(id);
-                var blockContext = this.getBlockContext(id);
+                blockContext = this.getBlockContext(id);
                 this._getFlattenedDepends(blockContext, a);
 
             }
@@ -2516,11 +2569,12 @@
         _processParenting: function() {
             var pages = this.getPageContexts(),
                 i,
-                context;
+                context,
+                parent;
             for (i = 0; i < pages.length; i++) {
                 context = pages[i];
                 if (context.parentId) {
-                    var parent = this.getPageContext(context.parentId);
+                    parent = this.getPageContext(context.parentId);
                     if (!parent) {
                         Log.warn("Parent node '" + context.parentId + "' cannot be found for '" + context.id + "'");
                         continue;
