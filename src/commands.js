@@ -27,8 +27,9 @@
 
 		_buildMaster: function(context, request, session) {
 
-			var masterClass, master;
-			var type = StringUtils.trim(context.type).toLowerCase();
+			var masterClass,
+				master,
+				type = StringUtils.trim(context.type).toLowerCase();
 
 			if (type != "") {
 				masterClass = session.commandMasters["_" + type];
@@ -102,7 +103,8 @@
 					if (typeof f == "function") {
 						f.apply(null, args); //TODO: Check the this context.
                     } else {
-                        Log.warn("There is no function to execute for command '" + this.context.id + "' and target '" + this.context.target + "'.");
+                        Log.warn("There is no function to execute for command '" + this.context.id + "' and target '" +
+							     this.context.target + "'.");
                     }
 					this.isExecuted = true;
 				}
