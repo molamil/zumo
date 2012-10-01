@@ -1,21 +1,24 @@
 
 
-	// *** PARAMS MANAGER OBJECT
+    // *** PARAMS MANAGER OBJECT
 
-	var ParamsManager = {
+    var ParamsManager = {
 
-		// --- METHODS
+        // --- METHODS
 
-		apply: function(target, params, session) {
+        apply: function(target, params, session) {
 
-			//TODO: Add checks
+            var i,
+                param;
 
-			// Merge the params
-			for(var i = 0; i < params.length; i++) {
-				var param = params[i];
-				target[param.name] = param.value;
-			}
+            //TODO: Add checks
 
-		}
+            // Merge the params
+            for(i = 0; i < params.length; i++) {
+                param = params[i];
+                target[param.name] = param.value;
+            }
 
-	};
+        }
+
+    };

@@ -394,7 +394,7 @@
                 this.session.viewMasters[name] = master;
             } else {
                 Log.warn("Cannot register view master with name " + name + " - there is already registered a master " +
-                    "with that name")
+                         "with that name")
             }
         },
 
@@ -511,7 +511,7 @@
                 this.session.commandMasters[name] = master;
             } else {
                 Log.warn("Cannot register command master with name " + name + " - there is already registered a " +
-					"master with that name")
+                         "master with that name")
             }
         },
 
@@ -519,12 +519,12 @@
             this.session.commandMasters[name] = null;
         },
 
-		//TODO: Use mix function instead of the verbose proxy.
+        //TODO: Use mix function instead of the verbose proxy.
         observe: function(fName, hook, priority) {
             Agent.observe(this, fName, hook, priority);
         },
 
-		//TODO: Use mix function instead of the verbose proxy.
+        //TODO: Use mix function instead of the verbose proxy.
         ignore: function(fName, hook) {
             Agent.ignore(this, fName, hook);
         },

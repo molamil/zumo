@@ -113,8 +113,8 @@
 			Fade.prototype = {
 
 				doIn: function() {
-					var that = this;
-					var $target = $(this.target);
+					var that = this,
+                        $target = $(this.target);
 					$target.css("display", "none");
 					$target.fadeIn("slow", function() {
 						that.setState(Zumo.StateManagers.STATE_ON);
@@ -157,9 +157,12 @@
             return null;
 
         mergeAttributes = function(o, element, list) {
-            for (var i = 0; i < list.length; i++) {
-                var name = list[i];
-                var value = $(element).attr("data-" + name);
+            var i,
+                name,
+                value;
+            for (i = 0; i < list.length; i++) {
+                name = list[i];
+                value = $(element).attr("data-" + name);
                 if (value)
                     o[name] = value;
             }

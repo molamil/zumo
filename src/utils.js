@@ -1,119 +1,121 @@
 
 
-	// *** LOG OBJECT
+    // *** LOG OBJECT
 
-	var Log = {
+    var Log = {
 
-		// --- PROPERTIES
+        // --- PROPERTIES
 
-		LEVELS: ["error", "warn", "info", "debug"],
-		level: 2,
-		prefix: _NAME.toUpperCase() + " - ",
+        LEVELS: ["error", "warn", "info", "debug"],
+        level: 2,
+        prefix: _NAME.toUpperCase() + " - ",
 
-		// --- METHODS
+        // --- METHODS
 
-		debug: function(message) {
-			if (typeof message == "string")
-				message = this.prefix + message;
-			this._log(message, 3);
-		},
+        debug: function(message) {
+            if (typeof message == "string")
+                message = this.prefix + message;
+            this._log(message, 3);
+        },
 
-		info: function(message) {
-			this._log(this.prefix + message, 2);
-		},
+        info: function(message) {
+            this._log(this.prefix + message, 2);
+        },
 
-		warn: function(message) {
-			this._log(this.prefix + message, 1);
-		},
+        warn: function(message) {
+            this._log(this.prefix + message, 1);
+        },
 
-		error: function(message) {
-			this._log(this.prefix + message, 0);
-		},
+        error: function(message) {
+            this._log(this.prefix + message, 0);
+        },
 
-		// Default Firebug console logging implemented.
-		_log: function(message, level) {
+        // Default Firebug console logging implemented.
+        _log: function(message, level) {
 
-			// Check that Firebug is enabled.
-			if (!window.console)
-				return;
+            var fLevel;
 
-			// Set level as default if not passed.
-			if (level == null)
-				level = this.level;
+            // Check that Firebug is enabled.
+            if (!window.console)
+                return;
 
-			if (this.level >= level) {
-				var fLevel = window.console[this.LEVELS[level]];
-				if (typeof fLevel == "function")
-					fLevel.call(window.console, message);
-			}
+            // Set level as default if not passed.
+            if (level == null)
+                level = this.level;
 
-		}
+            if (this.level >= level) {
+                fLevel = window.console[this.LEVELS[level]];
+                if (typeof fLevel == "function")
+                    fLevel.call(window.console, message);
+            }
 
-	};
+        }
 
-
-	// *** DELEGATE OBJECT
-
-	var Delegate = {
-
-		// --- METHODS
-
-		create: function(f, context, args) {
-			return function () {
-				f.apply(context, args);
-			}
-		}
-
-	};
+    };
 
 
-	// *** STRING UTILS OBJECT
+    // *** DELEGATE OBJECT
 
-	var StringUtils = {
+    var Delegate = {
 
-		// --- METHODS
+        // --- METHODS
 
-		trim: function(s) {
-			s = s || "";
-			return s.replace(/^\s+|\s+$/g, "");
-		},
+        create: function(f, context, args) {
+            return function () {
+                f.apply(context, args);
+            }
+        }
 
-		ltrim: function(s) {
-			s = s || "";
-			return s.replace(/^\s+/, "");
-		},
-
-		rtrim: function(s) {
-			s = s || "";
-			return s.replace(/\s+$/, "");
-		}
-
-	};
+    };
 
 
-	// *** OBJECT UTILS OBJECT
+    // *** STRING UTILS OBJECT
 
-	var ObjectUtils = {
+    var StringUtils = {
 
-		// --- METHODS
+        // --- METHODS
 
-		extend: function(child, supertype) {
-			child.prototype.__proto__ = supertype.prototype;
-		},
+        trim: function(s) {
+            s = s || "";
+            return s.replace(/^\s+|\s+$/g, "");
+        },
 
-		mix: function() {
-			var arg,
-				prop,
-				child = {};
-			for (arg = 0; arg < arguments.length; arg++) {
-				for (prop in arguments[arg]) {
-					if (arguments[arg].hasOwnProperty(prop))
-						child[prop] = arguments[arg][prop];
-				}
-			}
-		},
+        ltrim: function(s) {
+            s = s || "";
+            return s.replace(/^\s+/, "");
+        },
 
-		merge: function(target, origin) {
+        rtrim: function(s) {
+            s = s || "";
+            return s.replace(/\s+$/, "");
+        }
+
+    };
+
+
+    // *** OBJECT UTILS OBJECT
+
+    var ObjectUtils = {
+
+        // --- METHODS
+
+        extend: function(child, supertype) {
+            child.prototype.__proto__ = supertype.prototype;
+        },
+
+        mix: function() {
+            var arg,
+                prop,
+                child = {};
+            for (arg = 0; arg < arguments.length; arg++) {
+                for (prop in arguments[arg]) {
+                    if (arguments[arg].hasOwnProperty(prop))
+                        child[prop] = arguments[arg][prop];
+                }
+            }
+        },
+
+        merge: function(target, origin) {
 
             var i,
                 l = 1,
@@ -128,23 +130,24 @@
 
             for (i = 0; i < l; i++) {
                 o = (origin.length) ? origin[i] : origin;
-				//TODO: Consider using hasOwnProperty.
+                //TODO: Consider using hasOwnProperty.
                 for (p in o)
                     target[p] = o[p];
             }
 
         },
 
-		find: function(target, container) {
-			var parts = target.split(".");
-			var o = container || window;
-			for (var i = 0; i < parts.length; i++) {
-				o = o[parts[i]];
-				if (!o)
-					break;
-			}
-			return o;
-		},
+        find: function(target, container) {
+            var parts = target.split("."),
+                o = container || window,
+                i;
+            for (i = 0; i < parts.length; i++) {
+                o = o[parts[i]];
+                if (!o)
+                    break;
+            }
+            return o;
+        },
 
         isEmpty: function(o) {
             var p;
@@ -162,18 +165,20 @@
             }
         }
 
-	};
+    };
 
 
-	// *** DOM UTILS OBJECT
+    // *** DOM UTILS OBJECT
 
     var DomUtils = {
 
         getChildren: function(o, name) {
-            var children = [];
+            var children = [],
+                i,
+                child;
             if (o && o.childNodes.length) {
-                for (var i = 0; i < o.childNodes.length; i++) {
-                    var child = o.childNodes[i];
+                for (i = 0; i < o.childNodes.length; i++) {
+                    child = o.childNodes[i];
                     if (child.nodeType == 1 && (!name || child.nodeName == name))
                         children.push(child);
                 }

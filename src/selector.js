@@ -1,15 +1,15 @@
 
 
-	// *** SELECTOR OBJECT
+    // *** SELECTOR OBJECT
 
-	var Selector = {
+    var Selector = {
 
-		// --- METHODS
+        // --- METHODS
 
-		select: function(selector, container) {
+        select: function(selector, container) {
             // Setting container to document anyway in the default selector since we use getElementById
-			container = document;
-			return container.getElementById(selector.substr(1));
-		}
+            container = document;
+            return container.getElementById(selector.substr(1));
+        }
 
-	};
+    };

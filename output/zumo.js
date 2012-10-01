@@ -2,10 +2,15 @@
 
  DECLARATION OF IMPLICIT OBJECTS ACCROSS THE ZUMO FRAMEWORK
 
- session:		{id:String, root:Object, defaultPropName:String, viewMasters:Array, defaultViewMasterClass:Object, commandMasters:Array, defaultCommandMasterClass:Object}
- request:		{id:String, params:Object}
- context:		{id:String, type:String, target:String, container:String, manager:String, title:String, props: Object, propContexts:Array, handlers:Array, node:String, parent:String, level:number}
- propContext:	{name:String, value:*, target:String}
+ session:       {id:String, root:Object, defaultPropName:String, viewMasters:Array, defaultViewMasterClass:Object,
+                 commandMasters:Array, defaultCommandMasterClass:Object}
+
+ request:       {id:String, params:Object}
+
+ context:       {id:String, type:String, target:String, container:String, manager:String, title:String, props: Object,
+                 propContexts:Array, handlers:Array, node:String, parent:String, level:number}
+
+ propContext:   {name:String, value:*, target:String}
 
  */
 (function(window) {
@@ -229,120 +234,122 @@
 
 	};
 
-	// *** LOG OBJECT
+    // *** LOG OBJECT
 
-	var Log = {
+    var Log = {
 
-		// --- PROPERTIES
+        // --- PROPERTIES
 
-		LEVELS: ["error", "warn", "info", "debug"],
-		level: 2,
-		prefix: _NAME.toUpperCase() + " - ",
+        LEVELS: ["error", "warn", "info", "debug"],
+        level: 2,
+        prefix: _NAME.toUpperCase() + " - ",
 
-		// --- METHODS
+        // --- METHODS
 
-		debug: function(message) {
-			if (typeof message == "string")
-				message = this.prefix + message;
-			this._log(message, 3);
-		},
+        debug: function(message) {
+            if (typeof message == "string")
+                message = this.prefix + message;
+            this._log(message, 3);
+        },
 
-		info: function(message) {
-			this._log(this.prefix + message, 2);
-		},
+        info: function(message) {
+            this._log(this.prefix + message, 2);
+        },
 
-		warn: function(message) {
-			this._log(this.prefix + message, 1);
-		},
+        warn: function(message) {
+            this._log(this.prefix + message, 1);
+        },
 
-		error: function(message) {
-			this._log(this.prefix + message, 0);
-		},
+        error: function(message) {
+            this._log(this.prefix + message, 0);
+        },
 
-		// Default Firebug console logging implemented.
-		_log: function(message, level) {
+        // Default Firebug console logging implemented.
+        _log: function(message, level) {
 
-			// Check that Firebug is enabled.
-			if (!window.console)
-				return;
+            var fLevel;
 
-			// Set level as default if not passed.
-			if (level == null)
-				level = this.level;
+            // Check that Firebug is enabled.
+            if (!window.console)
+                return;
 
-			if (this.level >= level) {
-				var fLevel = window.console[this.LEVELS[level]];
-				if (typeof fLevel == "function")
-					fLevel.call(window.console, message);
-			}
+            // Set level as default if not passed.
+            if (level == null)
+                level = this.level;
 
-		}
+            if (this.level >= level) {
+                fLevel = window.console[this.LEVELS[level]];
+                if (typeof fLevel == "function")
+                    fLevel.call(window.console, message);
+            }
 
-	};
+        }
 
-
-	// *** DELEGATE OBJECT
-
-	var Delegate = {
-
-		// --- METHODS
-
-		create: function(f, context, args) {
-			return function () {
-				f.apply(context, args);
-			}
-		}
-
-	};
+    };
 
 
-	// *** STRING UTILS OBJECT
+    // *** DELEGATE OBJECT
 
-	var StringUtils = {
+    var Delegate = {
 
-		// --- METHODS
+        // --- METHODS
 
-		trim: function(s) {
-			s = s || "";
-			return s.replace(/^\s+|\s+$/g, "");
-		},
+        create: function(f, context, args) {
+            return function () {
+                f.apply(context, args);
+            }
+        }
 
-		ltrim: function(s) {
-			s = s || "";
-			return s.replace(/^\s+/, "");
-		},
-
-		rtrim: function(s) {
-			s = s || "";
-			return s.replace(/\s+$/, "");
-		}
-
-	};
+    };
 
 
-	// *** OBJECT UTILS OBJECT
+    // *** STRING UTILS OBJECT
 
-	var ObjectUtils = {
+    var StringUtils = {
 
-		// --- METHODS
+        // --- METHODS
 
-		extend: function(child, supertype) {
-			child.prototype.__proto__ = supertype.prototype;
-		},
+        trim: function(s) {
+            s = s || "";
+            return s.replace(/^\s+|\s+$/g, "");
+        },
 
-		mix: function() {
-			var arg,
-				prop,
-				child = {};
-			for (arg = 0; arg < arguments.length; arg++) {
-				for (prop in arguments[arg]) {
-					if (arguments[arg].hasOwnProperty(prop))
-						child[prop] = arguments[arg][prop];
-				}
-			}
-		},
+        ltrim: function(s) {
+            s = s || "";
+            return s.replace(/^\s+/, "");
+        },
 
-		merge: function(target, origin) {
+        rtrim: function(s) {
+            s = s || "";
+            return s.replace(/\s+$/, "");
+        }
+
+    };
+
+
+    // *** OBJECT UTILS OBJECT
+
+    var ObjectUtils = {
+
+        // --- METHODS
+
+        extend: function(child, supertype) {
+            child.prototype.__proto__ = supertype.prototype;
+        },
+
+        mix: function() {
+            var arg,
+                prop,
+                child = {};
+            for (arg = 0; arg < arguments.length; arg++) {
+                for (prop in arguments[arg]) {
+                    if (arguments[arg].hasOwnProperty(prop))
+                        child[prop] = arguments[arg][prop];
+                }
+            }
+        },
+
+        merge: function(target, origin) {
 
             var i,
                 l = 1,
@@ -357,23 +364,24 @@
 
             for (i = 0; i < l; i++) {
                 o = (origin.length) ? origin[i] : origin;
-				//TODO: Consider using hasOwnProperty.
+                //TODO: Consider using hasOwnProperty.
                 for (p in o)
                     target[p] = o[p];
             }
 
         },
 
-		find: function(target, container) {
-			var parts = target.split(".");
-			var o = container || window;
-			for (var i = 0; i < parts.length; i++) {
-				o = o[parts[i]];
-				if (!o)
-					break;
-			}
-			return o;
-		},
+        find: function(target, container) {
+            var parts = target.split("."),
+                o = container || window,
+                i;
+            for (i = 0; i < parts.length; i++) {
+                o = o[parts[i]];
+                if (!o)
+                    break;
+            }
+            return o;
+        },
 
         isEmpty: function(o) {
             var p;
@@ -391,18 +399,20 @@
             }
         }
 
-	};
+    };
 
 
-	// *** DOM UTILS OBJECT
+    // *** DOM UTILS OBJECT
 
     var DomUtils = {
 
         getChildren: function(o, name) {
-            var children = [];
+            var children = [],
+                i,
+                child;
             if (o && o.childNodes.length) {
-                for (var i = 0; i < o.childNodes.length; i++) {
-                    var child = o.childNodes[i];
+                for (i = 0; i < o.childNodes.length; i++) {
+                    child = o.childNodes[i];
                     if (child.nodeType == 1 && (!name || child.nodeName == name))
                         children.push(child);
                 }
@@ -412,19 +422,19 @@
 
     };
 
-	// *** SELECTOR OBJECT
+    // *** SELECTOR OBJECT
 
-	var Selector = {
+    var Selector = {
 
-		// --- METHODS
+        // --- METHODS
 
-		select: function(selector, container) {
+        select: function(selector, container) {
             // Setting container to document anyway in the default selector since we use getElementById
-			container = document;
-			return container.getElementById(selector.substr(1));
-		}
+            container = document;
+            return container.getElementById(selector.substr(1));
+        }
 
-	};
+    };
 
     // *** LOADER CLASS
 
@@ -489,7 +499,7 @@
 
     };
 
-	// *** PROPS MANAGER OBJECT
+    // *** PROPS MANAGER OBJECT
 
     var PropsManager = {
 
@@ -497,17 +507,22 @@
 
         apply: function(target, propContexts, session) {
 
+            var i,
+                propContext,
+                nTarget,
+                name;
+
             if (!target || !propContexts)
                 return;
 
             // Merge the props
-            for(var i = 0; i < propContexts.length; i++) {
-                var propContext = propContexts[i];
-                var nTarget = target;
+            for(i = 0; i < propContexts.length; i++) {
+                propContext = propContexts[i];
+                nTarget = target;
                 if (propContext.target)
                     nTarget = session.selector(propContext.target, target);
                 if (nTarget) {
-                    var name = propContext.name || session.defaultPropName;
+                    name = propContext.name || session.defaultPropName;
                     nTarget[name] = propContext.value;
                 }
             }
@@ -516,64 +531,67 @@
 
     };
 
-	// *** PARAMS MANAGER OBJECT
+    // *** PARAMS MANAGER OBJECT
 
-	var ParamsManager = {
+    var ParamsManager = {
 
-		// --- METHODS
+        // --- METHODS
 
-		apply: function(target, params, session) {
+        apply: function(target, params, session) {
 
-			//TODO: Add checks
+            var i,
+                param;
 
-			// Merge the params
-			for(var i = 0; i < params.length; i++) {
-				var param = params[i];
-				target[param.name] = param.value;
-			}
+            //TODO: Add checks
 
-		}
+            // Merge the params
+            for(i = 0; i < params.length; i++) {
+                param = params[i];
+                target[param.name] = param.value;
+            }
 
-	};
+        }
 
-	// *** PAGE CLASS
+    };
 
-	var Page = function (context, request, session) {
-		this.id = context.id;
-		this.context = context;
-		this.request = request;
-		this.session = session;
-		// --
-		// Implementing:
-		// this.master = null;
-	};
+    // *** PAGE CLASS
+
+    var Page = function (context, request, session) {
+        this.id = context.id;
+        this.context = context;
+        this.request = request;
+        this.session = session;
+        // --
+        // Implementing:
+        // this.master = null;
+    };
 
 
-	// *** BLOCK CLASS
+    // *** BLOCK CLASS
 
-	var Block = function (context, request, session) {
-		this.id = context.id;
-		this.context = context;
-		this.request = request;
-		this.session = session;
-		this._callers = [];
-		// --
-		// Implementing:
-		// this.master = null;
-	};
+    var Block = function (context, request, session) {
+        this.id = context.id;
+        this.context = context;
+        this.request = request;
+        this.session = session;
+        this._callers = [];
+        // --
+        // Implementing:
+        // this.master = null;
+    };
 
-	Block.prototype = {
+    Block.prototype = {
 
-		addCaller: function(id) {
-			if (!this.existsCaller(id))
-				this._callers.push(id);
-		},
+        addCaller: function(id) {
+            if (!this.existsCaller(id))
+                this._callers.push(id);
+        },
 
-		removeCaller: function(id) {
-			var i = this._callers.indexOf(id);
-			if (i != -1)
-				this._callers.splice(i, 1);
-		},
+        removeCaller: function(id) {
+            var i = this._callers.indexOf(id);
+            if (i != -1)
+                this._callers.splice(i, 1);
+        },
 
         existsCaller: function(id) {
             var contains = false,
@@ -587,278 +605,281 @@
             return contains;
         },
 
-		getCallers: function() {
-			return this._callers;
-		}
+        getCallers: function() {
+            return this._callers;
+        }
 
-	};
+    };
 
 
-	// *** PAGE BLOCK BUILDER OBJECT
+    // *** PAGE BLOCK BUILDER OBJECT
 
-	var PageBlockBuilder = {
+    var PageBlockBuilder = {
 
-		// --- METHODS
+        // --- METHODS
 
-		createPage: function(context, request, session) {
+        createPage: function(context, request, session) {
 
-			var page = new Page(context, request, session),
+            var page = new Page(context, request, session),
                 stateManager = this._buildStateManager(context, session);
 
-			page.master = this._buildMaster(context, request, session, stateManager);
+            page.master = this._buildMaster(context, request, session, stateManager);
             stateManager.master = page.master;
 
-			return page;
+            return page;
 
-		},
+        },
 
-		createBlock: function(context, request, session) {
+        createBlock: function(context, request, session) {
 
-			var block = new Block(context, request, session),
+            var block = new Block(context, request, session),
                 stateManager = this._buildStateManager(context, session);
 
-			block.master = this._buildMaster(context, request, session, stateManager);
+            block.master = this._buildMaster(context, request, session, stateManager);
             stateManager.master = block.master;
 
-			return block;
+            return block;
 
-		},
+        },
 
-		_buildMaster: function(context, request, session, stateManager) {
+        _buildMaster: function(context, request, session, stateManager) {
 
-			var masterClass,
-				master,
-				type = StringUtils.trim(context.type).toLowerCase();
+            var masterClass,
+                master,
+                type = StringUtils.trim(context.type).toLowerCase();
 
-			if (type != "") {
-				masterClass = session.viewMasters["_" + type];
-			} else {
-				masterClass = session.defaultViewMasterClass;
-			}
+            if (type != "") {
+                masterClass = session.viewMasters["_" + type];
+            } else {
+                masterClass = session.defaultViewMasterClass;
+            }
 
-			if (masterClass) {
-				if (typeof masterClass == "function") {
-					master = new masterClass(context, request, session, stateManager);
-				} else {
-					Log.error("The type " + type + " in " + context.id + " cannot create a new page");
-				}
-			} else {
-				Log.error("The type " + type + " cannot be resolved in page: " + context.id);
-			}
+            if (masterClass) {
+                if (typeof masterClass == "function") {
+                    master = new masterClass(context, request, session, stateManager);
+                } else {
+                    Log.error("The type " + type + " in " + context.id + " cannot create a new page");
+                }
+            } else {
+                Log.error("The type " + type + " cannot be resolved in page: " + context.id);
+            }
 
-			return master;
+            return master;
 
-		},
+        },
 
-		_buildStateManager: function(context, session) {
+        _buildStateManager: function(context, session) {
 
-			var stateManagerClass,
-				stateManager,
-				manager = StringUtils.trim(context.manager).toLowerCase();
+            var stateManagerClass,
+                stateManager,
+                manager = StringUtils.trim(context.manager).toLowerCase();
 
-			if (manager != "") {
-				stateManagerClass = session.stateManagers[manager];
-			} else {
-				stateManagerClass = session.defaultStateManagerClass;
-			}
+            if (manager != "") {
+                stateManagerClass = session.stateManagers[manager];
+            } else {
+                stateManagerClass = session.defaultStateManagerClass;
+            }
 
-			if (stateManagerClass) {
-				if (typeof stateManagerClass == "function") {
-					stateManager = new stateManagerClass(null, session);
-				} else {
-					Log.error("The manager " + manager + " in " + context.id + " cannot create a valid state manager");
-				}
-			} else {
-				Log.error("The manager " + manager + " cannot be resolved in: " + context.id);
-			}
+            if (stateManagerClass) {
+                if (typeof stateManagerClass == "function") {
+                    stateManager = new stateManagerClass(null, session);
+                } else {
+                    Log.error("The manager " + manager + " in " + context.id + " cannot create a valid state manager");
+                }
+            } else {
+                Log.error("The manager " + manager + " cannot be resolved in: " + context.id);
+            }
 
-			return stateManager;
+            return stateManager;
 
-		}
+        }
 
-	};
+    };
 
-	// *** VIEW MASTERS OBJECT
+    // *** VIEW MASTERS OBJECT
 
-	var ViewMasters = {
+    var ViewMasters = {
 
-		// --- METHODS - Using init method to create class functions as ViewMasters members
+        // --- METHODS - Using init method to create class functions as ViewMasters members
 
-		init: function() {
+        init: function() {
 
 
-			// *** ABSTRACT MASTER CLASS
+            // *** ABSTRACT MASTER CLASS
 
-			var AbstractMaster = function(context, request, session, stateManager) {
+            var AbstractMaster = function(context, request, session, stateManager) {
 
-				this.context = context;
-				this.request = request;
-				this.session = session;
-				this.stateManager = stateManager;
-				this.isDisplayed = false;
-				this.isCleared = false;
+                var fMediator;
 
-				//TODO: Move this to PageBlockBuilder
-				if (this.context.mediator) {
-					var fMediator = ObjectUtils.find(this.context.mediator);
-					if (typeof fMediator == "function") {
-						this.fMediator = fMediator;
-					}
-				}
+                this.context = context;
+                this.request = request;
+                this.session = session;
+                this.stateManager = stateManager;
+                this.isDisplayed = false;
+                this.isCleared = false;
 
-				// --
-				// Implementing:
-				// this.target = null;
-				// this.container = null;
-				// this.mediator = null;
+                //TODO: Move this to PageBlockBuilder
+                if (this.context.mediator) {
+                    fMediator = ObjectUtils.find(this.context.mediator);
+                    if (typeof fMediator == "function") {
+                        this.fMediator = fMediator;
+                    }
+                }
 
-			};
+                // --
+                // Implementing:
+                // this.target = null;
+                // this.container = null;
+                // this.mediator = null;
 
-			AbstractMaster.prototype = {
+            };
 
-				display: function() {
-					Log.info("Displaying " + this.context.id + " with target " + this.context.target);
-					this.onDisplay(this);
-					var containerName = StringUtils.trim(this.context.container);
-					if (containerName != "") {
-						this.container = this.session.selector(this.context.container, this.session.root);
-						if (this.container == null)
-							Log.error("Invalid container for page " + this.context.id + ": " + this.context.container);
-					}
-				},
+            AbstractMaster.prototype = {
 
-				destroy: function() {
-					Log.info("Destroying " + this.context.id);
-					if (this.mediator && typeof this.mediator.destroy == "function")
-						this.mediator.destroy();
-					if (this.stateManager)
-						this.stateManager.destroy();
-				},
+                display: function() {
+                    var containerName;
+                    Log.info("Displaying " + this.context.id + " with target " + this.context.target);
+                    this.onDisplay(this);
+                    containerName = StringUtils.trim(this.context.container);
+                    if (containerName != "") {
+                        this.container = this.session.selector(this.context.container, this.session.root);
+                        if (this.container == null)
+                            Log.error("Invalid container for page " + this.context.id + ": " + this.context.container);
+                    }
+                },
 
-				clear: function() {
-					Log.info("Clearing " + this.context.id);
-					this.onClear(this);
-					if (this.stateManager)
-						this.stateManager.setState(StateManagers.STATE_OUT);
-				},
+                destroy: function() {
+                    Log.info("Destroying " + this.context.id);
+                    if (this.mediator && typeof this.mediator.destroy == "function")
+                        this.mediator.destroy();
+                    if (this.stateManager)
+                        this.stateManager.destroy();
+                },
 
-				init: function() {
+                clear: function() {
+                    Log.info("Clearing " + this.context.id);
+                    this.onClear(this);
+                    if (this.stateManager)
+                        this.stateManager.setState(StateManagers.STATE_OUT);
+                },
 
-					Log.debug("Initializing " + this.context.id);
+                init: function() {
 
-					if (this.target) {
+                    Log.debug("Initializing " + this.context.id);
+
+                    if (this.target) {
 
                         PropsManager.apply(this.target, this.context.propContexts, this.session);
                         ObjectUtils.merge(this.target, this.request.params);
 
-						if (this.fMediator) {
-							this.mediator = new this.fMediator(this.target);
-							PropsManager.apply(this.mediator, this.context.propContexts, this.session);
-							ObjectUtils.merge(this.mediator, this.request.params);
-							if (typeof this.mediator.init == "function")
-								this.mediator.init();
-						}
+                        if (this.fMediator) {
+                            this.mediator = new this.fMediator(this.target);
+                            PropsManager.apply(this.mediator, this.context.propContexts, this.session);
+                            ObjectUtils.merge(this.mediator, this.request.params);
+                            if (typeof this.mediator.init == "function")
+                                this.mediator.init();
+                        }
 
-						if (this.stateManager) {
-							this.stateManager.target = this.target;
-							Agent.observe(this.stateManager, "onStateChange", this.onStateChange, this);
-							//TODO: Merge props into state managers
-							this.stateManager.setState(StateManagers.STATE_IN);
-						}
-						
-					}
+                        if (this.stateManager) {
+                            this.stateManager.target = this.target;
+                            Agent.observe(this.stateManager, "onStateChange", this.onStateChange, this);
+                            //TODO: Merge props into state managers
+                            this.stateManager.setState(StateManagers.STATE_IN);
+                        }
 
-					this.onInit(this);
+                    }
 
-				},
+                    this.onInit(this);
 
-				onStateChange: function(target, state) {
-					if (state == StateManagers.STATE_IN) {
-						this.onIn(this);
-					} else if (state == StateManagers.STATE_ON) {
-						this.onOn(this);
-					} else if (state == StateManagers.STATE_OUT) {
-						this.onOut(this);
-					} else if (state == StateManagers.STATE_OFF) {
-						this.onOff(this);
-						this.destroy();
-					}
-				},
+                },
 
-				// Default event handlers
-				onDisplay: function(master) {},
-				onClear: function(master) {},
-				onInit: function(master) {},
-				onIn: function(master) {},
-				onOn: function(master) {},
-				onOut: function(master) {},
-				onOff: function(master) {}
+                onStateChange: function(target, state) {
+                    if (state == StateManagers.STATE_IN) {
+                        this.onIn(this);
+                    } else if (state == StateManagers.STATE_ON) {
+                        this.onOn(this);
+                    } else if (state == StateManagers.STATE_OUT) {
+                        this.onOut(this);
+                    } else if (state == StateManagers.STATE_OFF) {
+                        this.onOff(this);
+                        this.destroy();
+                    }
+                },
 
-			};
+                // Default event handlers
+                onDisplay: function(master) {},
+                onClear: function(master) {},
+                onInit: function(master) {},
+                onIn: function(master) {},
+                onOn: function(master) {},
+                onOut: function(master) {},
+                onOff: function(master) {}
+
+            };
 
 
-			// *** DOM MASTER CLASS
+            // *** DOM MASTER CLASS
 
-			var DomMaster = function(context, request, session, stateManager) {
-				AbstractMaster.call(this, context, request, session, stateManager);
-				//TODO: See how to configure the master properties.
-				this.cloneDom = false;
+            var DomMaster = function(context, request, session, stateManager) {
+                AbstractMaster.call(this, context, request, session, stateManager);
+                //TODO: See how to configure the master properties.
+                this.cloneDom = false;
                 // --
                 // Implementing:
                 // this.originalDisplay = null;
                 // this.originalVisibility = null;
-			};
+            };
 
-			DomMaster.prototype = {
-				
-				display: function() {
+            DomMaster.prototype = {
 
-					AbstractMaster.prototype.display.apply(this, arguments); // Call super
+                display: function() {
 
-					Log.debug("DomMaster display: " + this.context.id);
+                    AbstractMaster.prototype.display.apply(this, arguments); // Call super
 
-					this.target = this.session.selector(this.context.target);
-					if (this.target == null) {
-						Log.error("Invalid target for page " + this.context.id + ": " + this.context.target);
-						return;
-					}
+                    Log.debug("DomMaster display: " + this.context.id);
 
-					if (this.cloneDom) {
-						this.target = this.target.cloneNode(true);
-						this.container.appendChild(this.target);
-					}
+                    this.target = this.session.selector(this.context.target);
+                    if (this.target == null) {
+                        Log.error("Invalid target for page " + this.context.id + ": " + this.context.target);
+                        return;
+                    }
+
+                    if (this.cloneDom) {
+                        this.target = this.target.cloneNode(true);
+                        this.container.appendChild(this.target);
+                    }
 
                     this.originalDisplay = this._getStyle(this.target, "display");
                     this.originalVisibility = this._getStyle(this.target, "visibility");
                     if (this.originalDisplay == "none")
-						this.target.style.display = "inherit";
-					if (this.originalVisibility == "hidden")
-						this.target.style.visibility = "visible";
+                        this.target.style.display = "inherit";
+                    if (this.originalVisibility == "hidden")
+                        this.target.style.visibility = "visible";
 
-					this.init();
+                    this.init();
 
-				},
+                },
 
-				destroy: function() {
-					AbstractMaster.prototype.destroy.apply(this, arguments); // Call super
-					Log.debug("DomMaster destroy: " + this.context.id);
-					this.target.style.display = this.originalDisplay;
-					this.target.style.visibility = this.originalVisibility;
-					if (this.cloneDom)
-						this.container.removeChild(this.target);
-				},
+                destroy: function() {
+                    AbstractMaster.prototype.destroy.apply(this, arguments); // Call super
+                    Log.debug("DomMaster destroy: " + this.context.id);
+                    this.target.style.display = this.originalDisplay;
+                    this.target.style.visibility = this.originalVisibility;
+                    if (this.cloneDom)
+                        this.container.removeChild(this.target);
+                },
 
-				init: function() {
-					AbstractMaster.prototype.init.apply(this, arguments); // Call super
-				},
+                init: function() {
+                    AbstractMaster.prototype.init.apply(this, arguments); // Call super
+                },
 
-				clear: function() {
-					AbstractMaster.prototype.clear.apply(this, arguments); // Call super
-				},
+                clear: function() {
+                    AbstractMaster.prototype.clear.apply(this, arguments); // Call super
+                },
 
-				onStateChange: function(target, state) {
-					AbstractMaster.prototype.onStateChange.apply(this, arguments); // Call super
-				},
+                onStateChange: function(target, state) {
+                    AbstractMaster.prototype.onStateChange.apply(this, arguments); // Call super
+                },
 
                 _getStyle: function(target, style) {
                     var value,
@@ -873,96 +894,96 @@
                     return value;
                 },
 
-				// Default event handlers
-				onDisplay: function(master) {},
-				onClear: function(master) {},
-				onInit: function(master) {},
-				onIn: function(master) {},
-				onOn: function(master) {},
-				onOut: function(master) {},
-				onOff: function(master) {}
+                // Default event handlers
+                onDisplay: function(master) {},
+                onClear: function(master) {},
+                onInit: function(master) {},
+                onIn: function(master) {},
+                onOn: function(master) {},
+                onOut: function(master) {},
+                onOff: function(master) {}
 
-			};
+            };
 
 
-			// *** DOM CLONE MASTER CLASS
+            // *** DOM CLONE MASTER CLASS
 
-			var DomCloneMaster = function(context, request, session, stateManager) {
-				DomMaster.call(this, context, request, session, stateManager);
-				this.cloneDom = true;
-			};
+            var DomCloneMaster = function(context, request, session, stateManager) {
+                DomMaster.call(this, context, request, session, stateManager);
+                this.cloneDom = true;
+            };
 
-			DomCloneMaster.prototype = {
+            DomCloneMaster.prototype = {
 
-				display: function() {
-					DomMaster.prototype.display.apply(this, arguments); // Call super
-				},
+                display: function() {
+                    DomMaster.prototype.display.apply(this, arguments); // Call super
+                },
 
-				destroy: function() {
-					DomMaster.prototype.destroy.apply(this, arguments); // Call super
-				},
+                destroy: function() {
+                    DomMaster.prototype.destroy.apply(this, arguments); // Call super
+                },
 
-				init: function() {
-					DomMaster.prototype.init.apply(this, arguments); // Call super
-				},
+                init: function() {
+                    DomMaster.prototype.init.apply(this, arguments); // Call super
+                },
 
-				clear: function() {
-					DomMaster.prototype.clear.apply(this, arguments); // Call super
-				},
+                clear: function() {
+                    DomMaster.prototype.clear.apply(this, arguments); // Call super
+                },
 
-				onStateChange: function(target, state) {
-					DomMaster.prototype.onStateChange.apply(this, arguments); // Call super
-				},
+                onStateChange: function(target, state) {
+                    DomMaster.prototype.onStateChange.apply(this, arguments); // Call super
+                },
 
                 _getStyle: function(target, style) {
-					return DomMaster.prototype._getStyle.apply(this, arguments); // Call super
-				},
+                    return DomMaster.prototype._getStyle.apply(this, arguments); // Call super
+                },
 
-				// Default event handlers
-				onDisplay: function(master) {},
-				onClear: function(master) {},
-				onInit: function(master) {},
-				onIn: function(master) {},
-				onOn: function(master) {},
-				onOut: function(master) {},
-				onOff: function(master) {}
+                // Default event handlers
+                onDisplay: function(master) {},
+                onClear: function(master) {},
+                onInit: function(master) {},
+                onIn: function(master) {},
+                onOn: function(master) {},
+                onOut: function(master) {},
+                onOff: function(master) {}
 
-			};
+            };
 
 
-			// *** LOADER CLASS
+            // *** LOADER CLASS
 
-			var LoaderMaster = function(context, request, session, stateManager) {
-				AbstractMaster.call(this, context, request, session, stateManager);
-				this.useXml = false;
-				this.loader = null;
-			};
+            var LoaderMaster = function(context, request, session, stateManager) {
+                AbstractMaster.call(this, context, request, session, stateManager);
+                this.useXml = false;
+                this.loader = null;
+            };
 
-			LoaderMaster.prototype = {
+            LoaderMaster.prototype = {
 
-				display: function() {
-					AbstractMaster.prototype.display.apply(this, arguments); // Call super
-					Log.debug("LoaderMaster display");
-					this.loader = new Loader();
-					this.loader.load(this.context.target, this.onLoaded, this);
-				},
+                display: function() {
+                    AbstractMaster.prototype.display.apply(this, arguments); // Call super
+                    Log.debug("LoaderMaster display");
+                    this.loader = new Loader();
+                    this.loader.load(this.context.target, this.onLoaded, this);
+                },
 
-				destroy: function() {
-					AbstractMaster.prototype.destroy.apply(this, arguments); // Call super
-					Log.debug("LoaderMaster destroy");
-					this.container.innerHTML = "";
-				},
+                destroy: function() {
+                    AbstractMaster.prototype.destroy.apply(this, arguments); // Call super
+                    Log.debug("LoaderMaster destroy");
+                    this.container.innerHTML = "";
+                },
 
-				onLoaded: function(xmlHttp) {
-					Log.debug("LoaderMaster received content");
-					this.target = xmlHttp.responseText;
-					this.container.innerHTML = this.target;
-					this.init();
-				},
+                onLoaded: function(xmlHttp) {
+                    Log.debug("LoaderMaster received content");
+                    this.target = xmlHttp.responseText;
+                    this.container.innerHTML = this.target;
+                    this.init();
+                },
 
-				init: function() {
-					AbstractMaster.prototype.init.apply(this, arguments); // Call super
-				},
+                init: function() {
+                    AbstractMaster.prototype.init.apply(this, arguments); // Call super
+                },
 
                 clear: function() {
                     DomMaster.prototype.clear.apply(this, arguments); // Call super
@@ -981,206 +1002,206 @@
                 onOut: function(master) {},
                 onOff: function(master) {}
 
-			};
-
-			
-			// *** BUILDER MASTER CLASS
-
-			var BuilderMaster = function(context, request, session, stateManager) {
-				AbstractMaster.call(this, context, request, session, stateManager);
-				this.fConstructor = null;
-				this.builder = null;
-				this.domContent = null;
-			};
-
-			BuilderMaster.prototype = {
-
-				display: function() {
-					AbstractMaster.prototype.display.apply(this, arguments); // Call super
-					Log.debug("BuilderMaster display");
-					this.fConstructor = ObjectUtils.find(this.context.target);
-					if (typeof this.fConstructor != "function") {
-						Log.error("Invalid target for page " + this.context.id + ": " + this.context.target);
-						return;
-					}
-					this.builder = new this.fConstructor();
-					//TODO: Implement checks on build to make sure it is a function and it returns dom
-					this.target = this.builder.build();
-					this.container.appendChild(this.target);
-					this.init();
-					if (typeof this.builder.init == "function")
-						this.builder.init();
-				},
-
-				destroy: function() {
-					AbstractMaster.prototype.destroy.apply(this, arguments); // Call super
-					Log.debug("BuilderMaster destroy");
-					if (typeof this.builder.destroy == "function")
-						this.builder.destroy();
-					if (this.target)
-						this.container.removeChild(this.target);
-				},
-
-				init: function() {
-					AbstractMaster.prototype.init.apply(this, arguments); // Call super
-					PropsManager.apply(this.builder, this.context.propContexts, this.session);
-					ObjectUtils.merge(this.builder, this.request.params);
-				}
-
-			};
+            };
 
 
-			// *** INIT - Initializing ViewMasters
+            // *** BUILDER MASTER CLASS
 
-			this.AbstractMaster = AbstractMaster;
-			this.DomMaster = DomMaster;
-			this.DomCloneMaster = DomCloneMaster;
-			this.LoaderMaster = LoaderMaster;
-			this.BuilderMaster = BuilderMaster;
+            var BuilderMaster = function(context, request, session, stateManager) {
+                AbstractMaster.call(this, context, request, session, stateManager);
+                this.fConstructor = null;
+                this.builder = null;
+                this.domContent = null;
+            };
 
-			//ObjectUtils.extend(this.DomMaster, this.AbstractMaster);
-			//ObjectUtils.extend(this.DomCloneMaster, this.DomMaster);
-			//ObjectUtils.extend(this.LoaderMaster, this.AbstractMaster);
-			//ObjectUtils.extend(this.BuilderMaster, this.AbstractMaster);
+            BuilderMaster.prototype = {
 
+                display: function() {
+                    AbstractMaster.prototype.display.apply(this, arguments); // Call super
+                    Log.debug("BuilderMaster display");
+                    this.fConstructor = ObjectUtils.find(this.context.target);
+                    if (typeof this.fConstructor != "function") {
+                        Log.error("Invalid target for page " + this.context.id + ": " + this.context.target);
+                        return;
+                    }
+                    this.builder = new this.fConstructor();
+                    //TODO: Implement checks on build to make sure it is a function and it returns dom
+                    this.target = this.builder.build();
+                    this.container.appendChild(this.target);
+                    this.init();
+                    if (typeof this.builder.init == "function")
+                        this.builder.init();
+                },
 
-		}
+                destroy: function() {
+                    AbstractMaster.prototype.destroy.apply(this, arguments); // Call super
+                    Log.debug("BuilderMaster destroy");
+                    if (typeof this.builder.destroy == "function")
+                        this.builder.destroy();
+                    if (this.target)
+                        this.container.removeChild(this.target);
+                },
 
-	};
+                init: function() {
+                    AbstractMaster.prototype.init.apply(this, arguments); // Call super
+                    PropsManager.apply(this.builder, this.context.propContexts, this.session);
+                    ObjectUtils.merge(this.builder, this.request.params);
+                }
 
-	// *** STATE MANAGERS OBJECT
-
-	var StateManagers = {
-
-		// --- PROPERTIES
-
-		STATE_IN: "IN",
-		STATE_ON: "ON",
-		STATE_OUT: "OUT",
-		STATE_OFF: "OFF",
-
-		// --- METHODS - Using init method to create class functions as StateManagers members
-
-		init: function() {
-
-
-			// *** BASE IO3 MANAGER CLASS
-
-			var BaseIo3Manager = function(target, session) {
-				this.target = target;
-				this.session = session;
-				this._state = null;
-			};
-
-			BaseIo3Manager.prototype = {
-
-				destroy: function() {
-					// Empty
-				},
-
-				getState: function() {
-					return this._state;
-				},
-
-				setState: function(state) {
-					state = state.toUpperCase();
-					if (state != StateManagers.STATE_IN && state != StateManagers.STATE_ON &&
-						state != StateManagers.STATE_OUT && state != StateManagers.STATE_OFF) {
-						Log.warn("Unknown state, returning without changing state for target " + this.target);
-						return;
-					}
-					if (state != this._state) {
-						this._state = state;
-						this._changeState();
-					}
-				},
-
-				doIn: function() {
-					this.setState(StateManagers.STATE_ON);
-				},
-
-				doOn: function() {
-					// Empty
-				},
-
-				doOut: function() {
-					this.setState(StateManagers.STATE_OFF);
-				},
-
-				doOff: function() {
-					// Empty
-				},
-
-				_changeState: function() {
-
-					this.onStateChange(this.target, this._state);
-
-					if (this._state == StateManagers.STATE_IN) {
-						this.doIn();
-					} else if (this._state == StateManagers.STATE_ON) {
-						this.doOn();
-					} else if (this._state == StateManagers.STATE_OUT) {
-						if (this.target != null) {
-							this.doOut();
-						} else {
-							Log.info("target is null when trying to set state to OUT, setting state to OFF instead " +
-								"of calling doOut to avoid errors.");
-							this._state = StateManagers.STATE_OFF;
-						}
-					} else if (this._state == StateManagers.STATE_OFF) {
-						this.doOff();
-					}
-
-				},
-
-				onStateChange: function(target, state) {
-					// Empty
-				}
-
-			};
+            };
 
 
-			// *** INIT - Initializing StateManagers
+            // *** INIT - Initializing ViewMasters
 
-			this.BaseIo3Manager = BaseIo3Manager;
+            this.AbstractMaster = AbstractMaster;
+            this.DomMaster = DomMaster;
+            this.DomCloneMaster = DomCloneMaster;
+            this.LoaderMaster = LoaderMaster;
+            this.BuilderMaster = BuilderMaster;
+
+            //ObjectUtils.extend(this.DomMaster, this.AbstractMaster);
+            //ObjectUtils.extend(this.DomCloneMaster, this.DomMaster);
+            //ObjectUtils.extend(this.LoaderMaster, this.AbstractMaster);
+            //ObjectUtils.extend(this.BuilderMaster, this.AbstractMaster);
 
 
-		},
+        }
 
-		createStateManager: function() {
+    };
 
-			var stateManager,
-				useConfArgument = typeof arguments[0] == "object",
-				conf = useConfArgument ? arguments[0] : {},
-				parent = useConfArgument ? arguments[1] : arguments[2];
+    // *** STATE MANAGERS OBJECT
 
-			// Set default parent for the manager if not provided.
-			parent = parent || this.BaseIo3Manager;
+    var StateManagers = {
 
-			if (!useConfArgument) {
-				if ((typeof arguments[0] == "function") && (typeof arguments[1] == "function")) {
-					conf.doIn = arguments[0];
-					conf.doOut = arguments[1];
-				} else {
-					Log.warn("Malformed call to createStateManager - either createStateManager(conf, [parent]) or " +
-						"createStateManager(doIn, doOut, [parent]) are allowed.");
-				}
-			}
+        // --- PROPERTIES
 
-			// Constructor function, calling parent with arguments.
-			stateManager = function() {
-				parent.apply(this, arguments)
-			};
+        STATE_IN: "IN",
+        STATE_ON: "ON",
+        STATE_OUT: "OUT",
+        STATE_OFF: "OFF",
 
-			// Extending.
-			stateManager.prototype = new parent();
-			ObjectUtils.merge(stateManager.prototype, conf);
+        // --- METHODS - Using init method to create class functions as StateManagers members
 
-			return stateManager;
+        init: function() {
 
-		}
 
-	};
+            // *** BASE IO3 MANAGER CLASS
+
+            var BaseIo3Manager = function(target, session) {
+                this.target = target;
+                this.session = session;
+                this._state = null;
+            };
+
+            BaseIo3Manager.prototype = {
+
+                destroy: function() {
+                    // Empty
+                },
+
+                getState: function() {
+                    return this._state;
+                },
+
+                setState: function(state) {
+                    state = state.toUpperCase();
+                    if (state != StateManagers.STATE_IN && state != StateManagers.STATE_ON &&
+                        state != StateManagers.STATE_OUT && state != StateManagers.STATE_OFF) {
+                        Log.warn("Unknown state, returning without changing state for target " + this.target);
+                        return;
+                    }
+                    if (state != this._state) {
+                        this._state = state;
+                        this._changeState();
+                    }
+                },
+
+                doIn: function() {
+                    this.setState(StateManagers.STATE_ON);
+                },
+
+                doOn: function() {
+                    // Empty
+                },
+
+                doOut: function() {
+                    this.setState(StateManagers.STATE_OFF);
+                },
+
+                doOff: function() {
+                    // Empty
+                },
+
+                _changeState: function() {
+
+                    this.onStateChange(this.target, this._state);
+
+                    if (this._state == StateManagers.STATE_IN) {
+                        this.doIn();
+                    } else if (this._state == StateManagers.STATE_ON) {
+                        this.doOn();
+                    } else if (this._state == StateManagers.STATE_OUT) {
+                        if (this.target != null) {
+                            this.doOut();
+                        } else {
+                            Log.info("target is null when trying to set state to OUT, setting state to OFF instead " +
+                                     "of calling doOut to avoid errors.");
+                            this._state = StateManagers.STATE_OFF;
+                        }
+                    } else if (this._state == StateManagers.STATE_OFF) {
+                        this.doOff();
+                    }
+
+                },
+
+                onStateChange: function(target, state) {
+                    // Empty
+                }
+
+            };
+
+
+            // *** INIT - Initializing StateManagers
+
+            this.BaseIo3Manager = BaseIo3Manager;
+
+
+        },
+
+        createStateManager: function() {
+
+            var stateManager,
+                useConfArgument = typeof arguments[0] == "object",
+                conf = useConfArgument ? arguments[0] : {},
+                parent = useConfArgument ? arguments[1] : arguments[2];
+
+            // Set default parent for the manager if not provided.
+            parent = parent || this.BaseIo3Manager;
+
+            if (!useConfArgument) {
+                if ((typeof arguments[0] == "function") && (typeof arguments[1] == "function")) {
+                    conf.doIn = arguments[0];
+                    conf.doOut = arguments[1];
+                } else {
+                    Log.warn("Malformed call to createStateManager - either createStateManager(conf, [parent]) or " +
+                             "createStateManager(doIn, doOut, [parent]) are allowed.");
+                }
+            }
+
+            // Constructor function, calling parent with arguments.
+            stateManager = function() {
+                parent.apply(this, arguments)
+            };
+
+            // Extending.
+            stateManager.prototype = new parent();
+            ObjectUtils.merge(stateManager.prototype, conf);
+
+            return stateManager;
+
+        }
+
+    };
 
     // *** COMMAND CLASS
 
@@ -2245,7 +2266,7 @@
                 this.session.viewMasters[name] = master;
             } else {
                 Log.warn("Cannot register view master with name " + name + " - there is already registered a master " +
-                    "with that name")
+                         "with that name")
             }
         },
 
@@ -2362,7 +2383,7 @@
                 this.session.commandMasters[name] = master;
             } else {
                 Log.warn("Cannot register command master with name " + name + " - there is already registered a " +
-					"master with that name")
+                         "master with that name")
             }
         },
 
@@ -2370,12 +2391,12 @@
             this.session.commandMasters[name] = null;
         },
 
-		//TODO: Use mix function instead of the verbose proxy.
+        //TODO: Use mix function instead of the verbose proxy.
         observe: function(fName, hook, priority) {
             Agent.observe(this, fName, hook, priority);
         },
 
-		//TODO: Use mix function instead of the verbose proxy.
+        //TODO: Use mix function instead of the verbose proxy.
         ignore: function(fName, hook) {
             Agent.ignore(this, fName, hook);
         },
@@ -2662,9 +2683,7 @@
     window.ZumoExt = ZumoExt;
     window.ZumoAgent = Agent;
 
-})(this);
-
-(function(window) {
+})(this);(function(window) {
 
 
 	// Check for Zumo
@@ -2779,8 +2798,8 @@
 			Fade.prototype = {
 
 				doIn: function() {
-					var that = this;
-					var $target = $(this.target);
+					var that = this,
+                        $target = $(this.target);
 					$target.css("display", "none");
 					$target.fadeIn("slow", function() {
 						that.setState(Zumo.StateManagers.STATE_ON);
@@ -2823,9 +2842,12 @@
             return null;
 
         mergeAttributes = function(o, element, list) {
-            for (var i = 0; i < list.length; i++) {
-                var name = list[i];
-                var value = $(element).attr("data-" + name);
+            var i,
+                name,
+                value;
+            for (i = 0; i < list.length; i++) {
+                name = list[i];
+                value = $(element).attr("data-" + name);
                 if (value)
                     o[name] = value;
             }
