@@ -1,6 +1,6 @@
 
 
-    // *** PAGE CLASS
+    // *** PAGE - CONSTRUCTOR
 
     var Page = function (context, request, session) {
         this.id = context.id;
@@ -13,7 +13,7 @@
     };
 
 
-    // *** BLOCK CLASS
+    // *** BLOCK - CONSTRUCTOR
 
     var Block = function (context, request, session) {
         this.id = context.id;
@@ -58,7 +58,7 @@
     };
 
 
-    // *** PAGE BLOCK BUILDER OBJECT
+    // *** PAGE BLOCK BUILDER - OBJECT
 
     var PageBlockBuilder = {
 

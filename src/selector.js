@@ -1,6 +1,6 @@
 
 
-    // *** SELECTOR OBJECT
+    // *** SELECTOR - OBJECT
 
     var Selector = {
 

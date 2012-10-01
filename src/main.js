@@ -1,6 +1,6 @@
 
 
-    // *** ZUMO OBJECT
+    // *** ZUMO - OBJECT
 
     //TODO: Make non-static so we can have several Zumo objects at a time.
 
@@ -775,7 +775,9 @@
     // ************************************************************************************************************
 
 
-    // *** ZUMO EXT OBJECT
+    //TODO: XXX: Consider merging ZumoExt into Zumo. Probably no need to have them separately.
+
+    // *** ZUMO EXT - OBJECT
 
     var ZumoExt = {
 

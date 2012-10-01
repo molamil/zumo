@@ -1,6 +1,6 @@
 
 
-    // *** PROPS MANAGER OBJECT
+    // *** PROPS MANAGER - OBJECT
 
     var PropsManager = {
 

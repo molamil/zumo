@@ -1,6 +1,6 @@
 
 
-    // *** PARAMS MANAGER OBJECT
+    // *** PARAMS MANAGER - OBJECT
 
     var ParamsManager = {
 

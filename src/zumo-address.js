@@ -6,7 +6,7 @@
         return;
 
 
-    // *** ADDRESS MANAGER
+    // *** ADDRESS MANAGER - OBJECT
 
     var AddressManager = {
 

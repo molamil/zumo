@@ -1,6 +1,6 @@
 
 
-    // *** VIEW MASTERS OBJECT
+    // *** VIEW MASTERS - OBJECT
 
     var ViewMasters = {
 
@@ -9,7 +9,7 @@
         init: function() {
 
 
-            // *** ABSTRACT MASTER CLASS
+            // *** ABSTRACT MASTER - CONSTRUCTOR
 
             var AbstractMaster = function(context, request, session, stateManager) {
 
@@ -122,7 +122,7 @@
             };
 
 
-            // *** DOM MASTER CLASS
+            // *** DOM MASTER - CONSTRUCTOR
 
             var DomMaster = function(context, request, session, stateManager) {
                 AbstractMaster.call(this, context, request, session, stateManager);
@@ -210,7 +210,7 @@
             };
 
 
-            // *** DOM CLONE MASTER CLASS
+            // *** DOM CLONE MASTER - CONSTRUCTOR
 
             var DomCloneMaster = function(context, request, session, stateManager) {
                 DomMaster.call(this, context, request, session, stateManager);
@@ -255,7 +255,7 @@
             };
 
 
-            // *** LOADER CLASS
+            // *** LOADER - CONSTRUCTOR
 
             var LoaderMaster = function(context, request, session, stateManager) {
                 AbstractMaster.call(this, context, request, session, stateManager);
@@ -309,7 +309,7 @@
             };
 
 
-            // *** BUILDER MASTER CLASS
+            // *** BUILDER MASTER - CONSTRUCTOR
 
             var BuilderMaster = function(context, request, session, stateManager) {
                 AbstractMaster.call(this, context, request, session, stateManager);

@@ -1,6 +1,6 @@
 
 
-    // *** STATE MANAGERS OBJECT
+    // *** STATE MANAGERS - OBJECT
 
     var StateManagers = {
 
@@ -16,7 +16,7 @@
         init: function() {
 
 
-            // *** BASE IO3 MANAGER CLASS
+            // *** BASE IO3 MANAGER - CONSTRUCTOR
 
             var BaseIo3Manager = function(target, session) {
                 this.target = target;

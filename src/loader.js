@@ -1,6 +1,6 @@
 
 
-    // *** LOADER CLASS
+    // *** LOADER - CONSTRUCTOR
 
     var Loader = function() {
         this.method = "GET";

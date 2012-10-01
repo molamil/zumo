@@ -15,9 +15,9 @@
  */
 (function(window) {
 
+
     var _NAME = "${name}";
     var _VERSION = "${version}";
-
     ${src}
 
 })(this);

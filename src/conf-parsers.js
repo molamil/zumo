@@ -1,6 +1,6 @@
 
 
-    // *** XML CONF PARSER OBJECT
+    // *** XML CONF PARSER - OBJECT
 
     var XmlConfParser = {
 

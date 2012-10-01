@@ -1,6 +1,6 @@
 
 
-    // *** LOG OBJECT
+    // *** LOG - OBJECT
 
     var Log = {
 
@@ -54,7 +54,7 @@
     };
 
 
-    // *** DELEGATE OBJECT
+    // *** DELEGATE - OBJECT
 
     var Delegate = {
 
@@ -69,7 +69,7 @@
     };
 
 
-    // *** STRING UTILS OBJECT
+    // *** STRING UTILS - OBJECT
 
     var StringUtils = {
 
@@ -93,7 +93,7 @@
     };
 
 
-    // *** OBJECT UTILS OBJECT
+    // *** OBJECT UTILS - OBJECT
 
     var ObjectUtils = {
 

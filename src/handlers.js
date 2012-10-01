@@ -1,6 +1,6 @@
 
 
-    // *** HANDLER MANAGER CLASS
+    // *** HANDLER MANAGER - CONSTRUCTOR
 
     var HandlerManager = function(app) {
         this.app = app;

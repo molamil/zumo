@@ -1,6 +1,6 @@
 
 
-    // *** COMMAND CLASS
+    // *** COMMAND - CONSTRUCTOR
 
     var Command = function (context, request, session) {
         this.id = context.id;
@@ -13,7 +13,7 @@
     };
 
 
-    // *** COMMAND BUILDER OBJECT
+    // *** COMMAND BUILDER - OBJECT
 
     var CommandBuilder = {
 
@@ -54,7 +54,7 @@
     };
 
 
-    // *** COMMAND MASTERS OBJECT
+    // *** COMMAND MASTERS - OBJECT
 
     var CommandMasters = {
 
@@ -63,7 +63,7 @@
         init: function() {
 
 
-            // *** ABSTRACT MASTER CLASS
+            // *** ABSTRACT MASTER - CONSTRUCTOR
 
             var AbstractMaster = function(context, request, session) {
                 this.context = context;
@@ -81,7 +81,7 @@
             };
 
 
-            // *** FUNCTION MASTER CLASS
+            // *** FUNCTION MASTER - CONSTRUCTOR
 
             var FunctionMaster = function(context, request, session) {
                 AbstractMaster.call(this, context, request, session);

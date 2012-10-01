@@ -1,3 +1,7 @@
+
+
+// *** JQUERY EXTENSIONS
+
 (function(window) {
 
 
