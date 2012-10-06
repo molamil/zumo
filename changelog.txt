@@ -8,6 +8,7 @@ ZUMO 0.2 (XX-XX-XXXX)
 
 [XXX]
 
+*  Added createStateManager method for easy manager creation and built-in inheritance.
 *  Removed awkward underscore at the beginning of the state managers.
 *  Re-organized source files.
 
