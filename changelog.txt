@@ -8,9 +8,10 @@ ZUMO 0.2 (XX-XX-XXXX)
 
 [XXX]
 
+*  Added VoidMaster ("void") for views without target.
 *  Fixed Builder view master.
-*  Added createStateManager method for easy manager creation and built-in inheritance.
-*  Removed awkward underscore at the beginning of the state managers.
+*  Added createStateManager and createViewMaster methods for easy creation and built-in inheritance.
+*  Removed awkward initial underscore in names when creating state managers and view masters.
 *  Re-organized source files.
 
 ------------------------------------------------------------------------------------------------------------------------
