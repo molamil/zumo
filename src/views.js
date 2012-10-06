@@ -95,7 +95,7 @@
                 type = StringUtils.trim(context.type).toLowerCase();
 
             if (type != "") {
-                masterClass = session.viewMasters["_" + type];
+                masterClass = session.viewMasters[type];
             } else {
                 masterClass = session.defaultViewMasterClass;
             }
@@ -104,10 +104,10 @@
                 if (typeof masterClass == "function") {
                     master = new masterClass(context, request, session, stateManager);
                 } else {
-                    Log.error("The type " + type + " in " + context.id + " cannot create a new page");
+                    Log.error("The type '" + type + "' in " + context.id + " cannot create a new page");
                 }
             } else {
-                Log.error("The type " + type + " cannot be resolved in page: " + context.id);
+                Log.error("The type '" + type + "' cannot be resolved in page: " + context.id);
             }
 
             return master;
@@ -130,10 +130,10 @@
                 if (typeof stateManagerClass == "function") {
                     stateManager = new stateManagerClass(null, session);
                 } else {
-                    Log.error("The manager " + manager + " in " + context.id + " cannot create a valid state manager");
+                    Log.error("The manager '" + manager + "' in " + context.id + " cannot create a valid state manager");
                 }
             } else {
-                Log.error("The manager " + manager + " cannot be resolved in: " + context.id);
+                Log.error("The manager '" + manager + "' cannot be resolved in: " + context.id);
             }
 
             return stateManager;

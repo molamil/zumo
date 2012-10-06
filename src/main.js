@@ -13,13 +13,13 @@
         StateManagers: StateManagers,
 
         _VIEW_MASTERS: {
-            _dom: "DomMaster",
-            _domclone: "DomCloneMaster",
-            _loader: "LoaderMaster",
-            _builder: "BuilderMaster",
-            _void: "VoidMaster"
+            dom: "DomMaster",
+            domclone: "DomCloneMaster",
+            loader: "LoaderMaster",
+            builder: "BuilderMaster",
+            void: "VoidMaster"
         },
-        _DEFAULT_VIEW_TYPE: "_dom",
+        _DEFAULT_VIEW_TYPE: "dom",
         _STATE_MANAGERS: {
             base: "BaseIo3Manager"
         },
