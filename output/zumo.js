@@ -733,7 +733,7 @@
 
             // *** ABSTRACT MASTER - CONSTRUCTOR
 
-            var AbstractMaster = function(context, request, session, stateManager) {
+            var AbstractMaster = this.AbstractMaster = function(context, request, session, stateManager) {
 
                 var fMediator;
 
@@ -846,21 +846,9 @@
 
             // *** DOM MASTER - CONSTRUCTOR
 
-            var DomMaster = function(context, request, session, stateManager) {
-                AbstractMaster.call(this, context, request, session, stateManager);
-                //TODO: See how to configure the master properties.
-                this.cloneDom = false;
-                // --
-                // Implementing:
-                // this.originalDisplay = null;
-                // this.originalVisibility = null;
-            };
-
-            DomMaster.prototype = {
+            var DomMaster = this.DomMaster = this.createViewMaster({
 
                 display: function() {
-
-                    AbstractMaster.prototype.display.apply(this, arguments); // Call super
 
                     Log.debug("DomMaster display: " + this.context.id);
 
@@ -887,24 +875,11 @@
                 },
 
                 destroy: function() {
-                    AbstractMaster.prototype.destroy.apply(this, arguments); // Call super
                     Log.debug("DomMaster destroy: " + this.context.id);
                     this.target.style.display = this.originalDisplay;
                     this.target.style.visibility = this.originalVisibility;
                     if (this.cloneDom)
                         this.container.removeChild(this.target);
-                },
-
-                init: function() {
-                    AbstractMaster.prototype.init.apply(this, arguments); // Call super
-                },
-
-                clear: function() {
-                    AbstractMaster.prototype.clear.apply(this, arguments); // Call super
-                },
-
-                onStateChange: function(target, state) {
-                    AbstractMaster.prototype.onStateChange.apply(this, arguments); // Call super
                 },
 
                 _getStyle: function(target, style) {
@@ -918,84 +893,31 @@
                             value = computedStyle.getPropertyValue(style);
                     }
                     return value;
-                },
+                }
 
-                // Default event handlers
-                onDisplay: function(master) {},
-                onClear: function(master) {},
-                onInit: function(master) {},
-                onIn: function(master) {},
-                onOn: function(master) {},
-                onOut: function(master) {},
-                onOff: function(master) {}
-
-            };
+            }, AbstractMaster);
 
 
             // *** DOM CLONE MASTER - CONSTRUCTOR
 
-            var DomCloneMaster = function(context, request, session, stateManager) {
-                DomMaster.call(this, context, request, session, stateManager);
-                this.cloneDom = true;
-            };
+            var DomCloneMaster = this.DomCloneMaster = this.createViewMaster({
 
-            DomCloneMaster.prototype = {
+                cloneDom: true
 
-                display: function() {
-                    DomMaster.prototype.display.apply(this, arguments); // Call super
-                },
-
-                destroy: function() {
-                    DomMaster.prototype.destroy.apply(this, arguments); // Call super
-                },
-
-                init: function() {
-                    DomMaster.prototype.init.apply(this, arguments); // Call super
-                },
-
-                clear: function() {
-                    DomMaster.prototype.clear.apply(this, arguments); // Call super
-                },
-
-                onStateChange: function(target, state) {
-                    DomMaster.prototype.onStateChange.apply(this, arguments); // Call super
-                },
-
-                _getStyle: function(target, style) {
-                    return DomMaster.prototype._getStyle.apply(this, arguments); // Call super
-                },
-
-                // Default event handlers
-                onDisplay: function(master) {},
-                onClear: function(master) {},
-                onInit: function(master) {},
-                onIn: function(master) {},
-                onOn: function(master) {},
-                onOut: function(master) {},
-                onOff: function(master) {}
-
-            };
+            }, DomMaster);
 
 
-            // *** LOADER - CONSTRUCTOR
+            // *** LOADER MASTER - CONSTRUCTOR
 
-            var LoaderMaster = function(context, request, session, stateManager) {
-                AbstractMaster.call(this, context, request, session, stateManager);
-                this.useXml = false;
-                this.loader = null;
-            };
-
-            LoaderMaster.prototype = {
+            var LoaderMaster = this.LoaderMaster = this.createViewMaster({
 
                 display: function() {
-                    AbstractMaster.prototype.display.apply(this, arguments); // Call super
                     Log.debug("LoaderMaster display");
                     this.loader = new Loader();
                     this.loader.load(this.context.target, this.onLoaded, this);
                 },
 
                 destroy: function() {
-                    AbstractMaster.prototype.destroy.apply(this, arguments); // Call super
                     Log.debug("LoaderMaster destroy");
                     this.container.innerHTML = "";
                 },
@@ -1005,45 +927,16 @@
                     this.target = xmlHttp.responseText;
                     this.container.innerHTML = this.target;
                     this.init();
-                },
+                }
 
-                init: function() {
-                    AbstractMaster.prototype.init.apply(this, arguments); // Call super
-                },
-
-                clear: function() {
-                    DomMaster.prototype.clear.apply(this, arguments); // Call super
-                },
-
-                onStateChange: function(target, state) {
-                    DomMaster.prototype.onStateChange.apply(this, arguments); // Call super
-                },
-
-                // Default event handlers
-                onDisplay: function(master) {},
-                onClear: function(master) {},
-                onInit: function(master) {},
-                onIn: function(master) {},
-                onOn: function(master) {},
-                onOut: function(master) {},
-                onOff: function(master) {}
-
-            };
+            }, AbstractMaster);
 
 
             // *** BUILDER MASTER - CONSTRUCTOR
 
-            var BuilderMaster = function(context, request, session, stateManager) {
-                AbstractMaster.call(this, context, request, session, stateManager);
-                this.fConstructor = null;
-                this.builder = null;
-                this.domContent = null;
-            };
-
-            BuilderMaster.prototype = {
+            var BuilderMaster = this.BuilderMaster = this.createViewMaster({
 
                 display: function() {
-                    AbstractMaster.prototype.display.apply(this, arguments); // Call super
                     Log.debug("BuilderMaster display");
                     this.fConstructor = ObjectUtils.find(this.context.target);
                     if (typeof this.fConstructor != "function") {
@@ -1060,7 +953,6 @@
                 },
 
                 destroy: function() {
-                    AbstractMaster.prototype.destroy.apply(this, arguments); // Call super
                     Log.debug("BuilderMaster destroy");
                     if (typeof this.builder.destroy == "function")
                         this.builder.destroy();
@@ -1069,62 +961,25 @@
                 },
 
                 init: function() {
-                    AbstractMaster.prototype.init.apply(this, arguments); // Call super
                     PropsManager.apply(this.builder, this.context.propContexts, this.session);
                     ObjectUtils.merge(this.builder, this.request.params);
-                },
+                }
 
-                clear: function() {
-                    AbstractMaster.prototype.clear.apply(this, arguments); // Call super
-                },
-
-                onStateChange: function(target, state) {
-                    AbstractMaster.prototype.onStateChange.apply(this, arguments); // Call super
-                },
-
-                // Default event handlers
-                onDisplay: function(master) {},
-                onClear: function(master) {},
-                onInit: function(master) {},
-                onIn: function(master) {},
-                onOn: function(master) {},
-                onOut: function(master) {},
-                onOff: function(master) {}
-
-            };
-
-
-            // *** INIT - Initializing ViewMasters
-
-            this.AbstractMaster = AbstractMaster;
-            this.DomMaster = DomMaster;
-            this.DomCloneMaster = DomCloneMaster;
-            this.LoaderMaster = LoaderMaster;
-            this.BuilderMaster = BuilderMaster;
+            }, AbstractMaster);
 
 
         },
 
-        //TODO: Implement, test.
-        createViewMaster: function() {
+        createViewMaster: function(conf, parent) {
 
             var viewMaster,
-                useConfArgument = typeof arguments[0] == "object",
-                conf = useConfArgument ? arguments[0] : {},
-                parent = useConfArgument ? arguments[1] : arguments[2];
+                p;
+
+            conf = conf || {};
+            parent = parent || this.AbstractMaster;
 
             // Set default parent for the manager if not provided.
             parent = parent || this.BaseIo3Manager;
-
-            if (!useConfArgument) {
-                if ((typeof arguments[0] == "function") && (typeof arguments[1] == "function")) {
-                    conf.doIn = arguments[0];
-                    conf.doOut = arguments[1];
-                } else {
-                    Log.warn("Malformed call to createStateManager - either createStateManager(conf, [parent]) or " +
-                        "createStateManager(doIn, doOut, [parent]) are allowed.");
-                }
-            }
 
             // Constructor function, calling parent with arguments.
             viewMaster = function() {
@@ -1132,8 +987,19 @@
             };
 
             // Extending.
-            viewMaster.prototype = new parent();
-            ObjectUtils.merge(viewMaster.prototype, conf);
+            viewMaster.prototype = new parent(arguments);
+
+            //TODO: Move this to Agent.extend
+            // If the function is already on the parent, observe and hook, otherwise merge.
+            for (p in conf) {
+                if (conf.hasOwnProperty(p)) {
+                    if (typeof conf[p] == "function" && typeof viewMaster.prototype[p] == "function") {
+                        Agent.observe(viewMaster.prototype, p, conf[p], viewMaster);
+                    } else {
+                        viewMaster.prototype[p] = conf[p];
+                    }
+                }
+            }
 
             return viewMaster;
 
