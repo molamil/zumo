@@ -19,7 +19,6 @@
                 this.request = request;
                 this.session = session;
                 this.stateManager = stateManager;
-                this.isDisplayed = false;
                 this.isCleared = false;
 
                 //TODO: Move this to PageBlockBuilder
