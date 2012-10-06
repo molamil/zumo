@@ -17,7 +17,7 @@
             domclone: "DomCloneMaster",
             loader: "LoaderMaster",
             builder: "BuilderMaster",
-            void: "VoidMaster"
+            _void: "VoidMaster" // "void" is aliased to "void".
         },
         _DEFAULT_VIEW_TYPE: "dom",
         _STATE_MANAGERS: {
@@ -57,6 +57,9 @@
 
             // Add alias for go as goto, for compatibility.
             this["goto"] = this.go;
+
+            // Add alias for go as goto, for compatibility.
+            this._VIEW_MASTERS["void"] = this._VIEW_MASTERS._void;
 
             this._initViewMasters();
             this._initStateManagers();
