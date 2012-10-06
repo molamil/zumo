@@ -7,6 +7,7 @@
         this._activeHandlers = []; // of {handlerContext:Object, context:Object, contextType:String, f:Function}
         this._bindings = []; // of {type:String, f:Function, target:String}
         this.updateBindings = false;
+        this.hasRegistered = false;
     };
 
     HandlerManager.prototype = {
@@ -23,7 +24,8 @@
                 commandContext,
                 i;
 
-            this.unregisterHandlers();
+            if (this.hasRegistered)
+                this.unregisterHandlers();
 
             for (i = 0; i < pageContexts.length; i++) {
                 pageContext = pageContexts[i];
@@ -39,6 +41,8 @@
                 commandContext = commandContexts[i];
                 this._registerHandlersFromContext(commandContext, "command");
             }
+
+            this.hasRegistered = true;
 
             this.updateBindings = this._updateBindings();
 

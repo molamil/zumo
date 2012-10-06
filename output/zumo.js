@@ -1085,11 +1085,40 @@
             this.LoaderMaster = LoaderMaster;
             this.BuilderMaster = BuilderMaster;
 
-            //ObjectUtils.extend(this.DomMaster, this.AbstractMaster);
-            //ObjectUtils.extend(this.DomCloneMaster, this.DomMaster);
-            //ObjectUtils.extend(this.LoaderMaster, this.AbstractMaster);
-            //ObjectUtils.extend(this.BuilderMaster, this.AbstractMaster);
 
+        },
+
+        //TODO: Implement, test.
+        createViewMaster: function() {
+
+            var viewMaster,
+                useConfArgument = typeof arguments[0] == "object",
+                conf = useConfArgument ? arguments[0] : {},
+                parent = useConfArgument ? arguments[1] : arguments[2];
+
+            // Set default parent for the manager if not provided.
+            parent = parent || this.BaseIo3Manager;
+
+            if (!useConfArgument) {
+                if ((typeof arguments[0] == "function") && (typeof arguments[1] == "function")) {
+                    conf.doIn = arguments[0];
+                    conf.doOut = arguments[1];
+                } else {
+                    Log.warn("Malformed call to createStateManager - either createStateManager(conf, [parent]) or " +
+                        "createStateManager(doIn, doOut, [parent]) are allowed.");
+                }
+            }
+
+            // Constructor function, calling parent with arguments.
+            viewMaster = function() {
+                parent.apply(this, arguments);
+            };
+
+            // Extending.
+            viewMaster.prototype = new parent();
+            ObjectUtils.merge(viewMaster.prototype, conf);
+
+            return viewMaster;
 
         }
 
@@ -1217,7 +1246,7 @@
 
             // Constructor function, calling parent with arguments.
             stateManager = function() {
-                parent.apply(this, arguments)
+                parent.apply(this, arguments);
             };
 
             // Extending.
@@ -1663,6 +1692,7 @@
         this._activeHandlers = []; // of {handlerContext:Object, context:Object, contextType:String, f:Function}
         this._bindings = []; // of {type:String, f:Function, target:String}
         this.updateBindings = false;
+        this.hasRegistered = false;
     };
 
     HandlerManager.prototype = {
@@ -1679,7 +1709,8 @@
                 commandContext,
                 i;
 
-            this.unregisterHandlers();
+            if (this.hasRegistered)
+                this.unregisterHandlers();
 
             for (i = 0; i < pageContexts.length; i++) {
                 pageContext = pageContexts[i];
@@ -1695,6 +1726,8 @@
                 commandContext = commandContexts[i];
                 this._registerHandlersFromContext(commandContext, "command");
             }
+
+            this.hasRegistered = true;
 
             this.updateBindings = this._updateBindings();
 
