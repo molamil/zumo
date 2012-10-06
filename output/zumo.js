@@ -261,8 +261,8 @@
         // --- PROPERTIES
 
         LEVELS: ["error", "warn", "info", "debug"],
-        level: 2,
-        prefix: _NAME.toUpperCase() + " - ",
+        level: 1,
+        prefix: _NAME ? _NAME.toUpperCase() + " - " : "", //TODO: Set prefix elsewhere.
 
         // --- METHODS
 
@@ -967,6 +967,21 @@
             }, AbstractMaster);
 
 
+            // *** VOID MASTER - CONSTRUCTOR
+
+            var VoidMaster = this.VoidMaster = this.createViewMaster({
+
+                display: function () {
+                    this.init();
+                },
+
+                clear: function () {
+                    this.destroy();
+                }
+
+            }, AbstractMaster);
+
+
         },
 
         createViewMaster: function(conf, parent) {
@@ -976,9 +991,6 @@
 
             conf = conf || {};
             parent = parent || this.AbstractMaster;
-
-            // Set default parent for the manager if not provided.
-            parent = parent || this.BaseIo3Manager;
 
             // Constructor function, calling parent with arguments.
             viewMaster = function() {
@@ -1834,7 +1846,8 @@
             _dom: "DomMaster",
             _domclone: "DomCloneMaster",
             _loader: "LoaderMaster",
-            _builder: "BuilderMaster"
+            _builder: "BuilderMaster",
+            _void: "VoidMaster"
         },
         _DEFAULT_VIEW_TYPE: "_dom",
         _STATE_MANAGERS: {
@@ -2220,6 +2233,18 @@
             this.session.viewMasters[name] = null;
         },
 
+        createViewMaster: function() {
+
+            // Proxy to ViewMasters.createViewMaster with the arguments passed without name, and register.
+            var name = arguments[0],
+                viewMaster = ViewMasters.createViewMaster.apply(ViewMasters, [].slice.call(arguments, 1));
+
+            this.registerViewMaster(name, viewMaster);
+
+            return viewMaster;
+
+        },
+
         registerStateManager: function(name, manager) {
             if (StringUtils.trim(name) == "") {
                 Log.warn("Cannot register a state manager with an empty name");
@@ -2241,10 +2266,11 @@
             this.session.stateManagers[name] = null;
         },
 
-        createStateManager: function(name) {
+        createStateManager: function() {
 
             // Proxy to StateManagers.createStateManager with the arguments passed without name, and register.
-            var stateManager = StateManagers.createStateManager.apply(StateManagers, [].slice.call(arguments, 1));
+            var name = arguments[0],
+                stateManager = StateManagers.createStateManager.apply(StateManagers, [].slice.call(arguments, 1));
 
             this.registerStateManager(name, stateManager);
 
@@ -2296,12 +2322,12 @@
 
             if (!this.isInit()) {
                 Log.warn("Cannot get command context (" + id + ")- Zumo is not yet initalized");
-                return;
+                return null;
             }
 
             if (this._conf.commands == null || this._conf.commands.length == 0) {
                 Log.info("Cannot get block context since there are no commands configured");
-                return;
+                return null;
             }
 
             for (i = 0; i < this._conf.commands.length; i++) {

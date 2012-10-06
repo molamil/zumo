@@ -245,6 +245,21 @@
             }, AbstractMaster);
 
 
+            // *** VOID MASTER - CONSTRUCTOR
+
+            var VoidMaster = this.VoidMaster = this.createViewMaster({
+
+                display: function () {
+                    this.init();
+                },
+
+                clear: function () {
+                    this.destroy();
+                }
+
+            }, AbstractMaster);
+
+
         },
 
         createViewMaster: function(conf, parent) {
@@ -254,9 +269,6 @@
 
             conf = conf || {};
             parent = parent || this.AbstractMaster;
-
-            // Set default parent for the manager if not provided.
-            parent = parent || this.BaseIo3Manager;
 
             // Constructor function, calling parent with arguments.
             viewMaster = function() {
