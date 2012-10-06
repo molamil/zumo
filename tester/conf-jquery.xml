@@ -26,9 +26,18 @@
 			<handler target="#linkGreen" type="click"/>
 		</page>
 
+		<page id="transparent" type="void" depends="brown, pink">
+			<handler target="#linkTransparent" type="click"/>
+		</page>
+
 		<block id="brown" target="#brown">
 			<handler target="#linkBrown" type="click"/>
 			<handler target="#clearBrown" type="click" action="clearBlock"/>
+		</block>
+
+		<block id="pink" target="#pink">
+			<handler target="#linkPink" type="click"/>
+			<handler target="#clearPink" type="click" action="clearBlock"/>
 		</block>
 
 	</views>
