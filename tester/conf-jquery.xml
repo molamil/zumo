@@ -3,7 +3,7 @@
 
 	<views>
 
-		<page id="grey" target="#grey">
+		<page id="grey" target="#grey" mediator="views.LogMediator">
 			<handler type="startup"/>
 			<handler target="#linkGrey" type="click"/>
 			<handler target="#pages .orange" type="click"/>
@@ -18,8 +18,12 @@
 			<handler target="#linkOrange" type="click"/>
 		</page>
 
-		<page id="white" type="loader" target="news.txt" container="#white">
+		<page id="white" type="loader" target="news.txt" container="#white" mediator="views.LogMediator">
 			<handler target="#linkWhite" type="click"/>
+		</page>
+
+		<page id="green" type="builder" target="views.Green" container="#pages" mediator="views.LogMediator">
+			<handler target="#linkGreen" type="click"/>
 		</page>
 
 		<block id="brown" target="#brown">

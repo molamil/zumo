@@ -11,6 +11,7 @@
 	<script type="text/javascript" src="../output/zumo.js"></script>
 	<script type="text/javascript">
 
+
 		// ZUMO SETUP
 
 		$(function() {
@@ -25,13 +26,54 @@
 
 		});
 
+
+        // VIEWS
+
+        var views = {};
+
+        views.Green = function() {};
+
+        views.Green.prototype = {
+
+            build: function() {
+                return $('<div id="white" style="background-color: #09ff00;"></div>')[0];
+            },
+
+            init: function() {
+                Zumo.log.info("*** views.Green.init");
+            },
+
+            destroy: function() {
+                Zumo.log.info("*** views.Green.destroy");
+            }
+
+        };
+
+        views.LogMediator = function(dom) {
+            this.dom = dom;
+        };
+
+        views.LogMediator.prototype = {
+
+            init: function() {
+                Zumo.log.info("*** views.LogMediator.init");
+            },
+
+            destroy: function() {
+                Zumo.log.info("*** views.LogMediator.destroy");
+            }
+
+        };
+
+
         // COMMANDS
 
         var commands = {};
 
         commands.trigger = function(data) {
             $("body").trigger(data.type, data.data);
-        }
+        };
+
 
 	</script>
 
@@ -100,10 +142,11 @@
 <body>
 
 <div id="menu">
-	<a id="linkGrey"><strong>GREY</strong> (dom)</a><br />
-	<a id="linkPurple"><strong>PURPLE</strong> (dom)</a><br />
+	<a id="linkGrey" title="Mediator: views.LogMediator; Can come from clicking on Orange."><strong>GREY</strong> (dom)</a><br />
+	<a id="linkPurple" title="Depends: brown; Link only active when at Grey."><strong>PURPLE</strong> (dom)</a><br />
 	<a id="linkOrange"><strong>ORANGE</strong> (domclone)</a><br />
-	<a id="linkWhite"><strong>WHITE</strong> (loader)</a>
+	<a id="linkWhite" title="Mediator: views.LogMediator."><strong>WHITE</strong> (loader)</a><br />
+	<a id="linkGreen" title="Mediator: views.LogMediator."><strong>GREEN</strong> (builder)</a>
 	<hr />
 	<a id="linkBrown"><strong>BROWN</strong> (block)</a> - <a id="clearBrown" href="javascript: void(0);">clear</a>
     <hr />
