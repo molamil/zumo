@@ -1072,7 +1072,24 @@
                     AbstractMaster.prototype.init.apply(this, arguments); // Call super
                     PropsManager.apply(this.builder, this.context.propContexts, this.session);
                     ObjectUtils.merge(this.builder, this.request.params);
-                }
+                },
+
+                clear: function() {
+                    AbstractMaster.prototype.clear.apply(this, arguments); // Call super
+                },
+
+                onStateChange: function(target, state) {
+                    AbstractMaster.prototype.onStateChange.apply(this, arguments); // Call super
+                },
+
+                // Default event handlers
+                onDisplay: function(master) {},
+                onClear: function(master) {},
+                onInit: function(master) {},
+                onIn: function(master) {},
+                onOn: function(master) {},
+                onOut: function(master) {},
+                onOff: function(master) {}
 
             };
 

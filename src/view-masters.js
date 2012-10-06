@@ -350,7 +350,24 @@
                     AbstractMaster.prototype.init.apply(this, arguments); // Call super
                     PropsManager.apply(this.builder, this.context.propContexts, this.session);
                     ObjectUtils.merge(this.builder, this.request.params);
-                }
+                },
+
+                clear: function() {
+                    AbstractMaster.prototype.clear.apply(this, arguments); // Call super
+                },
+
+                onStateChange: function(target, state) {
+                    AbstractMaster.prototype.onStateChange.apply(this, arguments); // Call super
+                },
+
+                // Default event handlers
+                onDisplay: function(master) {},
+                onClear: function(master) {},
+                onInit: function(master) {},
+                onIn: function(master) {},
+                onOn: function(master) {},
+                onOut: function(master) {},
+                onOff: function(master) {}
 
             };
 
@@ -363,11 +380,40 @@
             this.LoaderMaster = LoaderMaster;
             this.BuilderMaster = BuilderMaster;
 
-            //ObjectUtils.extend(this.DomMaster, this.AbstractMaster);
-            //ObjectUtils.extend(this.DomCloneMaster, this.DomMaster);
-            //ObjectUtils.extend(this.LoaderMaster, this.AbstractMaster);
-            //ObjectUtils.extend(this.BuilderMaster, this.AbstractMaster);
 
+        },
+
+        //TODO: Implement, test.
+        createViewMaster: function() {
+
+            var viewMaster,
+                useConfArgument = typeof arguments[0] == "object",
+                conf = useConfArgument ? arguments[0] : {},
+                parent = useConfArgument ? arguments[1] : arguments[2];
+
+            // Set default parent for the manager if not provided.
+            parent = parent || this.BaseIo3Manager;
+
+            if (!useConfArgument) {
+                if ((typeof arguments[0] == "function") && (typeof arguments[1] == "function")) {
+                    conf.doIn = arguments[0];
+                    conf.doOut = arguments[1];
+                } else {
+                    Log.warn("Malformed call to createStateManager - either createStateManager(conf, [parent]) or " +
+                        "createStateManager(doIn, doOut, [parent]) are allowed.");
+                }
+            }
+
+            // Constructor function, calling parent with arguments.
+            viewMaster = function() {
+                parent.apply(this, arguments);
+            };
+
+            // Extending.
+            viewMaster.prototype = new parent();
+            ObjectUtils.merge(viewMaster.prototype, conf);
+
+            return viewMaster;
 
         }
 
