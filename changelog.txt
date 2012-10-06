@@ -4,9 +4,9 @@
 
 ------------------------------------------------------------------------------------------------------------------------
 
-ZUMO 0.2 (XX-XX-XXXX)
+ZUMO 0.2 (2012-10-07)
 
-[XXX]
+[Improvements on state managers and view masters]
 
 *  Added VoidMaster ("void") for views without target.
 *  Fixed Builder view master.
@@ -16,7 +16,7 @@ ZUMO 0.2 (XX-XX-XXXX)
 
 ------------------------------------------------------------------------------------------------------------------------
 
-ZUMO 0.1 (23-09-2012)
+ZUMO 0.1 (2012-09-23)
 
 [Initial release]
 
