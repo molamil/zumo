@@ -7,8 +7,8 @@
         // --- PROPERTIES
 
         LEVELS: ["error", "warn", "info", "debug"],
-        level: 2,
-        prefix: _NAME.toUpperCase() + " - ",
+        level: 1,
+        prefix: _NAME ? _NAME.toUpperCase() + " - " : "", //TODO: Set prefix elsewhere.
 
         // --- METHODS
 
