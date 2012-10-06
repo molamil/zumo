@@ -1,0 +1,25 @@
+------------------------------------------------------------------------------------------------------------------------
+
+                                                ZUMO FRAMEWORK CHANGELOG
+
+------------------------------------------------------------------------------------------------------------------------
+
+ZUMO 0.2 (2012-10-07)
+
+[Improvements on state managers and view masters]
+
+*  Added VoidMaster ("void") for views without target.
+*  Fixed Builder view master.
+*  Added createStateManager and createViewMaster methods for easy creation and built-in inheritance.
+*  Removed awkward initial underscore in names when creating state managers and view masters.
+*  Re-organized source files.
+
+------------------------------------------------------------------------------------------------------------------------
+
+ZUMO 0.1 (2012-09-23)
+
+[Initial release]
+
+*  Initial release, already used on several production-ready projects.
+
+------------------------------------------------------------------------------------------------------------------------
