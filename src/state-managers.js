@@ -121,7 +121,7 @@
 
             // Constructor function, calling parent with arguments.
             stateManager = function() {
-                parent.apply(this, arguments)
+                parent.apply(this, arguments);
             };
 
             // Extending.
