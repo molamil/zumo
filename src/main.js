@@ -8,7 +8,10 @@
 
         // --- PROPERTIES
 
+        //TODO: Use mix method instead.
+        StringUtils: StringUtils,
         ObjectUtils: ObjectUtils,
+        DomUtils: DomUtils,
         ViewMasters: ViewMasters,
         StateManagers: StateManagers,
 
