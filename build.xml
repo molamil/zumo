@@ -52,6 +52,7 @@
             <file file="${src.dir}/view-masters.js"/>
             <file file="${src.dir}/state-managers.js"/>
             <file file="${src.dir}/commands.js"/>
+            <file file="${src.dir}/command-masters.js"/>
             <file file="${src.dir}/conf-parsers.js"/>
             <file file="${src.dir}/handlers.js"/>
             <file file="${src.dir}/main.js"/>
