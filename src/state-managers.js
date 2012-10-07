@@ -18,7 +18,7 @@
 
             // *** BASE IO3 MANAGER - CONSTRUCTOR
 
-            var BaseIo3Manager = function(target, session) {
+            var BaseIo3Manager = this.BaseIo3Manager = function(target, session) {
                 this.target = target;
                 this.session = session;
                 this._state = null;
@@ -90,11 +90,6 @@
                 }
 
             };
-
-
-            // *** INIT - Initializing StateManagers
-
-            this.BaseIo3Manager = BaseIo3Manager;
 
 
         },
