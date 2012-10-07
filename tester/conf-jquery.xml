@@ -62,6 +62,10 @@
             <handler target="#linkTrigger" type="click"/>
         </command>
 
+        <command id="date" type="date">
+            <handler target="#linkDate" type="click"/>
+        </command>
+
     </commands>
 
 </zumo>

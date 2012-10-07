@@ -536,6 +536,18 @@
             this.session.commandMasters[name] = null;
         },
 
+        createCommandMaster: function() {
+
+            // Proxy to CommandMasters.createCommandMaster with the arguments passed without name, and register.
+            var name = arguments[0],
+                commandMaster = CommandMasters.createCommandMaster.apply(CommandMasters, [].slice.call(arguments, 1));
+
+            this.registerCommandMaster(name, commandMaster);
+
+            return commandMaster;
+
+        },
+
         //TODO: Use mix function instead of the verbose proxy.
         observe: function(fName, hook, priority) {
             Agent.observe(this, fName, hook, priority);
@@ -761,6 +773,7 @@
 
         // --- EVENTS
 
+        //TODO: Use mix function instead of the verbose empty callbacks.
         onConfLoaded: function() {},
         onPageRequest: function(context, request) {},
         onPageDisplay: function(master) {},

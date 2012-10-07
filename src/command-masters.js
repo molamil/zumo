@@ -65,7 +65,7 @@
                 conf = useConfArgument ? fOrConf : {};
 
             // Set default parent for the manager if not provided.
-            parent = parent || this.AbstractMaster();
+            parent = parent || this.AbstractMaster;
 
             if (!useConfArgument) {
                 if (typeof arguments[0] == "function") {
