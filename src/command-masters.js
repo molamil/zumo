@@ -11,11 +11,12 @@
 
             // *** ABSTRACT MASTER - CONSTRUCTOR
 
-            var AbstractMaster = function(context, request, session) {
+            var AbstractMaster = this.AbstractMaster = function(context, request, session) {
                 this.context = context;
                 this.request = request;
                 this.session = session;
                 this.isExecuted = false;
+                //TODO: See how to configure the master properties.
             };
 
             AbstractMaster.prototype = {
@@ -29,41 +30,62 @@
 
             // *** FUNCTION MASTER - CONSTRUCTOR
 
-            var FunctionMaster = function(context, request, session) {
-                AbstractMaster.call(this, context, request, session);
-                //TODO: See how to configure the master properties.
-            };
+            var FunctionMaster = this.FunctionMaster = this.createCommandMaster(function() {
 
-            FunctionMaster.prototype = {
+                var f = ObjectUtils.find(this.context.target),
+                    args = [],
+                    data = {};
 
-                execute: function() {
-                    AbstractMaster.prototype.execute.apply(this, arguments); // Call super
-                    var f = ObjectUtils.find(this.context.target),
-                        args = [],
-                        data = {};
-                    ObjectUtils.merge(data, [this.context.props, this.request.params]);
-                    if (data._args && data._args.length)
-                        args = data._args.slice(0);
-                    if (!ObjectUtils.isEmpty(data))
-                        args.push(data);
-                    if (typeof f == "function") {
-                        f.apply(null, args); //TODO: Check the this context.
-                    } else {
-                        Log.warn("There is no function to execute for command '" + this.context.id + "' and target '" +
-                            this.context.target + "'.");
-                    }
-                    this.isExecuted = true;
+                ObjectUtils.merge(data, [this.context.props, this.request.params]);
+
+                if (data._args && data._args.length)
+                    args = data._args.slice(0);
+
+                if (!ObjectUtils.isEmpty(data))
+                    args.push(data);
+
+                if (typeof f == "function") {
+                    f.apply(null, args); //TODO: Check the this context.
+                } else {
+                    Log.warn("There is no function to execute for command '" + this.context.id + "' and target '" +
+                        this.context.target + "'.");
                 }
 
+                this.isExecuted = true;
+
+            }, AbstractMaster);
+
+
+        },
+
+        createCommandMaster: function(fOrConf, parent) {
+
+            var commandMaster,
+                useConfArgument = typeof fOrConf == "object",
+                conf = useConfArgument ? fOrConf : {};
+
+            // Set default parent for the manager if not provided.
+            parent = parent || this.AbstractMaster();
+
+            if (!useConfArgument) {
+                if (typeof arguments[0] == "function") {
+                    conf.execute = fOrConf;
+                } else {
+                    Log.warn("Malformed call to createCommandMaster - either createCommandMaster(conf, [parent]) or " +
+                        "createCommandMaster(fExecute, [parent]) are allowed.");
+                }
+            }
+
+            // Constructor function, calling parent with arguments.
+            commandMaster = function() {
+                parent.apply(this, arguments);
             };
 
+            // Extending.
+            commandMaster.prototype = new parent();
+            ObjectUtils.merge(commandMaster.prototype, conf);
 
-            // *** INIT - Initializing CommandMasters
-
-            this.AbstractMaster = AbstractMaster;
-            this.FunctionMaster = FunctionMaster;
-
-            //ObjectUtils.extend(this.FunctionMaster, this.AbstractMaster);
+            return commandMaster;
 
         }
 
