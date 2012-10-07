@@ -8,7 +8,7 @@ ZUMO 0.3 (2012-XX-XX)
 
 [XXX]
 
-*  XXX
+*  Added createCommandMaster method for easy command creation and built-in inheritance.
 
 ------------------------------------------------------------------------------------------------------------------------
 
