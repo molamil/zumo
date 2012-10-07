@@ -13,7 +13,7 @@
                 nTarget,
                 name;
 
-            if (!target || !propContexts)
+            if (!target || !propContexts)
                 return;
 
             // Merge the props

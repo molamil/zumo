@@ -376,7 +376,7 @@
                 p,
                 o;
 
-            if (!target || !origin)
+            if (!target || !origin)
                 return;
 
             if (origin.length)
@@ -433,7 +433,7 @@
             if (o && o.childNodes.length) {
                 for (i = 0; i < o.childNodes.length; i++) {
                     child = o.childNodes[i];
-                    if (child.nodeType == 1 && (!name || child.nodeName == name))
+                    if (child.nodeType == 1 && (!name || child.nodeName == name))
                         children.push(child);
                 }
             }
@@ -535,7 +535,7 @@
                 nTarget,
                 name;
 
-            if (!target || !propContexts)
+            if (!target || !propContexts)
                 return;
 
             // Merge the props
@@ -990,7 +990,7 @@
                 p;
 
             conf = conf || {};
-            parent = parent || this.AbstractMaster;
+            parent = parent || this.AbstractMaster;
 
             // Constructor function, calling parent with arguments.
             viewMaster = function() {
@@ -1121,7 +1121,7 @@
                 parent = useConfArgument ? arguments[1] : arguments[2];
 
             // Set default parent for the manager if not provided.
-            parent = parent || this.BaseIo3Manager;
+            parent = parent || this.BaseIo3Manager;
 
             if (!useConfArgument) {
                 if ((typeof arguments[0] == "function") && (typeof arguments[1] == "function")) {
@@ -1249,7 +1249,7 @@
 
                 if (typeof f == "function") {
                     f.apply(null, args); //TODO: Check the this context.
-                } else {
+                } else {
                     Log.warn("There is no function to execute for command '" + this.context.id + "' and target '" +
                         this.context.target + "'.");
                 }
@@ -1268,7 +1268,7 @@
                 conf = useConfArgument ? fOrConf : {};
 
             // Set default parent for the manager if not provided.
-            parent = parent || this.AbstractMaster;
+            parent = parent || this.AbstractMaster;
 
             if (!useConfArgument) {
                 if (typeof arguments[0] == "function") {
@@ -1920,8 +1920,8 @@
         // Initializes the zumo object with the passed root parameter as the base DOM element to make selections on
         init: function(root, conf, params) {
 
-            root = root || document;
-            conf = conf || root;
+            root = root || document;
+            conf = conf || root;
             this._params = params || {};
             //TODO: Merge conf with params.
             this.root = root;

@@ -268,7 +268,7 @@
                 p;
 
             conf = conf || {};
-            parent = parent || this.AbstractMaster;
+            parent = parent || this.AbstractMaster;
 
             // Constructor function, calling parent with arguments.
             viewMaster = function() {

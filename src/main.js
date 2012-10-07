@@ -73,8 +73,8 @@
         // Initializes the zumo object with the passed root parameter as the base DOM element to make selections on
         init: function(root, conf, params) {
 
-            root = root || document;
-            conf = conf || root;
+            root = root || document;
+            conf = conf || root;
             this._params = params || {};
             //TODO: Merge conf with params.
             this.root = root;

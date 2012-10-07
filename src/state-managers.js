@@ -102,7 +102,7 @@
                 parent = useConfArgument ? arguments[1] : arguments[2];
 
             // Set default parent for the manager if not provided.
-            parent = parent || this.BaseIo3Manager;
+            parent = parent || this.BaseIo3Manager;
 
             if (!useConfArgument) {
                 if ((typeof arguments[0] == "function") && (typeof arguments[1] == "function")) {

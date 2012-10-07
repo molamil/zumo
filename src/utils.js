@@ -122,7 +122,7 @@
                 p,
                 o;
 
-            if (!target || !origin)
+            if (!target || !origin)
                 return;
 
             if (origin.length)
@@ -179,7 +179,7 @@
             if (o && o.childNodes.length) {
                 for (i = 0; i < o.childNodes.length; i++) {
                     child = o.childNodes[i];
-                    if (child.nodeType == 1 && (!name || child.nodeName == name))
+                    if (child.nodeType == 1 && (!name || child.nodeName == name))
                         children.push(child);
                 }
             }
