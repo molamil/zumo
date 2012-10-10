@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<zumo>
+
+	<views>
+
+		<page id="one" target="#frontpage" depends="teaser"/>
+
+		<page id="two" type="dom" target="#about">
+			<prop target="#content"><![CDATA[I am a nice header]]></prop>
+		</page>
+
+		<page id="three" type="loader" target="news.txt" container="#news"/>
+
+		<block id="teaser" target="#teaser"/>
+
+		<block id="footer" target="#footer"/>
+
+	</views>
+
+</zumo>

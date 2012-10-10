@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+	<title>tester</title>
+	
+	<script type="text/javascript" src="../../output/zumo.js"></script>
+	<script type="text/javascript">
+
+		// ZUMO SETUP
+
+		function initZumo() {
+
+			Zumo.log.level = 3;
+
+			Zumo.init(window.document, "conf.xml");
+
+			Zumo.observe("onConfLoaded", function() {
+					Zumo.go("one");
+				}
+			);
+
+			Zumo.observe("onPageRequest", function(context, request) {
+					Zumo.log.info("!!!");
+					Zumo.log.info("*** onPageRequest: " + context.id);
+					Zumo.log.debug(context);
+					Zumo.log.debug(request);
+					Zumo.log.info("!!!");
+				}
+			);
+
+		}
+
+		ZumoAgent.observe(window, "onload", initZumo);
+
+	</script>
+
+	<style type="text/css">
+
+		body {
+			font-family: Candara, sans-serif;
+			font-size: 10pt;
+		}
+
+		a {
+			color: #666666;
+			font-weight: bold;
+			text-decoration: none;
+		}
+
+		a:hover {
+			color: #999999;
+		}
+
+		hr {
+			visibility: hidden;
+		}
+
+		#menu {
+			float: left;
+			width: 100px;
+		}
+
+		#pages {
+			float: left;
+		}
+
+		#pages div {
+			display: none;
+			width: 300px;
+			height: 300px;
+			padding: 25px;
+		}
+
+		#news {
+			display: block !important;
+		}
+
+		#teaser {
+			position: absolute;
+			top: 0;
+			left: 108px;
+			width: 350px;
+			height: 10px;
+			background-color: #996600;
+			visibility: hidden;
+		}
+
+		#footer {
+			position: absolute;
+			top: 300px;
+			left: 108px;
+			width: 350px;
+			height: 20px;
+			background-color: #ff0033;
+			visibility: hidden;
+		}
+
+	</style>
+</head>
+
+<body>
+
+<div id="menu">
+	<a href="javascript: Zumo.go('one');">FRONTPAGE</a><br />
+	<a href="javascript: Zumo.go('two');">ABOUT</a><br />
+	<a href="javascript: Zumo.go('three');">NEWS</a>
+	<hr />
+	<a href="javascript: Zumo.displayBlock('teaser');">TEASER</a> <a href="javascript: Zumo.clearBlock('teaser');">(clear)</a>
+</div>
+
+<div id="pages">
+	<div id="frontpage" style="background-color: #cccccc;"></div>
+	<div id="about" style="background-color: #ff00ff;">
+		<p id="content"></p>
+	</div>
+	<div id="news"></div>
+</div>
+
+<div id="teaser"></div>
+
+<div id="footer"></div>
+
+</body>
+</html>
