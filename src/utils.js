@@ -60,9 +60,10 @@
 
         // --- METHODS
 
-        create: function(f, context, args) {
+        create: function(f, context) {
+            var args = [].slice.call(arguments, 2);
             return function () {
-                f.apply(context, args);
+                return f.apply(context, (arguments.length == 0) ? args : arguments);
             }
         }
 
@@ -99,40 +100,38 @@
 
         // --- METHODS
 
-        extend: function(child, supertype) {
-            child.prototype.__proto__ = supertype.prototype;
-        },
-
         mix: function() {
-            var arg,
-                prop,
-                child = {};
-            for (arg = 0; arg < arguments.length; arg++) {
-                for (prop in arguments[arg]) {
-                    if (arguments[arg].hasOwnProperty(prop))
-                        child[prop] = arguments[arg][prop];
-                }
-            }
-        },
-
-        merge: function(target, origin) {
 
             var i,
-                l = 1,
-                p,
-                o;
+                prop,
+                child = {};
 
-            if (!target || !origin)
-                return;
+            for (i = 0; i < arguments.length; i++) {
+                for (prop in arguments[i]) {
+                    if (arguments[i].hasOwnProperty(prop))
+                        child[prop] = arguments[i][prop];
+                }
+            }
 
-            if (origin.length)
-                l = origin.length;
+            return child;
 
-            for (i = 0; i < l; i++) {
-                o = (origin.length) ? origin[i] : origin;
-                //TODO: Consider using hasOwnProperty.
-                for (p in o)
-                    target[p] = o[p];
+        },
+
+        merge: function() {
+
+            var i,
+                prop,
+                child = arguments[0];
+
+            if (child && typeof child == "object") {
+
+                for (i = 0; i < arguments.length; i++) {
+                    for (prop in arguments[i]) {
+                        if (arguments[i].hasOwnProperty(prop))
+                            child[prop] = arguments[i][prop];
+                    }
+                }
+
             }
 
         },
@@ -153,8 +152,11 @@
             var p;
             if (o) {
                 if (typeof o == "object") {
-                    for (p in o)
-                        return false;
+                    for (p in o) {
+                        if (o.hasOwnProperty(p))
+                            return false;
+                    }
+                    return true;
                 } else if (typeof o == "string") {
                     return StringUtils.trim(o) == "";
                 } else {
