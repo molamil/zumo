@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xml>
+    <person>
+        <name>Jorge</name>
+        <friend>Ramiro</friend>
+        <friend>Patrik</friend>
+        <location>
+            <city>Copenhagen</city>
+            <country>Denmark</country>
+        </location>
+        <friend>Pernille</friend>
+    </person>
+    <person>
+        <name>Pernille</name>
+    </person>
+</xml>
