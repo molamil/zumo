@@ -110,6 +110,8 @@
 
 			// *** FADE CLASS
 
+            //TODO: Implement this transition manager in the 0.2 way.
+
 			var Fade = function(target, session) {
 				Zumo.StateManagers.BaseIo3Manager.call(this, target, session);
 			};
@@ -137,7 +139,7 @@
 
 			// *** INIT
 
-			Zumo.ObjectUtils.extend(Fade, Zumo.StateManagers.BaseIo3Manager);
+			//Zumo.ObjectUtils.extend(Fade, Zumo.StateManagers.BaseIo3Manager);
 			//TODO: Check whether it is possible to allow register managers not starting with _
 			Zumo.registerStateManager("_$fade", Fade);
 
