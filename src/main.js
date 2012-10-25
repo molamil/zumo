@@ -9,9 +9,11 @@
         // --- PROPERTIES
 
         //TODO: Use mix method instead.
+        Delegate: Delegate,
         StringUtils: StringUtils,
         ObjectUtils: ObjectUtils,
         DomUtils: DomUtils,
+        Loader: Loader,
         ViewMasters: ViewMasters,
         StateManagers: StateManagers,
 
