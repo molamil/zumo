@@ -8,6 +8,7 @@ ZUMO 0.3 (2012-XX-XX)
 
 [XXX]
 
+*  Optimized util methos: mix, merge, etc.
 *  Added createCommandMaster method for easy command creation and built-in inheritance.
 
 ------------------------------------------------------------------------------------------------------------------------
