@@ -17,72 +17,66 @@
 
 			// *** CASCADE CLASS
 
-			var Cascade = function(target, session) {
-				Zumo.StateManagers.BaseIo3Manager.call(this, target, session);
-				this.inDelay = 200;
-				this.delay = 90;
-				this.timeIn = 200;
-				this.timeOut = 200;
-				this.timeSlide = 300;
-				this.offsetSlide = 150;
-			};
-
-			Cascade.prototype = {
-
-				doIn: function() {
-					var that = this;
-					var $div = $("div", this.target);
-					for (var i = 0; i < $div.length; i++) {
-						var $thisDiv = $($div[i]);
-						var callback;
-						if (i == $div.length - 1) {
-							callback = function() {
-								that.setState(Zumo.StateManagers.STATE_ON);
-							}
-						}
-						$thisDiv.css("display", "none");
-						$thisDiv.delay(i * that.delay + that.inDelay).fadeIn(that.timeIn, callback);
-					}
-					if (Session.style == "vertical") {
-						var $target = $(that.target);
-						$target.css("left", that.offsetSlide);
-						$target.delay(100).animate({left: 0}, that.timeSlide);
-					}
-				},
-
-				doOut: function() {
-					var that = this;
-					if (Session.style == "vertical") {
-						var $target = $(that.target);
-						$target.css("left", 0);
-						$target.animate({left: -that.offsetSlide, opacity: 0}, that.timeSlide);
-					} else {
-						var $div = $("div", this.target);
-						for (var i = 0; i < $div.length; i++) {
-							var $thisDiv = $($div[i]);
-							var callback;
-							if (i == $div.length - 1) {
-								callback = function() {
-									that.setState(Zumo.StateManagers.STATE_OFF);
-								}
-							}
-							$thisDiv.delay(($div.length - 1 - i) * that.delay).fadeOut(that.timeOut * 2, callback);
-						}
-					}
-				}
-
-			};
-
-
-			// *** INIT
-
-			Zumo.ObjectUtils.extend(Cascade, Zumo.StateManagers.BaseIo3Manager);
-			Zumo.registerStateManager("_cascade", Cascade);
+            Zumo.createStateManager("cascade", {
+                inDelay: 200,
+                delay: 90,
+                timeIn: 200,
+                timeOut: 200,
+                timeSlide: 300,
+                offsetSlide: 150,
+                doIn: function() {
+                    var that = this,
+                        $div = $("div", this.target),
+                        i,
+                        $thisDiv,
+                        callback,
+                        $target;
+                    for (i = 0; i < $div.length; i++) {
+                        $thisDiv = $($div[i]);
+                        if (i == $div.length - 1) {
+                            callback = function() {
+                                that.setState(Zumo.StateManagers.STATE_ON);
+                            };
+                        }
+                        $thisDiv.css("display", "none");
+                        $thisDiv.delay(i * that.delay + that.inDelay).fadeIn(that.timeIn, callback);
+                    }
+                    if (Session.style == "vertical") {
+                        $target = $(that.target);
+                        $target.css("left", that.offsetSlide);
+                        $target.delay(100).animate({left: 0}, that.timeSlide);
+                    }
+                },
+                doOut: function() {
+                    var that = this,
+                        $target,
+                        $div,
+                        i,
+                        $thisDiv,
+                        callback;
+                    if (Session.style == "vertical") {
+                        $target = $(that.target);
+                        $target.css("left", 0);
+                        $target.animate({left: -that.offsetSlide, opacity: 0}, that.timeSlide);
+                    } else {
+                        $div = $("div", this.target);
+                        for (i = 0; i < $div.length; i++) {
+                            $thisDiv = $($div[i]);
+                            if (i == $div.length - 1) {
+                                callback = function() {
+                                    that.setState(Zumo.StateManagers.STATE_OFF);
+                                };
+                            }
+                            $thisDiv.delay(($div.length - 1 - i) * that.delay).fadeOut(that.timeOut * 2, callback);
+                        }
+                    }
+                }
+            });
 
 
 		}
 
-	}
+	};
 
 
 	// *** MOLA OBJECT
@@ -118,8 +112,9 @@
 		},
 
 		initMenu: function() {
-			var pageContexts = Zumo.getPageContexts();
-			for (var i = 0; i < pageContexts.length; i++) {
+			var pageContexts = Zumo.getPageContexts(),
+                i;
+			for (i = 0; i < pageContexts.length; i++) {
 				var pageContext = pageContexts[i];
 				var $li = $(document.createElement("li"));
 				$li.text(pageContext.title);
@@ -155,6 +150,6 @@ $(function() {
 	Zumo.onConfLoaded = function() {
 		Mola.init();
 		Zumo.go("frontpage");
-	}
+	};
 
 });
