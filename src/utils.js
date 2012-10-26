@@ -125,7 +125,7 @@
 
             if (child && typeof child == "object") {
 
-                for (i = 0; i < arguments.length; i++) {
+                for (i = 1; i < arguments.length; i++) {
                     for (prop in arguments[i]) {
                         if (arguments[i].hasOwnProperty(prop))
                             child[prop] = arguments[i][prop];
