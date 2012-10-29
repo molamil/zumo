@@ -61,7 +61,7 @@
         <delete file="${temp.file}"/>
         <replace file="${output.dir}/${output.file}" token="${name}" value="${project.title}"/>
         <replace file="${output.dir}/${output.file}" token="${version}" value="${project.version}"/>
-        <replace file="${output.dir}/${output.file}" token="${src}" value="${code}"/>
+        <replace file="${output.dir}/${output.file}" token="/* ${src} */" value="${code}"/>
         <concat destFile="${output.dir}/${output.file}" append="true">
             <file file="${src.dir}/zumo-jquery.js"/>
         </concat>

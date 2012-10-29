@@ -18,6 +18,6 @@
 
     var _NAME = "${name}",
         _VERSION = "${version}";
-    ${src}
+    /* ${src} */
 
 })(this);
