@@ -227,7 +227,7 @@
 					if (!data.success) {
 						alert("ERROR: Incorrect username or password");
 					} else {
-                    	$("body").trigger(events.LOGGED_IN, data);
+                        $("body").trigger(events.LOGGED_IN, data);
 					}
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
