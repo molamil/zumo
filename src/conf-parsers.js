@@ -10,9 +10,32 @@
             // TODO: Check for XML
             // TODO: Parse top level props
             var confObject = {};
+            confObject.includes = this._parseIncludes(conf, session);
             confObject.views = this._parseViews(conf, session);
             confObject.commands = this._parseCommands(conf, session);
             return confObject;
+        },
+
+        _parseIncludes: function(conf, session) {
+
+            var includeNodes = conf.getElementsByTagName("include"),
+                includeNode,
+                includes = [],
+                target,
+                i;
+
+            for (i = 0; i < includeNodes.length; i++) {
+
+                includeNode = includeNodes[i];
+                target = includeNode.attributes.getNamedItem("target").nodeValue;
+
+                if (!ObjectUtils.isEmpty(target))
+                    includes.push(target);
+
+            }
+
+            return includes;
+
         },
 
         _parseViews: function(conf, session) {

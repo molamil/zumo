@@ -50,6 +50,7 @@
         },
 
         _conf: null,
+        _confTargets: [],
         _params: null,
         _currentPage: null,
         _displayedPage: null,
@@ -567,10 +568,16 @@
             var confLoader;
             if (typeof conf == "string") {
                 Log.info("Initializing with remote configuration: " + conf);
+                if (this._confTargets.length == 0) {
+                    this._confTargets.push({
+                        target: conf,
+                        isParsed: false
+                    });
+                }
                 confLoader = new Loader();
-                confLoader.load(conf, this._onConfLoaded, this);
+                confLoader.load(conf, this._onConfLoaded, this, [conf]);
             } else {
-                this._processConf(conf)
+                this._processConf(conf);
             }
         },
 
@@ -741,11 +748,69 @@
                     break;
             }
 
-            this._conf = parsedConf;
+            if (parsedConf.includes && parsedConf.includes.length > 0) {
+                for (i = 0; i < parsedConf.includes.length; i++)
+                    this._addConfTarget(parsedConf.includes[i]);
+            }
 
-            this._processParenting();
-            this._handlerManager.registerHandlers();
-            this.onConfLoaded();
+            if (this._conf) {
+                ObjectUtils.mergeDeep(this._conf, parsedConf);
+            } else {
+                this._conf = parsedConf;
+            }
+
+            if (this._getPendingConfTargets().length == 0) {
+                this._processParenting();
+                this._handlerManager.registerHandlers();
+                this.onConfLoaded();
+            }
+
+        },
+
+        _addConfTarget: function(target) {
+
+            var i,
+                exists;
+
+            for (i = 0; i < this._confTargets.length; i++) {
+                if (target == this._confTargets[i].target) {
+                    Log.warn("Duplicated conf target '" + target + "', ignoring...");
+                    exists = true;
+                    break;
+                }
+            }
+
+            if (!exists) {
+                this._confTargets.push({
+                    target: target,
+                    isParsed: false
+                });
+                this._initConf(target);
+            }
+
+        },
+
+        _markConfTarget: function(target) {
+            var i;
+            for (i = 0; i < this._confTargets.length; i++) {
+                if (target == this._confTargets[i].target) {
+                    this._confTargets[i].isParsed = true;
+                    break;
+                }
+            }
+        },
+
+        _getPendingConfTargets: function() {
+
+            var i,
+                pendingConfTargets = [];
+
+            for (i = 0; i < this._confTargets.length; i++) {
+                if (!this._confTargets[i].isParsed)
+                    pendingConfTargets.push(this._confTargets[i].target);
+            }
+
+            return pendingConfTargets;
 
         },
 
@@ -797,8 +862,9 @@
         onBlockOut: function(master) {},
         onBlockOff: function(master) {},
 
-        _onConfLoaded: function(xmlHttp) {
-            Log.info("Conf was loaded");
+        _onConfLoaded: function(xmlHttp, target) {
+            Log.info("Conf was loaded, target = " + target);
+            this._markConfTarget(target);
             this._processConf(xmlHttp.responseXML);
         }
 

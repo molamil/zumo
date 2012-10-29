@@ -390,6 +390,25 @@
 
         },
 
+        mergeDeep: function(o1, o2) {
+
+            var i,
+                prop;
+
+            if (o1 && typeof o1 == "object" && o2 && typeof o2 == "object") {
+                for (prop in o2) {
+                    if (o2.hasOwnProperty(prop)) {
+                        if (typeof o2[prop] == "object" && typeof o1[prop] == "object") {
+                            this.mergeDeep(o1[prop], o2[prop]);
+                        } else {
+                            o1[prop] = o2[prop];
+                        }
+                    }
+                }
+            }
+
+        },
+
         find: function(target, container) {
             var parts = target.split("."),
                 o = container || window,
@@ -469,17 +488,19 @@
         // this.xmlHttp = null;
         // this.callback= null;
         // this.callbackObject = null;
+        // this.params = null;
     };
 
     Loader.prototype = {
 
-        load: function(url, onLoaded, callbackObject) {
+        load: function(url, onLoaded, callbackObject, params) {
 
             var onState = this.onState,
                 thisObject = this;
 
             this.callback = onLoaded;
             this.callbackObject = callbackObject;
+            this.params = params || [];
 
             if (window.XMLHttpRequest) {
                 this.xmlHttp = new XMLHttpRequest();
@@ -517,8 +538,12 @@
 
         onLoaded: function(xmlHttp) {
             Log.debug("The server returned content from Loader");
-            if (typeof this.callback == "function")
-                this.callback.call(this.callbackObject, xmlHttp);
+            var args = [];
+            if (typeof this.callback == "function") {
+                args.push(xmlHttp);
+                args = args.concat(this.params);
+                this.callback.apply(this.callbackObject, args);
+            }
         }
 
     };
@@ -1307,9 +1332,32 @@
             // TODO: Check for XML
             // TODO: Parse top level props
             var confObject = {};
+            confObject.includes = this._parseIncludes(conf, session);
             confObject.views = this._parseViews(conf, session);
             confObject.commands = this._parseCommands(conf, session);
             return confObject;
+        },
+
+        _parseIncludes: function(conf, session) {
+
+            var includeNodes = conf.getElementsByTagName("include"),
+                includeNode,
+                includes = [],
+                target,
+                i;
+
+            for (i = 0; i < includeNodes.length; i++) {
+
+                includeNode = includeNodes[i];
+                target = includeNode.attributes.getNamedItem("target").nodeValue;
+
+                if (!ObjectUtils.isEmpty(target))
+                    includes.push(target);
+
+            }
+
+            return includes;
+
         },
 
         _parseViews: function(conf, session) {
@@ -1899,6 +1947,7 @@
         },
 
         _conf: null,
+        _confTargets: [],
         _params: null,
         _currentPage: null,
         _displayedPage: null,
@@ -2416,10 +2465,16 @@
             var confLoader;
             if (typeof conf == "string") {
                 Log.info("Initializing with remote configuration: " + conf);
+                if (this._confTargets.length == 0) {
+                    this._confTargets.push({
+                        target: conf,
+                        isParsed: false
+                    });
+                }
                 confLoader = new Loader();
-                confLoader.load(conf, this._onConfLoaded, this);
+                confLoader.load(conf, this._onConfLoaded, this, [conf]);
             } else {
-                this._processConf(conf)
+                this._processConf(conf);
             }
         },
 
@@ -2590,11 +2645,69 @@
                     break;
             }
 
-            this._conf = parsedConf;
+            if (parsedConf.includes && parsedConf.includes.length > 0) {
+                for (i = 0; i < parsedConf.includes.length; i++)
+                    this._addConfTarget(parsedConf.includes[i]);
+            }
 
-            this._processParenting();
-            this._handlerManager.registerHandlers();
-            this.onConfLoaded();
+            if (this._conf) {
+                ObjectUtils.mergeDeep(this._conf, parsedConf);
+            } else {
+                this._conf = parsedConf;
+            }
+
+            if (this._getPendingConfTargets().length == 0) {
+                this._processParenting();
+                this._handlerManager.registerHandlers();
+                this.onConfLoaded();
+            }
+
+        },
+
+        _addConfTarget: function(target) {
+
+            var i,
+                exists;
+
+            for (i = 0; i < this._confTargets.length; i++) {
+                if (target == this._confTargets[i].target) {
+                    Log.warn("Duplicated conf target '" + target + "', ignoring...");
+                    exists = true;
+                    break;
+                }
+            }
+
+            if (!exists) {
+                this._confTargets.push({
+                    target: target,
+                    isParsed: false
+                });
+                this._initConf(target);
+            }
+
+        },
+
+        _markConfTarget: function(target) {
+            var i;
+            for (i = 0; i < this._confTargets.length; i++) {
+                if (target == this._confTargets[i].target) {
+                    this._confTargets[i].isParsed = true;
+                    break;
+                }
+            }
+        },
+
+        _getPendingConfTargets: function() {
+
+            var i,
+                pendingConfTargets = [];
+
+            for (i = 0; i < this._confTargets.length; i++) {
+                if (!this._confTargets[i].isParsed)
+                    pendingConfTargets.push(this._confTargets[i].target);
+            }
+
+            return pendingConfTargets;
 
         },
 
@@ -2646,8 +2759,9 @@
         onBlockOut: function(master) {},
         onBlockOff: function(master) {},
 
-        _onConfLoaded: function(xmlHttp) {
-            Log.info("Conf was loaded");
+        _onConfLoaded: function(xmlHttp, target) {
+            Log.info("Conf was loaded, target = " + target);
+            this._markConfTarget(target);
             this._processConf(xmlHttp.responseXML);
         }
 

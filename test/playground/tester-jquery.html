@@ -15,13 +15,13 @@
 
 		$(function() {
 
-			//Zumo.log.level = 3;
+			Zumo.log.level = 3;
 
 			Zumo.init(window.document, "conf-jquery.xml");
 
 			Zumo.onConfLoaded = function() {
 				$("body").trigger("startup");
-			}
+			};
 
 		});
 
