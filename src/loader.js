@@ -9,17 +9,19 @@
         // this.xmlHttp = null;
         // this.callback= null;
         // this.callbackObject = null;
+        // this.params = null;
     };
 
     Loader.prototype = {
 
-        load: function(url, onLoaded, callbackObject) {
+        load: function(url, onLoaded, callbackObject, params) {
 
             var onState = this.onState,
                 thisObject = this;
 
             this.callback = onLoaded;
             this.callbackObject = callbackObject;
+            this.params = params || [];
 
             if (window.XMLHttpRequest) {
                 this.xmlHttp = new XMLHttpRequest();
@@ -57,8 +59,12 @@
 
         onLoaded: function(xmlHttp) {
             Log.debug("The server returned content from Loader");
-            if (typeof this.callback == "function")
-                this.callback.call(this.callbackObject, xmlHttp);
+            var args = [];
+            if (typeof this.callback == "function") {
+                args.push(xmlHttp);
+                args = args.concat(this.params);
+                this.callback.apply(this.callbackObject, args);
+            }
         }
 
     };
