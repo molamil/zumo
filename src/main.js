@@ -64,6 +64,8 @@
             // Add alias for go as goto, for compatibility.
             this._VIEW_MASTERS["void"] = this._VIEW_MASTERS._void;
 
+            Log.prefix = _NAME ? _NAME.toUpperCase() + " - " : "";
+
             this._initViewMasters();
             this._initStateManagers();
             this._initCommandMasters();
