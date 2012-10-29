@@ -34,9 +34,7 @@
 
                 var f = ObjectUtils.find(this.context.target),
                     args = [],
-                    data = {};
-
-                ObjectUtils.merge(data, [this.context.props, this.request.params]);
+                    data = ObjectUtils.mix(this.context.props, this.request.params);
 
                 if (data._args && data._args.length)
                     args = data._args.slice(0);
