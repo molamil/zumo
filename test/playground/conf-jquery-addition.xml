@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <zumo>
 
+    <include target="conf-jquery-addition-commands.xml"/>
+
 	<views>
 
 		<block id="brown" target="#brown">
 			<handler target="#linkBrown" type="click"/>
 			<handler target="#clearBrown" type="click" action="clearBlock"/>
-		</block>
-
-		<block id="pink" target="#pink">
-			<handler target="#linkPink" type="click"/>
-			<handler target="#clearPink" type="click" action="clearBlock"/>
 		</block>
 
 	</views>
@@ -23,20 +20,6 @@
             </prop>
             <handler target="#linkAlert" type="click"/>
             <handler type="hello"/>
-        </command>
-
-        <command id="trigger" target="commands.trigger">
-            <prop name="type" value="hello"/>
-            <prop name="data">
-                <prop name="_args">
-                    <item>Hello from trigger command!</item>
-                </prop>
-            </prop>
-            <handler target="#linkTrigger" type="click"/>
-        </command>
-
-        <command id="date" type="date">
-            <handler target="#linkDate" type="click"/>
         </command>
 
     </commands>

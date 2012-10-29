@@ -318,7 +318,7 @@
             var args = [].slice.call(arguments, 2);
             return function () {
                 return f.apply(context, (arguments.length == 0) ? args : arguments);
-            }
+            };
         }
 
     };
@@ -397,9 +397,14 @@
 
             if (o1 && typeof o1 == "object" && o2 && typeof o2 == "object") {
                 for (prop in o2) {
-                    if (o2.hasOwnProperty(prop)) {
+                    if (o2[prop] !== null && o2.hasOwnProperty(prop)) {
                         if (typeof o2[prop] == "object" && typeof o1[prop] == "object") {
-                            this.mergeDeep(o1[prop], o2[prop]);
+                            if (o2[prop].hasOwnProperty("length") && o1[prop].hasOwnProperty("length") &&
+                                typeof o1[prop].concat == "function") {
+                                o1[prop] = o1[prop].concat(o2[prop]);
+                            } else {
+                                this.mergeDeep(o1[prop], o2[prop]);
+                            }
                         } else {
                             o1[prop] = o2[prop];
                         }

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<zumo>
+
+    <commands>
+
+        <command id="trigger" target="commands.trigger">
+            <prop name="type" value="hello"/>
+            <prop name="data">
+                <prop name="_args">
+                    <item>Hello from trigger command!</item>
+                </prop>
+            </prop>
+            <handler target="#linkTrigger" type="click"/>
+        </command>
+
+        <command id="date" type="date">
+            <handler target="#linkDate" type="click"/>
+        </command>
+
+    </commands>
+
+</zumo>

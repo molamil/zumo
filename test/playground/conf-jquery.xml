@@ -32,6 +32,11 @@
 			<handler target="#linkTransparent" type="click"/>
 		</page>
 
+        <block id="pink" target="#pink">
+            <handler target="#linkPink" type="click"/>
+            <handler target="#clearPink" type="click" action="clearBlock"/>
+        </block>
+
 	</views>
 
 </zumo>
