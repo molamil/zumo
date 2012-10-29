@@ -8,6 +8,8 @@ ZUMO 0.3 (2012-XX-XX)
 
 [XXX]
 
+*  Implemented includes for distributing the conf in several files.
+*  Added parameter support to Loader.
 *  Optimized util methos: mix, merge, etc.
 *  Added createCommandMaster method for easy command creation and built-in inheritance.
 
