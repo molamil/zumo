@@ -29,7 +29,7 @@
                 includeNode = includeNodes[i];
                 target = includeNode.attributes.getNamedItem("target").nodeValue;
 
-                if (!ObjectUtils.isEmpty(target))
+                if (!Utils.isEmpty(target))
                     includes.push(target);
 
             }
@@ -139,7 +139,7 @@
 
         _parsePropContexts: function(conf, session) {
 
-            var propNodes = DomUtils.getChildren(conf, "prop"),
+            var propNodes = Utils.getChildren(conf, "prop"),
                 propContexts = [],
                 propContext,
                 i;
@@ -181,9 +181,9 @@
 
             this._mergeAttributes(propContext, conf, ["name", "value"]);
 
-            hasChildren = DomUtils.getChildren(conf).length > 0;
-            itemNodes = DomUtils.getChildren(conf, "item");
-            propNodes = DomUtils.getChildren(conf, "prop");
+            hasChildren = Utils.getChildren(conf).length > 0;
+            itemNodes = Utils.getChildren(conf, "item");
+            propNodes = Utils.getChildren(conf, "prop");
 
             if (hasChildren) {
 
@@ -223,7 +223,7 @@
 
                 if (propContext.value) {
 
-                    if (conf.firstChild && StringUtils.trim(conf.firstChild.nodeValue) != "")
+                    if (conf.firstChild && Utils.trim(conf.firstChild.nodeValue) != "")
                         Log.warn("Both value attribute and text content found on prop: '" + propContext.name + "'. " +
                                  "Only value attribute will be used.");
 
@@ -253,7 +253,7 @@
                 value;
             for (i = 0; i < list.length; i++) {
                 name = list[i];
-                if (name && StringUtils.trim(name) != "") {
+                if (name && Utils.trim(name) != "") {
                     value = element.attributes.getNamedItem(name);
                     if (value)
                         o[name] = value.nodeValue;

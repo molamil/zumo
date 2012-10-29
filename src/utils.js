@@ -1,26 +1,17 @@
 
 
-    // *** DELEGATE - OBJECT
+    // *** UTILS - OBJECT
 
-    var Delegate = {
+    var Utils = {
 
         // --- METHODS
 
-        create: function(f, context) {
+        delegate: function(f, context) {
             var args = [].slice.call(arguments, 2);
             return function () {
                 return f.apply(context, (arguments.length == 0) ? args : arguments);
             };
-        }
-
-    };
-
-
-    // *** STRING UTILS - OBJECT
-
-    var StringUtils = {
-
-        // --- METHODS
+        },
 
         trim: function(s) {
             s = s || "";
@@ -35,16 +26,7 @@
         rtrim: function(s) {
             s = s || "";
             return s.replace(/\s+$/, "");
-        }
-
-    };
-
-
-    // *** OBJECT UTILS - OBJECT
-
-    var ObjectUtils = {
-
-        // --- METHODS
+        },
 
         mix: function() {
 
@@ -128,21 +110,14 @@
                     }
                     return true;
                 } else if (typeof o == "string") {
-                    return StringUtils.trim(o) == "";
+                    return Utils.trim(o) == "";
                 } else {
                     return false;
                 }
             } else {
                 return true;
             }
-        }
-
-    };
-
-
-    // *** DOM UTILS OBJECT
-
-    var DomUtils = {
+        },
 
         getChildren: function(o, name) {
             var children = [],

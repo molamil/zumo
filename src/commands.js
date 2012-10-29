@@ -29,7 +29,7 @@
 
             var masterClass,
                 master,
-                type = StringUtils.trim(context.type).toLowerCase();
+                type = Utils.trim(context.type).toLowerCase();
 
             if (type != "") {
                 masterClass = session.commandMasters["_" + type];

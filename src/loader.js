@@ -21,7 +21,7 @@
 
             this.callback = onLoaded;
             this.callbackObject = callbackObject;
-            this.params = params || [];
+            this.params = params || [];
 
             if (window.XMLHttpRequest) {
                 this.xmlHttp = new XMLHttpRequest();

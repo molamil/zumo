@@ -23,7 +23,7 @@
 
                 //TODO: Move this to PageBlockBuilder
                 if (this.context.mediator) {
-                    fMediator = ObjectUtils.find(this.context.mediator);
+                    fMediator = Utils.find(this.context.mediator);
                     if (typeof fMediator == "function") {
                         this.fMediator = fMediator;
                     }
@@ -43,7 +43,7 @@
                     var containerName;
                     Log.info("Displaying " + this.context.id + " with target " + this.context.target);
                     this.onDisplay(this);
-                    containerName = StringUtils.trim(this.context.container);
+                    containerName = Utils.trim(this.context.container);
                     if (containerName != "") {
                         this.container = this.session.selector(this.context.container, this.session.root);
                         if (this.container == null)
@@ -73,12 +73,12 @@
                     if (this.target) {
 
                         PropsManager.apply(this.target, this.context.propContexts, this.session);
-                        ObjectUtils.merge(this.target, this.request.params);
+                        Utils.merge(this.target, this.request.params);
 
                         if (this.fMediator) {
                             this.mediator = new this.fMediator(this.target);
                             PropsManager.apply(this.mediator, this.context.propContexts, this.session);
-                            ObjectUtils.merge(this.mediator, this.request.params);
+                            Utils.merge(this.mediator, this.request.params);
                             if (typeof this.mediator.init == "function")
                                 this.mediator.init();
                         }
@@ -215,7 +215,7 @@
 
                 display: function() {
                     Log.debug("BuilderMaster display");
-                    this.fConstructor = ObjectUtils.find(this.context.target);
+                    this.fConstructor = Utils.find(this.context.target);
                     if (typeof this.fConstructor != "function") {
                         Log.error("Invalid target for page " + this.context.id + ": " + this.context.target);
                         return;
@@ -239,7 +239,7 @@
 
                 init: function() {
                     PropsManager.apply(this.builder, this.context.propContexts, this.session);
-                    ObjectUtils.merge(this.builder, this.request.params);
+                    Utils.merge(this.builder, this.request.params);
                 }
 
             }, AbstractMaster);

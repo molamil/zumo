@@ -92,7 +92,7 @@
 
             var masterClass,
                 master,
-                type = StringUtils.trim(context.type).toLowerCase();
+                type = Utils.trim(context.type).toLowerCase();
 
             if (type != "") {
                 masterClass = session.viewMasters[type];
@@ -118,7 +118,7 @@
 
             var stateManagerClass,
                 stateManager,
-                manager = StringUtils.trim(context.manager).toLowerCase();
+                manager = Utils.trim(context.manager).toLowerCase();
 
             if (manager != "") {
                 stateManagerClass = session.stateManagers[manager];

@@ -9,10 +9,7 @@
         // --- PROPERTIES
 
         //TODO: Use mix method instead.
-        Delegate: Delegate,
-        StringUtils: StringUtils,
-        ObjectUtils: ObjectUtils,
-        DomUtils: DomUtils,
+        Utils: Utils,
         Loader: Loader,
         ViewMasters: ViewMasters,
         StateManagers: StateManagers,
@@ -392,7 +389,7 @@
         },
 
         registerViewMaster: function(name, master) {
-            if (StringUtils.trim(name) == "") {
+            if (Utils.trim(name) == "") {
                 Log.warn("Cannot register a view master with an empty name");
                 return;
             }
@@ -425,7 +422,7 @@
         },
 
         registerStateManager: function(name, manager) {
-            if (StringUtils.trim(name) == "") {
+            if (Utils.trim(name) == "") {
                 Log.warn("Cannot register a state manager with an empty name");
                 return;
             }
@@ -522,7 +519,7 @@
         },
 
         registerCommandMaster: function(name, master) {
-            if (StringUtils.trim(name) == "") {
+            if (Utils.trim(name) == "") {
                 Log.warn("Cannot register a command master with an empty name");
                 return;
             }
@@ -754,7 +751,7 @@
             }
 
             if (this._conf) {
-                ObjectUtils.mergeDeep(this._conf, parsedConf);
+                Utils.mergeDeep(this._conf, parsedConf);
             } else {
                 this._conf = parsedConf;
             }

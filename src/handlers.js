@@ -108,7 +108,7 @@
                             Log.debug("Handler " + handlerContext.type + "trigger when already at " + page.id);
                             ParamsManager.apply(page.master.target, handlerContext.params, this.session);
                         } else {
-                            ft = Delegate.create(app.go, app, pageContext.id, params);
+                            ft = Utils.delegate(app.go, app, pageContext.id, params);
                             setTimeout(ft, 10);
                         }
                     }

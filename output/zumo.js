@@ -308,27 +308,18 @@
     };
 
 
-    // *** DELEGATE - OBJECT
+    // *** UTILS - OBJECT
 
-    var Delegate = {
+    var Utils = {
 
         // --- METHODS
 
-        create: function(f, context) {
+        delegate: function(f, context) {
             var args = [].slice.call(arguments, 2);
             return function () {
                 return f.apply(context, (arguments.length == 0) ? args : arguments);
             };
-        }
-
-    };
-
-
-    // *** STRING UTILS - OBJECT
-
-    var StringUtils = {
-
-        // --- METHODS
+        },
 
         trim: function(s) {
             s = s || "";
@@ -343,16 +334,7 @@
         rtrim: function(s) {
             s = s || "";
             return s.replace(/\s+$/, "");
-        }
-
-    };
-
-
-    // *** OBJECT UTILS - OBJECT
-
-    var ObjectUtils = {
-
-        // --- METHODS
+        },
 
         mix: function() {
 
@@ -436,21 +418,14 @@
                     }
                     return true;
                 } else if (typeof o == "string") {
-                    return StringUtils.trim(o) == "";
+                    return Utils.trim(o) == "";
                 } else {
                     return false;
                 }
             } else {
                 return true;
             }
-        }
-
-    };
-
-
-    // *** DOM UTILS OBJECT
-
-    var DomUtils = {
+        },
 
         getChildren: function(o, name) {
             var children = [],
@@ -505,7 +480,7 @@
 
             this.callback = onLoaded;
             this.callbackObject = callbackObject;
-            this.params = params || [];
+            this.params = params || [];
 
             if (window.XMLHttpRequest) {
                 this.xmlHttp = new XMLHttpRequest();
@@ -703,7 +678,7 @@
 
             var masterClass,
                 master,
-                type = StringUtils.trim(context.type).toLowerCase();
+                type = Utils.trim(context.type).toLowerCase();
 
             if (type != "") {
                 masterClass = session.viewMasters[type];
@@ -729,7 +704,7 @@
 
             var stateManagerClass,
                 stateManager,
-                manager = StringUtils.trim(context.manager).toLowerCase();
+                manager = Utils.trim(context.manager).toLowerCase();
 
             if (manager != "") {
                 stateManagerClass = session.stateManagers[manager];
@@ -777,7 +752,7 @@
 
                 //TODO: Move this to PageBlockBuilder
                 if (this.context.mediator) {
-                    fMediator = ObjectUtils.find(this.context.mediator);
+                    fMediator = Utils.find(this.context.mediator);
                     if (typeof fMediator == "function") {
                         this.fMediator = fMediator;
                     }
@@ -797,7 +772,7 @@
                     var containerName;
                     Log.info("Displaying " + this.context.id + " with target " + this.context.target);
                     this.onDisplay(this);
-                    containerName = StringUtils.trim(this.context.container);
+                    containerName = Utils.trim(this.context.container);
                     if (containerName != "") {
                         this.container = this.session.selector(this.context.container, this.session.root);
                         if (this.container == null)
@@ -827,12 +802,12 @@
                     if (this.target) {
 
                         PropsManager.apply(this.target, this.context.propContexts, this.session);
-                        ObjectUtils.merge(this.target, this.request.params);
+                        Utils.merge(this.target, this.request.params);
 
                         if (this.fMediator) {
                             this.mediator = new this.fMediator(this.target);
                             PropsManager.apply(this.mediator, this.context.propContexts, this.session);
-                            ObjectUtils.merge(this.mediator, this.request.params);
+                            Utils.merge(this.mediator, this.request.params);
                             if (typeof this.mediator.init == "function")
                                 this.mediator.init();
                         }
@@ -969,7 +944,7 @@
 
                 display: function() {
                     Log.debug("BuilderMaster display");
-                    this.fConstructor = ObjectUtils.find(this.context.target);
+                    this.fConstructor = Utils.find(this.context.target);
                     if (typeof this.fConstructor != "function") {
                         Log.error("Invalid target for page " + this.context.id + ": " + this.context.target);
                         return;
@@ -993,7 +968,7 @@
 
                 init: function() {
                     PropsManager.apply(this.builder, this.context.propContexts, this.session);
-                    ObjectUtils.merge(this.builder, this.request.params);
+                    Utils.merge(this.builder, this.request.params);
                 }
 
             }, AbstractMaster);
@@ -1210,7 +1185,7 @@
 
             var masterClass,
                 master,
-                type = StringUtils.trim(context.type).toLowerCase();
+                type = Utils.trim(context.type).toLowerCase();
 
             if (type != "") {
                 masterClass = session.commandMasters["_" + type];
@@ -1267,14 +1242,14 @@
 
             var FunctionMaster = this.FunctionMaster = this.createCommandMaster(function() {
 
-                var f = ObjectUtils.find(this.context.target),
+                var f = Utils.find(this.context.target),
                     args = [],
-                    data = ObjectUtils.mix(this.context.props, this.request.params);
+                    data = Utils.mix(this.context.props, this.request.params);
 
                 if (data._args && data._args.length)
                     args = data._args.slice(0);
 
-                if (!ObjectUtils.isEmpty(data))
+                if (!Utils.isEmpty(data))
                     args.push(data);
 
                 if (typeof f == "function") {
@@ -1316,7 +1291,7 @@
 
             // Extending.
             commandMaster.prototype = new parent();
-            ObjectUtils.merge(commandMaster.prototype, conf);
+            Utils.merge(commandMaster.prototype, conf);
 
             return commandMaster;
 
@@ -1354,7 +1329,7 @@
                 includeNode = includeNodes[i];
                 target = includeNode.attributes.getNamedItem("target").nodeValue;
 
-                if (!ObjectUtils.isEmpty(target))
+                if (!Utils.isEmpty(target))
                     includes.push(target);
 
             }
@@ -1464,7 +1439,7 @@
 
         _parsePropContexts: function(conf, session) {
 
-            var propNodes = DomUtils.getChildren(conf, "prop"),
+            var propNodes = Utils.getChildren(conf, "prop"),
                 propContexts = [],
                 propContext,
                 i;
@@ -1506,9 +1481,9 @@
 
             this._mergeAttributes(propContext, conf, ["name", "value"]);
 
-            hasChildren = DomUtils.getChildren(conf).length > 0;
-            itemNodes = DomUtils.getChildren(conf, "item");
-            propNodes = DomUtils.getChildren(conf, "prop");
+            hasChildren = Utils.getChildren(conf).length > 0;
+            itemNodes = Utils.getChildren(conf, "item");
+            propNodes = Utils.getChildren(conf, "prop");
 
             if (hasChildren) {
 
@@ -1548,7 +1523,7 @@
 
                 if (propContext.value) {
 
-                    if (conf.firstChild && StringUtils.trim(conf.firstChild.nodeValue) != "")
+                    if (conf.firstChild && Utils.trim(conf.firstChild.nodeValue) != "")
                         Log.warn("Both value attribute and text content found on prop: '" + propContext.name + "'. " +
                                  "Only value attribute will be used.");
 
@@ -1578,7 +1553,7 @@
                 value;
             for (i = 0; i < list.length; i++) {
                 name = list[i];
-                if (name && StringUtils.trim(name) != "") {
+                if (name && Utils.trim(name) != "") {
                     value = element.attributes.getNamedItem(name);
                     if (value)
                         o[name] = value.nodeValue;
@@ -1757,7 +1732,7 @@
                             Log.debug("Handler " + handlerContext.type + "trigger when already at " + page.id);
                             ParamsManager.apply(page.master.target, handlerContext.params, this.session);
                         } else {
-                            ft = Delegate.create(app.go, app, pageContext.id, params);
+                            ft = Utils.delegate(app.go, app, pageContext.id, params);
                             setTimeout(ft, 10);
                         }
                     }
@@ -1909,10 +1884,7 @@
         // --- PROPERTIES
 
         //TODO: Use mix method instead.
-        Delegate: Delegate,
-        StringUtils: StringUtils,
-        ObjectUtils: ObjectUtils,
-        DomUtils: DomUtils,
+        Utils: Utils,
         Loader: Loader,
         ViewMasters: ViewMasters,
         StateManagers: StateManagers,
@@ -2292,7 +2264,7 @@
         },
 
         registerViewMaster: function(name, master) {
-            if (StringUtils.trim(name) == "") {
+            if (Utils.trim(name) == "") {
                 Log.warn("Cannot register a view master with an empty name");
                 return;
             }
@@ -2325,7 +2297,7 @@
         },
 
         registerStateManager: function(name, manager) {
-            if (StringUtils.trim(name) == "") {
+            if (Utils.trim(name) == "") {
                 Log.warn("Cannot register a state manager with an empty name");
                 return;
             }
@@ -2422,7 +2394,7 @@
         },
 
         registerCommandMaster: function(name, master) {
-            if (StringUtils.trim(name) == "") {
+            if (Utils.trim(name) == "") {
                 Log.warn("Cannot register a command master with an empty name");
                 return;
             }
@@ -2654,7 +2626,7 @@
             }
 
             if (this._conf) {
-                ObjectUtils.mergeDeep(this._conf, parsedConf);
+                Utils.mergeDeep(this._conf, parsedConf);
             } else {
                 this._conf = parsedConf;
             }

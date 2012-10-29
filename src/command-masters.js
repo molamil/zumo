@@ -32,14 +32,14 @@
 
             var FunctionMaster = this.FunctionMaster = this.createCommandMaster(function() {
 
-                var f = ObjectUtils.find(this.context.target),
+                var f = Utils.find(this.context.target),
                     args = [],
-                    data = ObjectUtils.mix(this.context.props, this.request.params);
+                    data = Utils.mix(this.context.props, this.request.params);
 
                 if (data._args && data._args.length)
                     args = data._args.slice(0);
 
-                if (!ObjectUtils.isEmpty(data))
+                if (!Utils.isEmpty(data))
                     args.push(data);
 
                 if (typeof f == "function") {
@@ -81,7 +81,7 @@
 
             // Extending.
             commandMaster.prototype = new parent();
-            ObjectUtils.merge(commandMaster.prototype, conf);
+            Utils.merge(commandMaster.prototype, conf);
 
             return commandMaster;
 

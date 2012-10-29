@@ -10,7 +10,7 @@
 
 module("Utils");
 
-test("Delegate", function() {
+test("delegate", function() {
 
     var o = {
             n: 1
@@ -20,8 +20,8 @@ test("Delegate", function() {
             j = j || 1;
             return this.n += i * j;
         },
-        fd1 = Zumo.Delegate.create(f, o),
-        fd2 = Zumo.Delegate.create(f, o, 2, 1);
+        fd1 = Zumo.Utils.delegate(f, o),
+        fd2 = Zumo.Utils.delegate(f, o, 2, 1);
 
     ok(isNaN(f()), 'isNaN(f()) = true');
     equal(fd1(), 2, 'fd1() = 2');
@@ -33,26 +33,26 @@ test("Delegate", function() {
 
 });
 
-test("StringUtils", function() {
+test("trim, ltrim, rtrim", function() {
 
-    equal(Zumo.StringUtils.trim(), '', 'trim() = ""');
-    equal(Zumo.StringUtils.trim('   '), '', 'trim("   ") = ""');
-    equal(Zumo.StringUtils.trim('Some text   '), 'Some text', 'trim("Some text   ") = "Some text"');
-    equal(Zumo.StringUtils.trim('    Some text   '), 'Some text', 'trim("    Some text   ") = "Some text"');
+    equal(Zumo.Utils.trim(), '', 'trim() = ""');
+    equal(Zumo.Utils.trim('   '), '', 'trim("   ") = ""');
+    equal(Zumo.Utils.trim('Some text   '), 'Some text', 'trim("Some text   ") = "Some text"');
+    equal(Zumo.Utils.trim('    Some text   '), 'Some text', 'trim("    Some text   ") = "Some text"');
 
-    equal(Zumo.StringUtils.ltrim(), '', 'ltrim() = ""');
-    equal(Zumo.StringUtils.ltrim('   '), '', 'ltrim("   ") = ""');
-    equal(Zumo.StringUtils.ltrim('Some text   '), 'Some text   ', 'ltrim("Some text   ") = "Some text   "');
-    equal(Zumo.StringUtils.ltrim('    Some text   '), 'Some text   ', 'ltrim("    Some text   ") = "Some text   "');
+    equal(Zumo.Utils.ltrim(), '', 'ltrim() = ""');
+    equal(Zumo.Utils.ltrim('   '), '', 'ltrim("   ") = ""');
+    equal(Zumo.Utils.ltrim('Some text   '), 'Some text   ', 'ltrim("Some text   ") = "Some text   "');
+    equal(Zumo.Utils.ltrim('    Some text   '), 'Some text   ', 'ltrim("    Some text   ") = "Some text   "');
 
-    equal(Zumo.StringUtils.rtrim(), '', 'rtrim() = ""');
-    equal(Zumo.StringUtils.rtrim('   '), '', 'rtrim("   ") = ""');
-    equal(Zumo.StringUtils.rtrim('Some text   '), 'Some text', 'rtrim("Some text   ") = "Some text"');
-    equal(Zumo.StringUtils.rtrim('    Some text   '), '    Some text', 'rtrim("    Some text   ") = "    Some text"');
+    equal(Zumo.Utils.rtrim(), '', 'rtrim() = ""');
+    equal(Zumo.Utils.rtrim('   '), '', 'rtrim("   ") = ""');
+    equal(Zumo.Utils.rtrim('Some text   '), 'Some text', 'rtrim("Some text   ") = "Some text"');
+    equal(Zumo.Utils.rtrim('    Some text   '), '    Some text', 'rtrim("    Some text   ") = "    Some text"');
 
 });
 
-test("ObjectUtils.mix", function() {
+test("mix", function() {
 
     var location = {
             city: "Copenhagen",
@@ -72,10 +72,10 @@ test("ObjectUtils.mix", function() {
             name: "Pernille",
             gender: "female"
         },
-        meAndSomebody = Zumo.ObjectUtils.mix(me, somebody),
-        meAndSomebodyAndMe = Zumo.ObjectUtils.mix(meAndSomebody, me),
-        meAndSomebodyAndElse = Zumo.ObjectUtils.mix(meAndSomebody, somebodyElse),
-        allAtOnce = Zumo.ObjectUtils.mix(me, somebody, somebodyElse);
+        meAndSomebody = Zumo.Utils.mix(me, somebody),
+        meAndSomebodyAndMe = Zumo.Utils.mix(meAndSomebody, me),
+        meAndSomebodyAndElse = Zumo.Utils.mix(meAndSomebody, somebodyElse),
+        allAtOnce = Zumo.Utils.mix(me, somebody, somebodyElse);
 
     equal(me.name, "Jorge", 'me.name = "Jorge"');
     equal(me.age, 32, 'me.age = 32');
@@ -107,13 +107,13 @@ test("ObjectUtils.mix", function() {
     equal(allAtOnce.gender, "female", 'allAtOnce.gender = "female"');
     equal(allAtOnce.location.city, "Copenhagen", 'allAtOnce.location.city = "Copenhagen"');
 
-    deepEqual(Zumo.ObjectUtils.mix(), {}, 'mix() = {}');
-    deepEqual(Zumo.ObjectUtils.mix(null, {i: 5}), {i: 5}, 'mix(null, {i: 5}) = {i: 5}');
-    deepEqual(Zumo.ObjectUtils.mix(10, {i: 5}), {i: 5}, 'mix(10, {i: 5}) = {i: 5}');
+    deepEqual(Zumo.Utils.mix(), {}, 'mix() = {}');
+    deepEqual(Zumo.Utils.mix(null, {i: 5}), {i: 5}, 'mix(null, {i: 5}) = {i: 5}');
+    deepEqual(Zumo.Utils.mix(10, {i: 5}), {i: 5}, 'mix(10, {i: 5}) = {i: 5}');
 
 });
 
-test("ObjectUtils.merge", function() {
+test("merge", function() {
 
     var location = {
             city: "Copenhagen",
@@ -133,7 +133,7 @@ test("ObjectUtils.merge", function() {
             name: "Pernille",
             gender: "female"
         },
-        nothing = Zumo.ObjectUtils.merge(me, somebody, somebodyElse);
+        nothing = Zumo.Utils.merge(me, somebody, somebodyElse);
 
     ok(nothing == null, 'merge does not return an object, nothing = null');
     ok(location === me.location, 'Checking that it is a shallow copy, location == me.location');
@@ -147,13 +147,13 @@ test("ObjectUtils.merge", function() {
     equal(me.location.country, "Spain",
           'Checking that it is a shallow copy, me.location.country == "Spain');
 
-    deepEqual(Zumo.ObjectUtils.merge(), undefined, 'merge() = undefined');
-    deepEqual(Zumo.ObjectUtils.merge(null, {i: 5}), undefined, 'merge(null, {i: 5}) = undefined');
-    deepEqual(Zumo.ObjectUtils.merge(10, {i: 5}), undefined, 'merge(10, {i: 5}) = undefined');
+    deepEqual(Zumo.Utils.merge(), undefined, 'merge() = undefined');
+    deepEqual(Zumo.Utils.merge(null, {i: 5}), undefined, 'merge(null, {i: 5}) = undefined');
+    deepEqual(Zumo.Utils.merge(10, {i: 5}), undefined, 'merge(10, {i: 5}) = undefined');
 
 });
 
-test("ObjectUtils.find", function() {
+test("find", function() {
 
     var me = {
             name: "Jorge",
@@ -170,45 +170,45 @@ test("ObjectUtils.find", function() {
             }
         };
 
-    equal(Zumo.ObjectUtils.find("name", me), "Jorge", 'find("name", me) = "Jorge"');
-    equal(Zumo.ObjectUtils.find("contact.web", me), "www.molamil.com", 'find("contact.web", me) = "www.molamil.com"');
-    equal(Zumo.ObjectUtils.find("contact.location.city", me), "Copenhagen", 'find("location.city", me) = "Copenhagen"');
-    equal(Zumo.ObjectUtils.find("friend.name", me), "Ramiro", 'find("friend.name", me) = "Ramiro"');
-    equal(Zumo.ObjectUtils.find("friend.nice", me), true, 'find("friend.nice", me) = true');
+    equal(Zumo.Utils.find("name", me), "Jorge", 'find("name", me) = "Jorge"');
+    equal(Zumo.Utils.find("contact.web", me), "www.molamil.com", 'find("contact.web", me) = "www.molamil.com"');
+    equal(Zumo.Utils.find("contact.location.city", me), "Copenhagen", 'find("location.city", me) = "Copenhagen"');
+    equal(Zumo.Utils.find("friend.name", me), "Ramiro", 'find("friend.name", me) = "Ramiro"');
+    equal(Zumo.Utils.find("friend.nice", me), true, 'find("friend.nice", me) = true');
 
-    deepEqual(Zumo.ObjectUtils.find("Zumo"), Zumo, 'Using window as default container, find("Zumo") = Zumo');
-    deepEqual(Zumo.ObjectUtils.find("Zumo.init"), Zumo.init,
+    deepEqual(Zumo.Utils.find("Zumo"), Zumo, 'Using window as default container, find("Zumo") = Zumo');
+    deepEqual(Zumo.Utils.find("Zumo.init"), Zumo.init,
               'Using window as default container, find("Zumo.init") = Zumo.init');
 
 });
 
-test("ObjectUtils.isEmpty", function() {
+test("isEmpty", function() {
 
-    ok(Zumo.ObjectUtils.isEmpty(), 'isEmpty() = true');
-    ok(Zumo.ObjectUtils.isEmpty(null), 'isEmpty(null) = true');
-    ok(Zumo.ObjectUtils.isEmpty(""), 'isEmpty("") = true');
-    ok(Zumo.ObjectUtils.isEmpty("   "), 'isEmpty("   ") = true');
-    ok(Zumo.ObjectUtils.isEmpty({}), 'isEmpty({}) = true');
-    ok(Zumo.ObjectUtils.isEmpty(false), 'isEmpty(false) = true');
-    ok(!Zumo.ObjectUtils.isEmpty("s"), 'isEmpty("s") = false');
-    ok(!Zumo.ObjectUtils.isEmpty(10), 'isEmpty(10) = false');
-    ok(!Zumo.ObjectUtils.isEmpty({s: null}), 'isEmpty(s: null) = false');
-    ok(!Zumo.ObjectUtils.isEmpty(true), 'isEmpty(true) = false');
+    ok(Zumo.Utils.isEmpty(), 'isEmpty() = true');
+    ok(Zumo.Utils.isEmpty(null), 'isEmpty(null) = true');
+    ok(Zumo.Utils.isEmpty(""), 'isEmpty("") = true');
+    ok(Zumo.Utils.isEmpty("   "), 'isEmpty("   ") = true');
+    ok(Zumo.Utils.isEmpty({}), 'isEmpty({}) = true');
+    ok(Zumo.Utils.isEmpty(false), 'isEmpty(false) = true');
+    ok(!Zumo.Utils.isEmpty("s"), 'isEmpty("s") = false');
+    ok(!Zumo.Utils.isEmpty(10), 'isEmpty(10) = false');
+    ok(!Zumo.Utils.isEmpty({s: null}), 'isEmpty(s: null) = false');
+    ok(!Zumo.Utils.isEmpty(true), 'isEmpty(true) = false');
 
 });
 
 new Zumo.Loader().load("test-person.xml", function(xmlHttp) {
 
-    test("DomUtils", function() {
+    test("getChildren", function() {
 
         var xml = $("xml", xmlHttp.responseXML)[0];
 
-        equal(Zumo.DomUtils.getChildren(xml, "person").length, 2, 'getChildren(xml, "person").length = 2');
-        equal(Zumo.DomUtils.getChildren(xml, "pizza").length, 0, 'getChildren(xml, "pizza").length = 0');
-        deepEqual(Zumo.DomUtils.getChildren(null, "pizza").length, 0, 'getChildren(null, "pizza").length = 0');
-        equal(Zumo.DomUtils.getChildren($("person", xml)[0], "friend").length, 3,
+        equal(Zumo.Utils.getChildren(xml, "person").length, 2, 'getChildren(xml, "person").length = 2');
+        equal(Zumo.Utils.getChildren(xml, "pizza").length, 0, 'getChildren(xml, "pizza").length = 0');
+        deepEqual(Zumo.Utils.getChildren(null, "pizza").length, 0, 'getChildren(null, "pizza").length = 0');
+        equal(Zumo.Utils.getChildren($("person", xml)[0], "friend").length, 3,
             'getChildren($("person", xml)[0], "friend").length = 3');
-        equal(Zumo.DomUtils.getChildren($("person", xml)[0], "location").length, 1,
+        equal(Zumo.Utils.getChildren($("person", xml)[0], "location").length, 1,
             'getChildren($("person", xml)[0], "location").length = 1');
 
         });
