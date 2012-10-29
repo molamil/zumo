@@ -139,7 +139,6 @@
 
 			// *** INIT
 
-			//Zumo.ObjectUtils.extend(Fade, Zumo.StateManagers.BaseIo3Manager);
 			//TODO: Check whether it is possible to allow register managers not starting with _
 			Zumo.registerStateManager("_$fade", Fade);
 

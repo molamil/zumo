@@ -121,7 +121,7 @@
 
             // Extending.
             stateManager.prototype = new parent();
-            ObjectUtils.merge(stateManager.prototype, conf);
+            Utils.merge(stateManager.prototype, conf);
 
             return stateManager;
 
