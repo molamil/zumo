@@ -197,7 +197,7 @@ test("isEmpty", function() {
 
 });
 
-new Zumo.Loader().load("test-person.xml", function(xmlHttp) {
+new Zumo.Loader().load("utils-person.xml", function(xmlHttp) {
 
     test("getChildren", function() {
 
