@@ -136,6 +136,25 @@
 
         },
 
+        mergeDeep: function(o1, o2) {
+
+            var i,
+                prop;
+
+            if (o1 && typeof o1 == "object" && o2 && typeof o2 == "object") {
+                for (prop in o2) {
+                    if (o2.hasOwnProperty(prop)) {
+                        if (typeof o2[prop] == "object" && typeof o1[prop] == "object") {
+                            this.mergeDeep(o1[prop], o2[prop]);
+                        } else {
+                            o1[prop] = o2[prop];
+                        }
+                    }
+                }
+            }
+
+        },
+
         find: function(target, container) {
             var parts = target.split("."),
                 o = container || window,
