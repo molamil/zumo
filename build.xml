@@ -43,6 +43,7 @@
         <tempfile property="temp.file" createfile="true"/>
         <concat destFile="${temp.file}">
             <file file="${src.dir}/agent.js"/>
+            <file file="${src.dir}/log.js"/>
             <file file="${src.dir}/utils.js"/>
             <file file="${src.dir}/selector.js"/>
             <file file="${src.dir}/loader.js"/>
