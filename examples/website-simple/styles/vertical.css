@@ -1,0 +1,67 @@
+/********************************************
+
+MOLA VERTICAL CSS
+
+Created by: www.molamil.com
+
+*********************************************/
+
+
+body {
+	height: 100%;
+}
+
+#site {
+	position: relative;
+	width: 900px;
+	height: 100%;
+	margin: 0 auto;
+}
+
+#logo {
+	float: none;
+	position: absolute;
+	top: 20px;
+	left: 20px;
+}
+
+#header {
+	position: absolute;
+	z-index: 100;
+	top: 0;
+	bottom: 0;
+	width: 180px;
+	left: -200px;
+	display: none;
+	border: 0;
+	background-color: rgba(0, 0, 0, 0.3);
+}
+
+#menu {
+	position: absolute;
+	top: 150px;
+	left: 20px;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	list-style-type: none;
+	text-align: left;
+}
+
+#menu li {
+	cursor: pointer;
+	clear: both;
+	display: block;
+	height: 25px;
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+	color: #666;
+	text-align: left;
+	font-size: 15px;
+}
+
+#menu li.over {
+	background-color: transparent;
+	color: #FFF;
+}

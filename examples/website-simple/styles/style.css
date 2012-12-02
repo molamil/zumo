@@ -1,0 +1,233 @@
+/********************************************
+
+MOLA MASTER CSS
+
+Structure:
+1.- Defaults
+2.- Commons
+3.- Main
+4.- Frontpage
+
+Created by: www.molamil.com
+
+*********************************************/
+
+
+/*** 1.- DEFAULTS ***/
+
+html {
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	color: #666;
+	font-family: 'Andada', sans-serif;
+	font-size: 14px;
+}
+
+a {
+	color: #717279;
+	text-decoration: none;
+}
+
+h1 {
+	margin: 30px 0 10px 0;
+	font-size: 20px;
+}
+
+h2 {
+	margin: 0 0 5px 0;
+	font-size: 16px;
+}
+
+p {
+	margin: 0 0 10px 0;
+}
+
+
+
+/*** 2.- COMMONS ***/
+
+
+/*** 3.- MAIN ***/
+
+#logo {
+    float: left;
+    margin-top: 13px;
+    color: #DDD;
+    text-align: right;
+    font-size: 55px;
+    line-height: 80%;
+}
+
+#pages {
+	display: none;
+}
+
+#page {
+	position: relative;
+	width: 900px;
+}
+
+#site {
+	width: 900px;
+	height: 800px;
+	margin: 10px auto;
+}
+
+#header {
+	display: none;
+	border: 1px solid #FFF;
+}
+
+#menu {
+	height: 20px;
+	margin: 77px 0 0 72px;
+	border-bottom: 3px solid #DDD;
+	list-style-type: none;
+	text-align: right;
+}
+
+#menu li {
+	cursor: pointer;
+	display: inline;
+	height: 20px;
+	padding: 0 5px;
+	list-style-type: none;
+	text-align: center;
+	font-size: 15px;
+}
+
+#menu li.over {
+	background-color: #DDD;
+}
+
+#menu li.active {
+	color: #FFF;
+	background-color: #DDD;
+}
+
+
+/*** 4.- FRONTPAGE ***/
+
+.frontpage {
+	position: absolute;
+	width: 900px;
+}
+
+.frontpage .reel {
+	width: 900px;
+	height: 150px;
+	margin-bottom: 20px;
+	padding-top: 60px;
+	color: #EEE;
+	background-color: #DDD;
+	text-align: center;
+	font-size: 75px;
+}
+
+.frontpage .about,
+.frontpage .services,
+.frontpage .news {
+	float: left;
+	width: 280px;
+	height: 110px;
+	border-bottom: 3px solid #DDD;
+	margin: 0 30px 20px 0;
+}
+
+.frontpage .news {
+	margin-right: 0;
+}
+
+.frontpage .story {
+	clear: both;
+	border-right: 280px solid #DDD;
+	padding-right: 30px;
+	margin-bottom: 20px;
+	color: #999;
+}
+
+.frontpage .closing {
+	clear: both;
+	height: 20px;
+	padding: 30px;
+	background-color: #EEE;
+	text-align: center;
+	font-size: 13px;
+}
+
+
+/*** 5.- WORK ***/
+
+.work {
+	position: absolute;
+	width: 900px;
+}
+
+.work .story {
+	clear: both;
+	border-left: 280px solid #DDD;
+	padding-left: 30px;
+	margin-bottom: 20px;
+	color: #999;
+}
+
+.work .intro {
+	clear: both;
+	margin-bottom: 20px;
+	color: #999;
+}
+
+.work .sample {
+	height: 150px;
+	margin-bottom: 20px;
+	padding-top: 60px;
+	color: #EEE;
+	background-color: #DDD;
+	text-align: center;
+	font-size: 75px;
+}
+
+.work .more,
+.work .references {
+	float: left;
+	width: 280px;
+	height: 110px;
+	border-bottom: 3px solid #DDD;
+	margin: 0 30px 20px 0;
+}
+
+.work .image {
+	float: left;
+	width: 280px;
+	height: 113px;
+	margin-bottom: 20px;
+	background-color: #DDD;
+}
+
+
+/*** 6.- MOLAPEOPLE ***/
+
+.molapeople {
+	position: absolute;
+	width: 900px;
+}
+
+.molapeople .story {
+	clear: both;
+	padding-right: 30px;
+	margin-bottom: 20px;
+	color: #999;
+}
+
+.molapeople .closing {
+	clear: both;
+	height: 20px;
+	padding: 30px;
+	background-color: #EEE;
+	text-align: center;
+	font-size: 13px;
+}

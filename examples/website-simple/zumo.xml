@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<zumo>
+
+	<views>
+
+		<page id="frontpage" title="FRONTPAGE" type="domclone" target="#pages .frontpage" container="#page" manager="cascade" />
+
+		<page id="work" title="WORK" type="domclone" target="#pages .work" container="#page" manager="cascade" />
+
+		<page id="molapeople" title="MOLAPEOPLE" type="domclone" target="#pages .molapeople" container="#page" manager="cascade" />
+
+		<block id="header" target="#header" manager="$fade" />
+
+	</views>
+
+</zumo>
