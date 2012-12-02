@@ -180,6 +180,7 @@
                 depends,
                 handlers,
                 handlerList,
+                handlerValue,
                 handlerValues,
                 handler,
                 i;
@@ -189,7 +190,7 @@
 
             depends = $element.attr("data-depends");
             if (depends) {
-                context.depends = depends.replace(/\s/g, " ").split(" ");
+                context.depends = depends.replace(/\s*,\s*|\s+/g, ",").split(",");
             } else {
                 context.depends = [];
             }
@@ -199,16 +200,23 @@
             if (handlers) {
                 handlerList = handlers.split(",");
                 for (i = 0; i < handlerList.length; i++) {
-                    handlerValues = handlerList[i].replace(/\s/g, "").split(":");
-                    if (handlerValues.length > 1) {
-                        handler = {
-                            target: handlerValues[0],
-                            type: handlerValues[1]
-                        }
+                    handler = {};
+                    handlerValue = handlerList[i];
+                    handlerValues = handlerValue.split("@");
+                    if (handlerValues.length == 2) {
+                        handler.at = Zumo.Utils.trim(handlerValues[1]);
+                        handlerValue = handlerValues[0];
+                    } else if (handlerValues.length > 2) {
+                        //TODO: Show warning: Too many @.
+                    }
+                    handlerValues = handlerValue.split(":");
+                    if (handlerValues.length == 1) {
+                        handler.type = handlerValues[0];
+                    } else if (handlerValues.length == 2) {
+                        handler.target = handlerValues[0];
+                        handler.type = handlerValues[1];
                     } else {
-                        handler = {
-                            type: handlerValues[0]
-                        }
+                        //TODO: Show warning: Too many :.
                     }
                     context.handlers.push(handler);
                 }

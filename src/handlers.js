@@ -44,6 +44,8 @@
 
             this.hasRegistered = true;
 
+            //TODO: This does not work if the bindings are already there (e.g. a click on a DOM element in #templates)
+            //      but are also intented to be applied to new elements created on the DOM
             this.updateBindings = this._updateBindings();
 
             Log.debug("Will update bindings? " + this.updateBindings);
@@ -84,13 +86,14 @@
 
         _createHandlerAction: function(handlerContext, mainContext, contextType) {
             if (contextType == "page") {
-                this._createPageHandlerAction(handlerContext, mainContext);
+                return this._createPageHandlerAction(handlerContext, mainContext);
             } else if (contextType == "block") {
-                this._createBlockHandlerAction(handlerContext, mainContext);
+                return this._createBlockHandlerAction(handlerContext, mainContext);
             } else if (contextType == "command") {
-                this._createCommandHandlerAction(handlerContext, mainContext);
+                return this._createCommandHandlerAction(handlerContext, mainContext);
             } else {
                 Log.warn("Could not create handler action - the context type is neither a page or a block");
+                return null;
             }
         },
 
