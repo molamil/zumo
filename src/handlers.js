@@ -45,7 +45,7 @@
             this.hasRegistered = true;
 
             //TODO: This does not work if the bindings are already there (e.g. a click on a DOM element in #templates)
-            //      but are also intented to be applied to new elements created on the DOM
+            //      but are also intended to be applied to new elements created on the DOM
             this.updateBindings = this._updateBindings();
 
             Log.debug("Will update bindings? " + this.updateBindings);
