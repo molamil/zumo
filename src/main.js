@@ -73,7 +73,20 @@
         },
 
         // Initializes the zumo object with the passed root parameter as the base DOM element to make selections on
-        init: function(root, conf, params) {
+        init: function() {
+
+            var root,
+                conf,
+                params;
+
+            if (typeof arguments[0] == "string") {
+                conf =  arguments[0];
+                params =  arguments[1];
+            } else if(arguments.length > 1) {
+                root =  arguments[0];
+                conf =  arguments[1];
+                params =  arguments[2];
+            }
 
             root = root || document;
             conf = conf || root;

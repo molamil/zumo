@@ -10,6 +10,24 @@
 		return;
 
 
+	// *** LISTENERS
+
+    var fViewInit = function(master) {
+        var $elsWithId = $("*[id]", master.target),
+            prefix = "z-"; //TODO: Make the prefix configurable
+        $elsWithId.each(function() {
+            var $this = $(this),
+                thisId = $this.attr("id"),
+                indexOfPrefix = thisId.indexOf(prefix);
+            if (indexOfPrefix == 0)
+                $this.attr("id", thisId.substr(prefix.length));
+        });
+    };
+
+    Zumo.observe("onPageInit", fViewInit);
+    Zumo.observe("onBlockInit", fViewInit);
+
+
 	// *** HANDLER MANAGER DECORATIONS
 
 	var bindHandler = function(type, handler, target) {

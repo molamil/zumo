@@ -1669,7 +1669,7 @@
             this.hasRegistered = true;
 
             //TODO: This does not work if the bindings are already there (e.g. a click on a DOM element in #templates)
-            //      but are also intented to be applied to new elements created on the DOM
+            //      but are also intended to be applied to new elements created on the DOM
             this.updateBindings = this._updateBindings();
 
             Log.debug("Will update bindings? " + this.updateBindings);
@@ -1951,7 +1951,20 @@
         },
 
         // Initializes the zumo object with the passed root parameter as the base DOM element to make selections on
-        init: function(root, conf, params) {
+        init: function() {
+
+            var root,
+                conf,
+                params;
+
+            if (typeof arguments[0] == "string") {
+                conf =  arguments[0];
+                params =  arguments[1];
+            } else if(arguments.length > 1) {
+                root =  arguments[0];
+                conf =  arguments[1];
+                params =  arguments[2];
+            }
 
             root = root || document;
             conf = conf || root;
@@ -2803,6 +2816,24 @@
 	// Check for Zumo
 	if (!Zumo || !ZumoExt)
 		return;
+
+
+	// *** LISTENERS
+
+    var fViewInit = function(master) {
+        var $elsWithId = $("*[id]", master.target),
+            prefix = "z-"; //TODO: Make the prefix configurable
+        $elsWithId.each(function() {
+            var $this = $(this),
+                thisId = $this.attr("id"),
+                indexOfPrefix = thisId.indexOf(prefix);
+            if (indexOfPrefix == 0)
+                $this.attr("id", thisId.substr(prefix.length));
+        });
+    };
+
+    Zumo.observe("onPageInit", fViewInit);
+    Zumo.observe("onBlockInit", fViewInit);
 
 
 	// *** HANDLER MANAGER DECORATIONS
