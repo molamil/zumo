@@ -175,6 +175,7 @@
             // Hook events
             Agent.observe(page.master, "onDisplay", this.onPageDisplay, this);
             Agent.observe(page.master, "onClear", this.onPageClear, this);
+            Agent.observe(page.master, "onCreate", this.onPageCreate, this);
             Agent.observe(page.master, "onInit", this.onPageInit, this);
             Agent.observe(page.master, "onIn", this.onPageIn, this);
             Agent.observe(page.master, "onOn", this.onPageOn, this);
@@ -309,6 +310,7 @@
                 // Hook events
                 Agent.observe(block.master, "onDisplay", this.onBlockDisplay, this);
                 Agent.observe(block.master, "onClear", this.onBlockClear, this);
+                Agent.observe(block.master, "onCreate", this.onBlockCreate, this);
                 Agent.observe(block.master, "onInit", this.onBlockInit, this);
                 Agent.observe(block.master, "onIn", this.onBlockIn, this);
                 Agent.observe(block.master, "onOn", this.onBlockOn, this);
@@ -860,6 +862,7 @@
         onPageRequest: function(context, request) {},
         onPageDisplay: function(master) {},
         onPageClear: function(master) {},
+        onPageCreate: function(master) {},
         onPageInit: function(master) {},
         onPageIn: function(master) {},
         onPageOn: function(master) {},
@@ -868,6 +871,7 @@
         onBlockRequest: function(context, request) {},
         onBlockDisplay: function(master) {},
         onBlockClear: function(master) {},
+        onBlockCreate: function(master) {},
         onBlockInit: function(master) {},
         onBlockIn: function(master) {},
         onBlockOn: function(master) {},

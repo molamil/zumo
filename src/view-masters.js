@@ -75,6 +75,8 @@
                         PropsManager.apply(this.target, this.context.propContexts, this.session);
                         Utils.merge(this.target, this.request.params);
 
+                        this.onCreate(this);
+
                         if (this.fMediator) {
                             this.mediator = new this.fMediator(this.target);
                             PropsManager.apply(this.mediator, this.context.propContexts, this.session);
@@ -112,6 +114,7 @@
                 // Default event handlers
                 onDisplay: function(master) {},
                 onClear: function(master) {},
+                onCreate: function(master) {},
                 onInit: function(master) {},
                 onIn: function(master) {},
                 onOn: function(master) {},

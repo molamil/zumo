@@ -804,6 +804,8 @@
                         PropsManager.apply(this.target, this.context.propContexts, this.session);
                         Utils.merge(this.target, this.request.params);
 
+                        this.onCreate(this);
+
                         if (this.fMediator) {
                             this.mediator = new this.fMediator(this.target);
                             PropsManager.apply(this.mediator, this.context.propContexts, this.session);
@@ -841,6 +843,7 @@
                 // Default event handlers
                 onDisplay: function(master) {},
                 onClear: function(master) {},
+                onCreate: function(master) {},
                 onInit: function(master) {},
                 onIn: function(master) {},
                 onOn: function(master) {},
@@ -2053,6 +2056,7 @@
             // Hook events
             Agent.observe(page.master, "onDisplay", this.onPageDisplay, this);
             Agent.observe(page.master, "onClear", this.onPageClear, this);
+            Agent.observe(page.master, "onCreate", this.onPageCreate, this);
             Agent.observe(page.master, "onInit", this.onPageInit, this);
             Agent.observe(page.master, "onIn", this.onPageIn, this);
             Agent.observe(page.master, "onOn", this.onPageOn, this);
@@ -2187,6 +2191,7 @@
                 // Hook events
                 Agent.observe(block.master, "onDisplay", this.onBlockDisplay, this);
                 Agent.observe(block.master, "onClear", this.onBlockClear, this);
+                Agent.observe(block.master, "onCreate", this.onBlockCreate, this);
                 Agent.observe(block.master, "onInit", this.onBlockInit, this);
                 Agent.observe(block.master, "onIn", this.onBlockIn, this);
                 Agent.observe(block.master, "onOn", this.onBlockOn, this);
@@ -2738,6 +2743,7 @@
         onPageRequest: function(context, request) {},
         onPageDisplay: function(master) {},
         onPageClear: function(master) {},
+        onPageCreate: function(master) {},
         onPageInit: function(master) {},
         onPageIn: function(master) {},
         onPageOn: function(master) {},
@@ -2746,6 +2752,7 @@
         onBlockRequest: function(context, request) {},
         onBlockDisplay: function(master) {},
         onBlockClear: function(master) {},
+        onBlockCreate: function(master) {},
         onBlockInit: function(master) {},
         onBlockIn: function(master) {},
         onBlockOn: function(master) {},
@@ -2820,7 +2827,7 @@
 
 	// *** LISTENERS
 
-    var fViewInit = function(master) {
+    var fViewCreate = function(master) {
         var $elsWithId = $("*[id]", master.target),
             prefix = "z-"; //TODO: Make the prefix configurable
         $elsWithId.each(function() {
@@ -2832,8 +2839,8 @@
         });
     };
 
-    Zumo.observe("onPageInit", fViewInit);
-    Zumo.observe("onBlockInit", fViewInit);
+    Zumo.observe("onPageCreate", fViewCreate);
+    Zumo.observe("onBlockCreate", fViewCreate);
 
 
 	// *** HANDLER MANAGER DECORATIONS

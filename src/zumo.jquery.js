@@ -12,7 +12,7 @@
 
 	// *** LISTENERS
 
-    var fViewInit = function(master) {
+    var fViewCreate = function(master) {
         var $elsWithId = $("*[id]", master.target),
             prefix = "z-"; //TODO: Make the prefix configurable
         $elsWithId.each(function() {
@@ -24,8 +24,8 @@
         });
     };
 
-    Zumo.observe("onPageInit", fViewInit);
-    Zumo.observe("onBlockInit", fViewInit);
+    Zumo.observe("onPageCreate", fViewCreate);
+    Zumo.observe("onBlockCreate", fViewCreate);
 
 
 	// *** HANDLER MANAGER DECORATIONS

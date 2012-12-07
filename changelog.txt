@@ -8,6 +8,7 @@ ZUMO 0.3 (2012-XX-XX)
 
 [XXX]
 
+*  Added onPageCreate and onBlockCreate, which are triggered after the dom is created, just before init.
 *  Prefix "z-" in DOM element ID's gets removed on view init.
 *  Support for Zumo.init(confString), obviating the document container.
 *  Improvements on DOM configuration; handlers can be set as e.g. data-handler=".selector:click@somePage"
