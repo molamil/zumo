@@ -13,6 +13,8 @@
             confObject.includes = this._parseIncludes(conf, session);
             confObject.views = this._parseViews(conf, session);
             confObject.commands = this._parseCommands(conf, session);
+            confObject.propContexts = this._parsePropContexts(conf.firstChild, session);
+            confObject.props = this._getPropsFromPropContexts(confObject.propContexts);
             return confObject;
         },
 

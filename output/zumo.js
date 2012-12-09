@@ -1316,6 +1316,8 @@
             confObject.includes = this._parseIncludes(conf, session);
             confObject.views = this._parseViews(conf, session);
             confObject.commands = this._parseCommands(conf, session);
+            confObject.propContexts = this._parsePropContexts(conf.firstChild, session);
+            confObject.props = this._getPropsFromPropContexts(confObject.propContexts);
             return confObject;
         },
 
@@ -1916,6 +1918,7 @@
 
         log: Log,
         root: null,
+        props: null,
         session: {
             viewMasters: {},
             defaultViewMasterClass: null,
@@ -2653,6 +2656,8 @@
             } else {
                 this._conf = parsedConf;
             }
+
+            this.props = this._conf.props;
 
             if (this._getPendingConfTargets().length == 0) {
                 this._processParenting();

@@ -35,6 +35,7 @@
 
         log: Log,
         root: null,
+        props: null,
         session: {
             viewMasters: {},
             defaultViewMasterClass: null,
@@ -772,6 +773,8 @@
             } else {
                 this._conf = parsedConf;
             }
+
+            this.props = this._conf.props;
 
             if (this._getPendingConfTargets().length == 0) {
                 this._processParenting();
