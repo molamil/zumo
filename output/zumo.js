@@ -1781,10 +1781,11 @@
                         app.clearBlock(blockContext.id);
                 };
 
-            if (handlerContext.action == "clearBlock") {
+            if (handlerContext.action == "clear" || handlerContext.action == "clearBlock") {
                 f = fClear;
-            } else if (handlerContext.action == "displayBlock" || handlerContext.action == "call" ||
-                       handlerContext.action == "" || handlerContext.action == null) {
+            } else if (handlerContext.action == "displayBlock" || handlerContext.action == "display" ||
+                       handlerContext.action == "call" || handlerContext.action == "" ||
+                       handlerContext.action == null) {
                 f = fDisplay;
             } else {
                 Log.warn("Could not resolve handler action: " + handlerContext.action);

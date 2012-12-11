@@ -8,6 +8,7 @@ ZUMO 0.3 (2012-XX-XX)
 
 [XXX]
 
+*  Support for new handler action (aliases): clear and display.
 *  Implemented props on Zumo object, parsed from conf.
 *  Added onPageCreate and onBlockCreate, which are triggered after the dom is created, just before init.
 *  Prefix "z-" in DOM element ID's gets removed on view init.
