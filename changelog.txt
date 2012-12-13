@@ -8,6 +8,7 @@ ZUMO 0.3 (2012-XX-XX)
 
 [XXX]
 
+*  Command masters, view masters and view managers are case insenstive.
 *  Void view masters (with no target) can execute mediators.
 *  Support for new handler action (aliases): clear and display.
 *  Implemented props on Zumo object, parsed from conf.

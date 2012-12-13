@@ -411,6 +411,7 @@
                 Log.warn("Cannot register a view master with an empty name");
                 return;
             }
+            name = name.toLowerCase();
             if (typeof master != "function") {
                 Log.warn("Cannot register view master with name " + name + " - master is not a function");
                 return;
@@ -444,6 +445,7 @@
                 Log.warn("Cannot register a state manager with an empty name");
                 return;
             }
+            name = name.toLowerCase();
             if (typeof manager != "function") {
                 Log.warn("Cannot register state manager with name " + name + " - manager is not a function");
                 return;
@@ -457,7 +459,7 @@
         },
 
         unregisterStateManager: function(name) {
-            this.session.stateManagers[name] = null;
+            this.session.stateManagers[name.toLowerCase()] = null;
         },
 
         createStateManager: function() {
@@ -541,6 +543,7 @@
                 Log.warn("Cannot register a command master with an empty name");
                 return;
             }
+            name = name.toLowerCase();
             if (typeof master != "function") {
                 Log.warn("Cannot register command master with name " + name + " - command is not a function");
                 return;
