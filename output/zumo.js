@@ -806,14 +806,6 @@
 
                         this.onCreate(this);
 
-                        if (this.fMediator) {
-                            this.mediator = new this.fMediator(this.target);
-                            PropsManager.apply(this.mediator, this.context.propContexts, this.session);
-                            Utils.merge(this.mediator, this.request.params);
-                            if (typeof this.mediator.init == "function")
-                                this.mediator.init();
-                        }
-
                         if (this.stateManager) {
                             this.stateManager.target = this.target;
                             Agent.observe(this.stateManager, "onStateChange", this.onStateChange, this);
@@ -821,6 +813,14 @@
                             this.stateManager.setState(StateManagers.STATE_IN);
                         }
 
+                    }
+
+                    if (this.fMediator) {
+                        this.mediator = new this.fMediator(this.target);
+                        PropsManager.apply(this.mediator, this.context.propContexts, this.session);
+                        Utils.merge(this.mediator, this.request.params);
+                        if (typeof this.mediator.init == "function")
+                            this.mediator.init();
                     }
 
                     this.onInit(this);
