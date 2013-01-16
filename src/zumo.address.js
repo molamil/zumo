@@ -33,9 +33,11 @@
 
         go: function() {
 
-            var id = $.address.value().substr(1);
+            var v = $.address.value(),
+                id;
 
-            if (Zumo.isInit()) {
+            if (v && Zumo.isInit()) {
+                id = v.substr(1);
                 if (id == "" || !Zumo.getPageContext(id))
                     id = this.defaultPage;
                 Zumo.go(id);

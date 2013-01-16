@@ -4,11 +4,12 @@
 
 ------------------------------------------------------------------------------------------------------------------------
 
-ZUMO 0.3 (2012-XX-XX)
+ZUMO 0.3 (2013-XX-XX)
 
 [XXX]
 
-*  Command masters, view masters and view managers are case insenstive.
+*  Included jQuery $fade state managers.
+*  Command masters, view masters and view managers are case insensitive.
 *  Void view masters (with no target) can execute mediators.
 *  Support for new handler action (aliases): clear and display.
 *  Implemented props on Zumo object, parsed from conf.
@@ -18,7 +19,7 @@ ZUMO 0.3 (2012-XX-XX)
 *  Improvements on DOM configuration; handlers can be set as e.g. data-handler=".selector:click@somePage"
 *  Implemented includes for distributing the conf in several files.
 *  Added parameter support to Loader.
-*  Optimized util methos: mix, merge, etc.
+*  Optimized util methods: mix, merge, etc.
 *  Added createCommandMaster method for easy command creation and built-in inheritance.
 
 ------------------------------------------------------------------------------------------------------------------------

@@ -121,51 +121,35 @@
 
 	// *** STATE MANAGERS
 
-	var StateManagers = {
+    (function (window) {
 
-		init: function() {
+        var $Fade = Zumo.createStateManager("$fade", {
 
+            duration: "slow",
 
-			// *** FADE CLASS
+            doIn: function() {
+                var that = this,
+                    $target = $(this.target);
+                $target.hide();
+                $target.fadeIn(this.duration, function() {
+                    that.setState(Zumo.StateManagers.STATE_ON);
+                });
+            },
 
-            //TODO: Implement this transition manager in the 0.2 way.
+            doOut: function() {
+                var that = this;
+                $(this.target).fadeOut(this.duration, function() {
+                    that.setState(Zumo.StateManagers.STATE_OFF);
+                });
+            }
 
-			var Fade = function(target, session) {
-				Zumo.StateManagers.BaseIo3Manager.call(this, target, session);
-			};
+        });
 
-			Fade.prototype = {
+        Zumo.createStateManager("$fadeSlow", {duration: "slow"}, $Fade);
 
-				doIn: function() {
-					var that = this,
-                        $target = $(this.target);
-					$target.css("display", "none");
-					$target.fadeIn("slow", function() {
-						that.setState(Zumo.StateManagers.STATE_ON);
-					});
-				},
+        Zumo.createStateManager("$fadeFast", {duration: "fast"}, $Fade);
 
-				doOut: function() {
-					var that = this;
-					$(this.target).fadeOut("slow", function() {
-						that.setState(Zumo.StateManagers.STATE_OFF);
-					});
-				}
-
-			};
-
-
-			// *** INIT
-
-			//TODO: Check whether it is possible to allow register managers not starting with _
-			Zumo.registerStateManager("_$fade", Fade);
-
-
-		}
-
-	};
-
-	StateManagers.init();
+    })(window);
 
 
     // *** CONF PARSERS
