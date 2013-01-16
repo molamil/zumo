@@ -36,7 +36,7 @@
 
         log: Log,
         root: null,
-        props: null,
+        props: null, //TODO: Consider moving props to session.
         session: {
             viewMasters: {},
             defaultViewMasterClass: null,

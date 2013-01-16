@@ -455,7 +455,7 @@
         },
 
         getNestedProperty: function(o, nestedProp) {
-            if (typeof o != "object" || typeof nestedProp != "string") {
+            if (!o || typeof o != "object" || typeof nestedProp != "string") {
                 return null;
             }
             var v = o,
@@ -677,9 +677,7 @@
                     }
 
                     endText = token.substring(endIndex + 1);
-
-                    if (outputText != "" || endText != "")
-                        outputText += value + endText;
+                    outputText += value + endText;
 
                 }
 
@@ -709,20 +707,28 @@
             var i,
                 propContext,
                 nTarget,
-                name;
+                name,
+                value;
 
             if (!target || !propContexts)
                 return;
 
             // Merge the props
-            for(i = 0; i < propContexts.length; i++) {
+            for (i = 0; i < propContexts.length; i++) {
                 propContext = propContexts[i];
                 nTarget = target;
-                if (propContext.target)
+                if (propContext.target) {
                     nTarget = session.selector(propContext.target, target);
+                }
                 if (nTarget) {
                     name = propContext.name || session.defaultPropName;
-                    nTarget[name] = propContext.value;
+                    value = propContext.value;
+                    if (typeof propContext.value == "string") {
+                        //TODO: Do not create new ExpressionResolver object but reuse instead.
+                        //TODO: See whether we get the props from the session and not Zumo.
+                        value = new ExpressionResolver().resolve(propContext.value, Zumo.props);
+                    }
+                    nTarget[name] = value;
                 }
             }
 
@@ -1482,11 +1488,11 @@
             // TODO: Check for XML
             // TODO: Parse top level props
             var confObject = {};
+            confObject.propContexts = this._parsePropContexts(conf.getElementsByTagName("zumo")[0], session);
+            confObject.props = this._getPropsFromPropContexts(confObject.propContexts);
             confObject.includes = this._parseIncludes(conf, session);
             confObject.views = this._parseViews(conf, session);
             confObject.commands = this._parseCommands(conf, session);
-            confObject.propContexts = this._parsePropContexts(conf.getElementsByTagName("zumo")[0], session);
-            confObject.props = this._getPropsFromPropContexts(confObject.propContexts);
             return confObject;
         },
 
@@ -2089,7 +2095,7 @@
 
         log: Log,
         root: null,
-        props: null,
+        props: null, //TODO: Consider moving props to session.
         session: {
             viewMasters: {},
             defaultViewMasterClass: null,

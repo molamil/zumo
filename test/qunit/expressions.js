@@ -19,6 +19,7 @@ test("resolve", function() {
         r = "This is a sample text with name Jorge and another var 10, including escaped {brackets} " +
             "and a nested property";
 
-    equal(resolver.resolve(s, data), r, 'resolver parses the expressions');
+    equal(resolver.resolve(s, data), r, 'resolver parses the expressions in text');
+    equal(resolver.resolve("{name}", data), "Jorge", 'resolver parses an expressions alone');
 
 });

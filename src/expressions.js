@@ -116,9 +116,7 @@
                     }
 
                     endText = token.substring(endIndex + 1);
-
-                    if (outputText != "" || endText != "")
-                        outputText += value + endText;
+                    outputText += value + endText;
 
                 }
 

@@ -147,7 +147,7 @@
         },
 
         getNestedProperty: function(o, nestedProp) {
-            if (typeof o != "object" || typeof nestedProp != "string") {
+            if (!o || typeof o != "object" || typeof nestedProp != "string") {
                 return null;
             }
             var v = o,

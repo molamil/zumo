@@ -10,11 +10,11 @@
             // TODO: Check for XML
             // TODO: Parse top level props
             var confObject = {};
+            confObject.propContexts = this._parsePropContexts(conf.getElementsByTagName("zumo")[0], session);
+            confObject.props = this._getPropsFromPropContexts(confObject.propContexts);
             confObject.includes = this._parseIncludes(conf, session);
             confObject.views = this._parseViews(conf, session);
             confObject.commands = this._parseCommands(conf, session);
-            confObject.propContexts = this._parsePropContexts(conf.getElementsByTagName("zumo")[0], session);
-            confObject.props = this._getPropsFromPropContexts(confObject.propContexts);
             return confObject;
         },
 
