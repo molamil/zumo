@@ -47,6 +47,7 @@
             <file file="${src.dir}/utils.js"/>
             <file file="${src.dir}/selector.js"/>
             <file file="${src.dir}/loader.js"/>
+            <file file="${src.dir}/expressions.js"/>
             <file file="${src.dir}/props.js"/>
             <file file="${src.dir}/params.js"/>
             <file file="${src.dir}/views.js"/>

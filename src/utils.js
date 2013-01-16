@@ -131,6 +131,38 @@
                 }
             }
             return children;
+        },
+
+        indexOf: function(a, item) {
+            var i;
+            if (a.length == undefined || item == null) {
+                return null;
+            }
+            for (i = 0; i < a.length; i++) {
+                if (a[i] === item) {
+                    return i;
+                }
+            }
+            return -1;
+        },
+
+        getNestedProperty: function(o, nestedProp) {
+            if (typeof o != "object" || typeof nestedProp != "string") {
+                return null;
+            }
+            var v = o,
+                a = nestedProp.split("."),
+                i;
+            for (i = 0; i < a.length; i++) {
+                v = v[a[i]];
+                if (v == null) {
+                    v = null;
+                    break;
+                }
+            }
+            if (v == o)
+                v = null;
+            return v;
         }
 
     };

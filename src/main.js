@@ -10,6 +10,7 @@
 
         //TODO: Use mix method instead.
         Utils: Utils,
+        ExpressionResolver: ExpressionResolver,
         Loader: Loader,
         ViewMasters: ViewMasters,
         StateManagers: StateManagers,
