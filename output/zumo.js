@@ -17,7 +17,7 @@
 
 
     var _NAME = "Zumo",
-        _VERSION = "0.3";
+        _VERSION = "0.4";
     
 
     // *** AGENT OBJECT (http://github.com/molamil/agent)

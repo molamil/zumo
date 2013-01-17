@@ -74,7 +74,7 @@
 
 
     <!-- RELEASE -->
-    <target name="release" description="Build and compress" depends="clean, build, compress">
+    <target name="release" description="Build and compress" depends="build, compress">
         <copy file="${output.dir}/${output.file}" tofile="${output.dir}/${release.file}"/>
     </target>
 
