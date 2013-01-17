@@ -8,6 +8,7 @@ ZUMO 0.3 (2013-XX-XX)
 
 [XXX]
 
+*  Expressions implemented in view and command props.
 *  Included jQuery $fade state managers.
 *  Command masters, view masters and view managers are case insensitive.
 *  Void view masters (with no target) can execute mediators.

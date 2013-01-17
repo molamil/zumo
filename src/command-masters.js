@@ -36,6 +36,8 @@
                     args = [],
                     data = Utils.mix(this.context.props, this.request.params);
 
+                PropsManager.resolve(data, this.session);
+
                 if (data._args && data._args.length)
                     args = data._args.slice(0);
 

@@ -704,7 +704,7 @@
 
         apply: function(target, propContexts, session) {
 
-            var i,
+            var resolver = session.resolver || new ExpressionResolver(),
                 propContext,
                 nTarget,
                 name,
@@ -724,14 +724,22 @@
                     name = propContext.name || session.defaultPropName;
                     value = propContext.value;
                     if (typeof propContext.value == "string") {
-                        //TODO: Do not create new ExpressionResolver object but reuse instead.
                         //TODO: See whether we get the props from the session and not Zumo.
-                        value = new ExpressionResolver().resolve(propContext.value, Zumo.props);
+                        value = resolver.resolve(propContext.value, Zumo.props);
                     }
                     nTarget[name] = value;
                 }
             }
 
+        },
+
+        resolve: function(props, session) {
+            var resolver = session.resolver || new ExpressionResolver(),
+                prop;
+            for (prop in props) {
+                //TODO: See whether we get the props from the session and not Zumo.
+                props[prop]= new ExpressionResolver().resolve(props[prop], Zumo.props);
+            }
         }
 
     };
@@ -1423,6 +1431,8 @@
                 var f = Utils.find(this.context.target),
                     args = [],
                     data = Utils.mix(this.context.props, this.request.params);
+
+                PropsManager.resolve(data, this.session);
 
                 if (data._args && data._args.length)
                     args = data._args.slice(0);
