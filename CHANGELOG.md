@@ -1,4 +1,4 @@
-ZUMO FRAMEWORK CHANGELOG
+Zumo Framework Changelog
 ========================
 
 ---
