@@ -1,10 +1,10 @@
-------------------------------------------------------------------------------------------------------------------------
+ZUMO FRAMEWORK CHANGELOG
+========================
 
-                                                ZUMO FRAMEWORK CHANGELOG
-
-------------------------------------------------------------------------------------------------------------------------
+---
 
 ZUMO 0.3 (2013-01-17)
+---------------------
 
 [Expressions, top level props, includes...]
 
@@ -23,9 +23,10 @@ ZUMO 0.3 (2013-01-17)
 *  Optimized util methods: mix, merge, etc.
 *  Added createCommandMaster method for easy command creation and built-in inheritance.
 
-------------------------------------------------------------------------------------------------------------------------
+---
 
 ZUMO 0.2 (2012-10-07)
+---------------------
 
 [Improvements on state managers and view masters]
 
@@ -35,12 +36,11 @@ ZUMO 0.2 (2012-10-07)
 *  Removed awkward initial underscore in names when creating state managers and view masters.
 *  Re-organized source files.
 
-------------------------------------------------------------------------------------------------------------------------
+---
 
 ZUMO 0.1 (2012-09-23)
+---------------------
 
 [Initial release]
 
 *  Initial release, already used on several production-ready projects.
-
-------------------------------------------------------------------------------------------------------------------------

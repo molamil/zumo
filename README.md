@@ -3,6 +3,9 @@ Zumo
 
 JavaScript framework that features low-level abstractions such as request, context and page.
 
-[Download the latest zumo.js nightly build](https://raw.github.com/molamil/zumo/master/output/zumo.js)
+Downloads
+---------
 
-Previous versions are available at the legacy [Google Code repository](http://code.google.com/p/zumo/)
+* [Zumo 0.3 - Uncompressed](https://raw.github.com/molamil/zumo/0.3/output/zumo-0.3.js)
+* [Zumo 0.3 - Minified](https://raw.github.com/molamil/zumo/0.3/output/zumo-0.3.min.js)
+* [Latest zumo.js nightly build](https://raw.github.com/molamil/zumo/master/output/zumo.js)
