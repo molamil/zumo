@@ -21,12 +21,15 @@
             });
 
             ZumoAgent.observe(Zumo, "onConfLoaded", function() {
-                console.log("ZUMO LOADED");
+
+                if (Zumo.props && Zumo.props.defaultPage)
+                    that.defaultPage = Zumo.props.defaultPage;
+
                 that.go();
+
             }, -1);
 
             ZumoAgent.observe(Zumo, "onPageDisplay", function(master) {
-                console.log("ZUMO onPageDisplay");
                 if (master.context.props._deepLink != "false")
                     $.address.value(master.context.id);
             });
