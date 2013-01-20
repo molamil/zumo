@@ -21,10 +21,12 @@
             });
 
             ZumoAgent.observe(Zumo, "onConfLoaded", function() {
+                console.log("ZUMO LOADED");
                 that.go();
             }, -1);
 
             ZumoAgent.observe(Zumo, "onPageDisplay", function(master) {
+                console.log("ZUMO onPageDisplay");
                 if (master.context.props._deepLink != "false")
                     $.address.value(master.context.id);
             });
@@ -33,14 +35,16 @@
 
         go: function() {
 
-            var v = $.address.value(),
-                id;
+            var id = $.address.value().substr(1);
 
-            if (v && Zumo.isInit()) {
-                id = v.substr(1);
+            if (Zumo.isInit()) {
+
                 if (id == "" || !Zumo.getPageContext(id))
                     id = this.defaultPage;
-                Zumo.go(id);
+
+                if (typeof id == "string")
+                    Zumo.go(id);
+
             }
 
         }
