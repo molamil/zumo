@@ -68,6 +68,42 @@
 
         resolve: function(input, data) {
 
+            var output,
+                i,
+                p;
+
+            if (typeof input == "string") {
+                return this.resolveFromString(input, data);
+            } else if (typeof input == "object") {
+
+                if (input.length !== undefined) {
+
+                    // It is an array - we iterate through all the elements.
+                    output = input.slice(0);
+
+                    for (i = 0; i < output.length; i++)
+                        output[i] = this.resolve(output[i], data);
+
+                } else {
+
+                    // It is an object - we iterate through all the properties.
+                    output = {};
+
+                    for (p in input)
+                        output[p] = this.resolve(input[p], data);
+
+                }
+
+                return output;
+
+            } else {
+                return null;
+            }
+
+        },
+
+        resolveFromString: function(input, data) {
+
             if (!input)
                 return null;
 

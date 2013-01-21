@@ -70,6 +70,8 @@
 
                     Log.debug("Initializing " + this.context.id);
 
+                    //TODO: XXX: Optimize, if there is both target and mediator, the same props are resolved twice.
+
                     if (this.target) {
 
                         PropsManager.apply(this.target, this.context.propContexts, this.session);
