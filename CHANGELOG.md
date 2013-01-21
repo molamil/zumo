@@ -3,6 +3,15 @@ Zumo Framework Changelog
 
 ---
 
+ZUMO 0.4 (2013...)
+------------------
+
+[In progress...]
+
+*  Expressions can resolve to a single object (non-string).
+
+---
+
 ZUMO 0.3 (2013-01-17)
 ---------------------
 

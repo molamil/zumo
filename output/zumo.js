@@ -632,10 +632,11 @@
             if (!input)
                 return null;
 
-            var a,
+            var values = [],
+                value,
+                a,
                 outputText,
                 output,
-                value,
                 i,
                 j,
                 prevToken,
@@ -643,12 +644,13 @@
                 endIndex,
                 expression,
                 evaluator,
+                startText,
                 endText;
 
             if (typeof data == "object") {
 
                 a = input.split(this.opening);
-                outputText = a[0];
+                startText = outputText = a[0];
 
                 for (i = 1; i < a.length; i++) {
 
@@ -672,6 +674,7 @@
                         evaluator = this.evaluators[j].f;
                         value = evaluator(expression, data);
                         if (value) {
+                            values.push(value);
                             break;
                         }
                     }
@@ -681,9 +684,13 @@
 
                 }
 
-                outputText = outputText.replace("\\" + this.opening, this.opening);
-                outputText = outputText.replace("\\" + this.closing, this.closing);
-                output = outputText;
+                if (values.length == 1 && startText == "" && endText == "") {
+                    output = value;
+                } else {
+                    outputText = outputText.replace("\\" + this.opening, this.opening);
+                    outputText = outputText.replace("\\" + this.closing, this.closing);
+                    output = outputText;
+                }
 
             } else {
                 output = input;
