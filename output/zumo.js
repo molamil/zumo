@@ -633,7 +633,9 @@
                 i,
                 p;
 
-            if (typeof input == "string") {
+            if (!input) {
+                return input;
+            } else if (typeof input == "string") {
                 return this.resolveFromString(input, data);
             } else if (typeof input == "object") {
 
@@ -658,7 +660,7 @@
                 return output;
 
             } else {
-                return null;
+                return input;
             }
 
         },
