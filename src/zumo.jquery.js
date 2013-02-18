@@ -10,17 +10,38 @@
 		return;
 
 
-	// *** LISTENERS
+	// *** HANDLERS
 
+    //TODO: Move this to the core package, no need to use jQuery
     var fViewCreate = function(master) {
+        //TODO: Check whether this algorithm can be optimized without using 3 iterations
         var $elsWithId = $("*[id]", master.target),
+            $elsWithFor = $("*[for]", master.target),
+            $elsWithName = $("*[name]", master.target),
             prefix = "z-"; //TODO: Make the prefix configurable
         $elsWithId.each(function() {
             var $this = $(this),
-                thisId = $this.attr("id"),
-                indexOfPrefix = thisId.indexOf(prefix);
+                zAttr = "id",
+                thisAttr = $this.attr(zAttr),
+                indexOfPrefix = thisAttr.indexOf(prefix);
             if (indexOfPrefix == 0)
-                $this.attr("id", thisId.substr(prefix.length));
+                $this.attr(zAttr, thisAttr.substr(prefix.length));
+        });
+        $elsWithFor.each(function() {
+            var $this = $(this),
+                zAttr = "for",
+                thisAttr = $this.attr(zAttr),
+                indexOfPrefix = thisAttr.indexOf(prefix);
+            if (indexOfPrefix == 0)
+                $this.attr(zAttr, thisAttr.substr(prefix.length));
+        });
+        $elsWithName.each(function() {
+            var $this = $(this),
+                zAttr = "name",
+                thisAttr = $this.attr(zAttr),
+                indexOfPrefix = thisAttr.indexOf(prefix);
+            if (indexOfPrefix == 0)
+                $this.attr(zAttr, thisAttr.substr(prefix.length));
         });
     };
 

@@ -778,9 +778,9 @@
                 this._conf = parsedConf;
             }
 
-            this.props = this._conf.props;
-
             if (this._getPendingConfTargets().length == 0) {
+                this.props = this._conf.props;
+                Utils.mergeDeep(this.props, this._params);
                 this._processParenting();
                 this._handlerManager.registerHandlers();
                 this.onConfLoaded();
