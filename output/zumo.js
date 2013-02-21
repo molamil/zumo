@@ -1786,9 +1786,13 @@
                         Log.warn("Both value attribute and text content found on prop: '" + propContext.name + "'. " +
                                  "Only value attribute will be used.");
 
-                } else {
+                } else if (conf.firstChild) {
 
                     propContext.value = conf.firstChild.nodeValue;
+
+                } else {
+
+                    propContext.value = "";
 
                 }
 

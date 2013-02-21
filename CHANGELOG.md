@@ -8,6 +8,7 @@ ZUMO 0.4 (2013...)
 
 [In progress...]
 
+*  Fix for empty prop values as XML attributes.
 *  Initial decorator implementation for props.
 *  Expressions can resolve to a single object (non-string).
 *  Fix for evaluating expressions on an empty input.
