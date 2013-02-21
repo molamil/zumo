@@ -12,7 +12,11 @@
                 propContext,
                 nTarget,
                 name,
-                value;
+                value,
+                decorator,
+                f,
+                i,
+                j;
 
             if (!target || !propContexts)
                 return;
@@ -29,6 +33,18 @@
                     value = propContext.value;
                     //TODO: See whether we get the props from the session and not Zumo.
                     value = resolver.resolve(propContext.value, Zumo.props);
+                    if (propContext.decorators && propContext.decorators.length) {
+                        //TODO: Move this logic to its own component.
+                        for (j = 0; j < propContext.decorators.length; j++) {
+                            decorator = propContext.decorators[j];
+                            f = Utils.find(decorator);
+                            if (typeof f == "function") {
+                                value = f.apply(null, [value]); //TODO: Check the this context.
+                            } else {
+                                Log.warn("There is no function for decorator '" + decorator + "'.");
+                            }
+                        }
+                    }
                     nTarget[name] = value;
                 }
             }

@@ -8,6 +8,7 @@ ZUMO 0.4 (2013...)
 
 [In progress...]
 
+*  Initial decorator implementation for props.
 *  Expressions can resolve to a single object (non-string).
 *  Fix for evaluating expressions on an empty input.
 *  Added prefix "z-" support for "name" and "for" attributes.

@@ -158,13 +158,21 @@
 
         _parsePropContext: function(conf, session) {
 
-            var propContext = {};
+            var propContext = {},
+                decoratorsValue,
+                decorators;
 
             //TODO: Add checks
             //TODO: Implement type resolvers
             //TODO: Implement expressions
 
             this._mergeAttributes(propContext, conf, ["name", "target"]);
+            decoratorsValue = conf.attributes.getNamedItem("decorators");
+            if (decoratorsValue) {
+                decorators = decoratorsValue.nodeValue.replace(/\s/g, "").split(",");
+                if (!(decorators.length == 1 && decorators[0] == ""))
+                    propContext.decorators = decorators;
+            }
             propContext.value = this._parsePropValue(conf, session);
 
             return propContext;

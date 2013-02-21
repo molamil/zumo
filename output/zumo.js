@@ -753,7 +753,11 @@
                 propContext,
                 nTarget,
                 name,
-                value;
+                value,
+                decorator,
+                f,
+                i,
+                j;
 
             if (!target || !propContexts)
                 return;
@@ -770,6 +774,18 @@
                     value = propContext.value;
                     //TODO: See whether we get the props from the session and not Zumo.
                     value = resolver.resolve(propContext.value, Zumo.props);
+                    if (propContext.decorators && propContext.decorators.length) {
+                        //TODO: Move this logic to its own component.
+                        for (j = 0; j < propContext.decorators.length; j++) {
+                            decorator = propContext.decorators[j];
+                            f = Utils.find(decorator);
+                            if (typeof f == "function") {
+                                value = f.apply(null, [value]); //TODO: Check the this context.
+                            } else {
+                                Log.warn("There is no function for decorator '" + decorator + "'.");
+                            }
+                        }
+                    }
                     nTarget[name] = value;
                 }
             }
@@ -1691,13 +1707,21 @@
 
         _parsePropContext: function(conf, session) {
 
-            var propContext = {};
+            var propContext = {},
+                decoratorsValue,
+                decorators;
 
             //TODO: Add checks
             //TODO: Implement type resolvers
             //TODO: Implement expressions
 
             this._mergeAttributes(propContext, conf, ["name", "target"]);
+            decoratorsValue = conf.attributes.getNamedItem("decorators");
+            if (decoratorsValue) {
+                decorators = decoratorsValue.nodeValue.replace(/\s/g, "").split(",");
+                if (!(decorators.length == 1 && decorators[0] == ""))
+                    propContext.decorators = decorators;
+            }
             propContext.value = this._parsePropValue(conf, session);
 
             return propContext;
