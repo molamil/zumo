@@ -2190,6 +2190,7 @@
             confParsers: []
         },
 
+        _isInit: false,
         _conf: null,
         _confTargets: [],
         _params: null,
@@ -2264,7 +2265,7 @@
 
         // Returns whether the Zumo object is initialized
         isInit: function() {
-            return this.root != null && this._conf != null;
+            return this._isInit;
         },
 
         // Displays a specific page by id, taking out the page currently displayed
@@ -2925,6 +2926,7 @@
                 Utils.mergeDeep(this.props, this._params);
                 this._processParenting();
                 this._handlerManager.registerHandlers();
+                this._isInit = true;
                 this.onConfLoaded();
             }
 
