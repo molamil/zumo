@@ -11,7 +11,8 @@
             var i,
                 param;
 
-            //TODO: Add checks
+            if (!target || !params)
+                return;
 
             // Merge the params
             for(i = 0; i < params.length; i++) {
