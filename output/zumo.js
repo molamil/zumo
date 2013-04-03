@@ -1936,14 +1936,10 @@
             //      but are also intended to be applied to new elements created on the DOM
             this.updateBindings = this._updateBindings();
 
-            Log.debug("Will update bindings? " + this.updateBindings);
-
-            if (this.updateBindings) {
-                //TODO: XXX: Check performance of reevaluating the bindings so often.
-                //TODO: XXX: Maybe we can use event bubbling, add all listeners to the body/root and check target match.
-                Agent.observe(this.app, "onPageInit", this.onViewInit, this);
-                Agent.observe(this.app, "onBlockInit", this.onViewInit, this);
-            }
+            //TODO: XXX: Check performance of reevaluating the bindings so often.
+            //TODO: XXX: Maybe we can use event bubbling, add all listeners to the body/root and check target match.
+            Agent.observe(this.app, "onPageInit", this.onViewInit, this);
+            Agent.observe(this.app, "onBlockInit", this.onViewInit, this);
 
         },
 
