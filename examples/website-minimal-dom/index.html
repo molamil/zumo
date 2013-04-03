@@ -1,19 +1,36 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-	
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta charset="utf-8" />
 
-	<title>tester</title>
+	<title>Zumo website example</title>
 
 	<link href='http://fonts.googleapis.com/css?family=Andada' rel='stylesheet' type='text/css' />
-	<link href="styles/style.css" rel="stylesheet" type="text/css" />
+	<link href="style.css" rel="stylesheet" type="text/css" />
 	
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.js"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
 	<script type="text/javascript" src="../../output/zumo.js"></script>
-	<script type="text/javascript" src="scripts/website.js"></script>
+
+    <script type="text/javascript">
+
+        // Starting Zumo when the DOM is ready
+        $(function() {
+
+            // For testing purposes, set log level to "info" so we can see some activity on the JavaScript console
+            Zumo.log.level = 2;
+
+            // Observe when the zumo conf is ready and trigger a jQuery event that will be used to display the frontpage
+            Zumo.observe("onConfLoaded", function() {
+                $("body").trigger("ready");
+            });
+
+            // Init Zumo, with no arguments it assumes that the configuration is made using the DOM data- attributes
+            // (it could also use external XML or JSON files)
+            Zumo.init();
+
+        });
+
+    </script>
 
 </head>
 
@@ -21,28 +38,28 @@
 
 <div id="site">
 
+    <div id="notification" data-block="hey" data-manager="$fade">Hey you!</div>
+
 	<div id="header">
 		<div id="logo">LO<br />GO</div>
         <ul id="menu">
-			<!--
 			<li id="navFrontpage">FRONTPAGE</li>
 			<li id="navWork">WORK</li>
-			<li id="navMolapeople">MOLAPEOPLE</li>
-			-->
+			<li id="navPeople">PEOPLE</li>
 		</ul>
 	</div>
 
-	<div id="page">
-		
-	</div>
+    <!-- Using the #page div as a container for the Zumo pages -->
+	<div id="page"></div>
 
 </div>
 
-<div id="pages">
+<!-- #templates is not displayed (display: none) but used for holding the DOM that will be cloned on to the #page container -->
+<div id="templates">
 
-	<div class="frontpage">
+	<div class="frontpage" data-page="frontpage" data-type="domclone" data-container="#page" data-handlers="ready, #navFrontpage:click, #logo:click">
 		<div><h1>FRONTPAGE</h1></div>
-		<div class="reel">REEL</div>
+		<div class="banner">SEE OUR WORK</div>
 		<div class="about">
 			<h2>Lorem ipsum</h2>
 			<p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.</p>
@@ -60,11 +77,12 @@
 			<p>Vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Typi non habent claritatem insitam.</p>
 		</div>
 		<div class="closing">
-			<p> Typi non habent claritatem insitam; est usus legentis in iis qui facit eorum claritatem.</p>
+			<p>Vero eros et accumsan</p>
 		</div>
 	</div>
 
-	<div class="work">
+    <!--TODO: Check why the .closing:click handler doesn't work -->
+	<div class="work" data-page="work" data-type="domclone" data-container="#page" data-handlers="#navWork:click, .closing:click" data-depends="hey">
 		<div><h1>WORK</h1></div>
 		<div class="story">
 			<p>Mirum est notare quam littera gothica, quam nunc putamus parum claram, anteposuerit litterarum formas humanitatis per seacula quarta decima et quinta decima. Eodem modo typi, qui nunc nobis videntur parum clari, fiant sollemnes in futurum.</p>
@@ -85,14 +103,14 @@
 		<div class="image"></div>
 	</div>
 
-	<div class="people">
+	<div class="people" data-page="people" data-type="domclone" data-container="#page" data-handlers="#navPeople:click">
 		<div><h1>PEOPLE</h1></div>
 		<div class="story">
 			<p>Vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Typi non habent claritatem insitam.</p>
 			<p>Mirum est notare quam littera gothica, quam nunc putamus parum claram, anteposuerit litterarum formas humanitatis per seacula quarta decima et quinta decima. Eodem modo typi, qui nunc nobis videntur parum clari, fiant sollemnes in futurum.</p>
 		</div>
 		<div class="closing">
-			<p> Typi non habent claritatem insitam; est usus legentis in iis qui facit eorum claritatem.</p>
+			<p>Typi non habent claritatem insitam; est usus legentis in iis qui facit eorum claritatem.</p>
 		</div>
 	</div>
 
