@@ -3,10 +3,10 @@ Zumo Framework Changelog
 
 ---
 
-ZUMO 0.4 (2013...)
+ZUMO 0.4 (2013-04-04)
 ------------------
 
-[In progress...]
+[Small fixes]
 
 *  Fix for empty prop values as XML attributes.
 *  Initial decorator implementation for props.
