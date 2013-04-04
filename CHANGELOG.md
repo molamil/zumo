@@ -3,6 +3,15 @@ Zumo Framework Changelog
 
 ---
 
+ZUMO 0.5 (2013...)
+------------------
+
+[In progress...]
+
+*  TODO...
+
+---
+
 ZUMO 0.4 (2013-04-04)
 ------------------
 
