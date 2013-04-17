@@ -19,7 +19,8 @@
             // For testing purposes, set log level to "info" so we can see some activity on the JavaScript console
             Zumo.log.level = 2;
 
-            // Observe when the zumo conf is ready and trigger a jQuery event that will be used to display the frontpage
+            // Observe when the zumo conf is ready and trigger a "ready" jQuery event,
+            // this event is used as a handler to display the "frontpage" page
             Zumo.observe("onConfLoaded", function() {
                 $(document).trigger("ready");
             });
@@ -38,6 +39,19 @@
 
 <div id="site">
 
+    <!--
+
+    The following div defines the "hey" block using the data-block attribute.
+
+    Since there is no data-type attribute, it uses "dom" as default, which will cause the "visibility" and/or "display"
+    CSS properties to toggle in order to display and clear the block.
+
+    It also uses "$fade" as data-manager. "$fade" is a built-in view manager that uses a jQuery fade transition in order
+    to show and hide the block.
+
+    This block has no handlers, but it is used as a depends on the "work" page.
+
+    -->
     <div id="notification" data-block="hey" data-manager="$fade">Hey you!</div>
 
 	<div id="header">
@@ -54,9 +68,30 @@
 
 </div>
 
-<!-- #templates is not displayed (display: none) but used for holding the DOM that will be cloned on to the #page container -->
+<!--
+#templates is not displayed (display: none), it is used for holding the DOM elements that will be cloned on to the
+#page container
+-->
 <div id="templates">
 
+    <!--
+
+    The following div defines the "frontpage" page using the data-page attribute.
+
+    It also uses "domclone" as the data-type, meaning that in order to display the page Zumo will clone this DOM block
+    onto the container specified in data-container.
+
+    The data-handlers define when the page will be displayed. In other words, it tells which event to listen in order
+    to display the page.
+
+    The list of handlers is separated by commas and if follows the format [selector:]eventType[@currentPage]
+
+    This page will then be displayed when the "ready" event is triggered, when the #navFrontpage element is clicked or
+    when the #logo element is clicked.
+
+    There can only be one page displayed at a time, so "frontpage" will be cleared as soon as another page is displayed.
+
+    -->
 	<div class="frontpage" data-page="frontpage" data-type="domclone" data-container="#page" data-handlers="ready, #navFrontpage:click, #logo:click">
 		<div><h1>FRONTPAGE</h1></div>
 		<div class="banner">SEE OUR WORK</div>
@@ -81,6 +116,17 @@
 		</div>
 	</div>
 
+    <!--
+
+    The following div defines the "work" page, similar to the "frontpage" above.
+
+    This page will be displayed when the #navWork element is clicked or when the .banner element is clicked while the
+    current displayed page is "frontpage".
+
+    This "work" page depends on the "hey" block. This means that the "hey" block will be displayed as the "work" page
+    is displayed, and cleared as the "work" page is cleared.
+
+    -->
 	<div class="work" data-page="work" data-type="domclone" data-container="#page" data-handlers="#navWork:click, .banner:click@frontpage" data-depends="hey">
 		<div><h1>WORK</h1></div>
 		<div class="story">
@@ -102,6 +148,14 @@
 		<div class="image"></div>
 	</div>
 
+    <!--
+
+    The following div defines the "people" page, similar to the pages above.
+
+    This page will be displayed when the #navPeople element is clicked or when the .banner element is clicked while the
+    current displayed page is "work".
+
+    -->
 	<div class="people" data-page="people" data-type="domclone" data-container="#page" data-handlers="#navPeople:click, .banner:click@work">
 		<div><h1>PEOPLE</h1></div>
 		<div class="story">
