@@ -6,7 +6,6 @@
         this.app = app;
         this._activeHandlers = []; // of {handlerContext:Object, context:Object, contextType:String, f:Function}
         this._bindings = []; // of {type:String, f:Function, target:String}
-        this.updateBindings = false;
         this.hasRegistered = false;
     };
 
