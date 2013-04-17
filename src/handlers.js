@@ -43,15 +43,7 @@
             }
 
             this.hasRegistered = true;
-
-            //TODO: This does not work if the bindings are already there (e.g. a click on a DOM element in #templates)
-            //      but are also intended to be applied to new elements created on the DOM
-            this.updateBindings = this._updateBindings();
-
-            //TODO: XXX: Check performance of reevaluating the bindings so often.
-            //TODO: XXX: Maybe we can use event bubbling, add all listeners to the body/root and check target match.
-            Agent.observe(this.app, "onPageInit", this.onViewInit, this);
-            Agent.observe(this.app, "onBlockInit", this.onViewInit, this);
+            this._updateBindings();
 
         },
 
@@ -222,30 +214,18 @@
             return true;
         },
 
-        _updateBindings: function(shallow) {
+        _updateBindings: function() {
 
             var binding,
-                i,
-                needsUpdate = false;
+                i;
 
             for (i = 0; i < this._bindings.length; i++) {
                 binding = this._bindings[i];
-                //TODO: XXX: See whether it is necessary to remove the existing bindings.
                 // Only update handlers with target.
-                if (!shallow || binding.target) {
-                    this._unbindHandler(binding.type, binding.f, binding.target);
-                    if (!this._bindHandler(binding.type, binding.f, binding.target))
-                        needsUpdate = true;
-                }
+                this._unbindHandler(binding.type, binding.f, binding.target);
+                !this._bindHandler(binding.type, binding.f, binding.target);
             }
 
-            return needsUpdate;
-
-        },
-
-        onViewInit: function() {
-            //TODO: FIXME: It seems to accumulate bindings when using "dom" as master.
-            this._updateBindings(true);
         }
 
     };

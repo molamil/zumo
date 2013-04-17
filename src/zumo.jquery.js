@@ -52,24 +52,20 @@
 	// *** HANDLER MANAGER DECORATIONS
 
 	var bindHandler = function(type, handler, target) {
-		target = target || $("body");
-        var $target = $(target);
-        if ($target.length > 0) {
-		    $(target).on(type, handler);
-            return true;
+        var $body = $("body");
+        if (target) {
+            $body.on(type, target, handler);
         } else {
-            return false;
+            $body.on(type, handler);
         }
 	};
 
 	var unbindHandler = function(type, handler, target) {
-		target = target || window;
-        var $target = $(target);
-        if ($target.length > 0) {
-            $target.off(type, handler);
-            return true;
+        var $body = $("body");
+        if (target) {
+            $body.off(type, target, handler);
         } else {
-            return false;
+            $body.off(type, handler);
         }
 	};
 
