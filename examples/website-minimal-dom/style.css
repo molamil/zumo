@@ -55,7 +55,7 @@ p {
     width: 100%;
     padding: 5px 0;
     background-color: #999;
-    color: #FFF;
+    color: #fff;
     text-align: center;
     font-size: 15px;
 }
@@ -64,7 +64,7 @@ p {
     cursor: pointer;
     float: left;
     margin-top: 13px;
-    color: #DDD;
+    color: #ddd;
     text-align: right;
     font-size: 55px;
     line-height: 80%;
@@ -87,14 +87,14 @@ p {
 }
 
 #header {
-	border: 1px solid #FFF;
+	border: 1px solid #fff;
     padding-top: 25px;
 }
 
 #menu {
 	height: 20px;
 	margin: 77px 0 0 72px;
-	border-bottom: 3px solid #DDD;
+	border-bottom: 3px solid #ddd;
 	list-style-type: none;
 	text-align: right;
 }
@@ -109,13 +109,8 @@ p {
 	font-size: 15px;
 }
 
-#menu li.over {
-	background-color: #DDD;
-}
-
-#menu li.active {
-	color: #FFF;
-	background-color: #DDD;
+#menu li:hover {
+	color: #bbb;
 }
 
 
@@ -127,14 +122,19 @@ p {
 }
 
 .frontpage .banner {
-	width: 900px;
+    cursor: pointer;
 	height: 150px;
+    border: 2px dotted #999;
 	margin-bottom: 20px;
 	padding-top: 60px;
 	color: #EEE;
-	background-color: #DDD;
+	background-color: #ddd;
 	text-align: center;
 	font-size: 75px;
+}
+
+.frontpage .banner:hover {
+    color: #FFF;
 }
 
 .frontpage .about,
@@ -143,7 +143,7 @@ p {
 	float: left;
 	width: 280px;
 	height: 110px;
-	border-bottom: 3px solid #DDD;
+	border-bottom: 3px solid #ddd;
 	margin: 0 30px 20px 0;
 }
 
@@ -153,18 +153,17 @@ p {
 
 .frontpage .story {
 	clear: both;
-	border-right: 280px solid #DDD;
+	border-right: 280px solid #ddd;
 	padding-right: 30px;
 	margin-bottom: 20px;
 	color: #999;
 }
 
 .frontpage .closing {
-    cursor: pointer;
-	clear: both;
+    clear: both;
 	height: 20px;
 	padding: 30px;
-	background-color: #EEE;
+	background-color: #eee;
 	text-align: center;
 	font-size: 13px;
 }
@@ -179,7 +178,7 @@ p {
 
 .work .story {
 	clear: both;
-	border-left: 280px solid #DDD;
+	border-left: 280px solid #ddd;
 	padding-left: 30px;
 	margin-bottom: 20px;
 	color: #999;
@@ -191,14 +190,20 @@ p {
 	color: #999;
 }
 
-.work .sample {
+.work .banner {
+    cursor: pointer;
 	height: 150px;
+    border: 2px dotted #999;
 	margin-bottom: 20px;
 	padding-top: 60px;
-	color: #EEE;
-	background-color: #DDD;
+	color: #eee;
+	background-color: #ddd;
 	text-align: center;
 	font-size: 75px;
+}
+
+.work .banner:hover {
+    color: #fff;
 }
 
 .work .more,
@@ -206,7 +211,7 @@ p {
 	float: left;
 	width: 280px;
 	height: 110px;
-	border-bottom: 3px solid #DDD;
+	border-bottom: 3px solid #ddd;
 	margin: 0 30px 20px 0;
 }
 
@@ -215,7 +220,7 @@ p {
 	width: 280px;
 	height: 113px;
 	margin-bottom: 20px;
-	background-color: #DDD;
+	background-color: #ddd;
 }
 
 
@@ -237,7 +242,7 @@ p {
 	clear: both;
 	height: 20px;
 	padding: 30px;
-	background-color: #EEE;
+	background-color: #eee;
 	text-align: center;
 	font-size: 13px;
 }

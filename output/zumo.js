@@ -3098,7 +3098,7 @@
 	// *** HANDLER MANAGER DECORATIONS
 
 	var bindHandler = function(type, handler, target) {
-        var $body = $("body");
+        var $body = $(document);
         if (target) {
             $body.on(type, target, handler);
         } else {
@@ -3107,7 +3107,7 @@
 	};
 
 	var unbindHandler = function(type, handler, target) {
-        var $body = $("body");
+        var $body = $(document);
         if (target) {
             $body.off(type, target, handler);
         } else {
