@@ -25,9 +25,9 @@
                 $(document).trigger("ready");
             });
 
-            // Init Zumo, with no arguments it assumes that the configuration is made using the DOM data- attributes
-            // (it could also use external XML or JSON files)
-            Zumo.init();
+            // Init Zumo, with a single argument specifying the path to the XML configuration file
+            // (it could also use a JSON file or inline DOM configuration)
+            Zumo.init("zumo.xml");
 
         });
 
@@ -39,20 +39,7 @@
 
 <div id="site">
 
-    <!--
-
-    The following div defines the "hey" block using the data-block attribute.
-
-    Since there is no data-type attribute, it uses "dom" as default, which will cause the "visibility" and/or "display"
-    CSS properties to toggle in order to display and clear the block.
-
-    It also uses "$fade" as data-manager. "$fade" is a built-in view manager that uses a jQuery fade transition in order
-    to show and hide the block.
-
-    This block has no handlers, but it is used as a depends on the "work" page.
-
-    -->
-    <div id="notification" data-block="hey" data-manager="$fade">Hey you!</div>
+    <div id="notification">Hey you!</div>
 
 	<div id="header">
 		<div id="logo">LO<br />GO</div>
@@ -74,25 +61,7 @@
 -->
 <div id="templates">
 
-    <!--
-
-    The following div defines the "frontpage" page using the data-page attribute.
-
-    It uses "domclone" as type, meaning that in order to display the page Zumo will clone this DOM block onto the
-    container specified in data-container.
-
-    The data-handlers define when the page will be displayed. In other words, it tells which event to listen in order
-    to display the page.
-
-    The list of handlers is separated by commas and if follows the format [selector:]eventType[@currentPage]
-
-    This page will then be displayed when the "ready" event is triggered, when the #navFrontpage element is clicked or
-    when the #logo element is clicked.
-
-    There can only be one page displayed at a time, so "frontpage" will be cleared as soon as another page is displayed.
-
-    -->
-	<div class="frontpage" data-page="frontpage" data-type="domclone" data-container="#page" data-handlers="ready, #navFrontpage:click, #logo:click">
+    <div class="frontpage">
 		<div><h1>FRONTPAGE</h1></div>
 		<div class="banner">SEE OUR WORK</div>
 		<div class="about">
@@ -116,18 +85,7 @@
 		</div>
 	</div>
 
-    <!--
-
-    The following div defines the "work" page, similar to the "frontpage" above.
-
-    This page will be displayed when the #navWork element is clicked or when the .banner element is clicked while the
-    current displayed page is "frontpage".
-
-    This "work" page depends on the "hey" block. This means that the "hey" block will be displayed as the "work" page
-    is displayed, and cleared as the "work" page is cleared.
-
-    -->
-	<div class="work" data-page="work" data-type="domclone" data-container="#page" data-handlers="#navWork:click, .banner:click@frontpage" data-depends="hey">
+    <div class="work">
 		<div><h1>WORK</h1></div>
 		<div class="story">
 			<p>Mirum est notare quam littera gothica, quam nunc putamus parum claram, anteposuerit litterarum formas humanitatis per seacula quarta decima et quinta decima. Eodem modo typi, qui nunc nobis videntur parum clari, fiant sollemnes in futurum.</p>
@@ -148,15 +106,7 @@
 		<div class="image"></div>
 	</div>
 
-    <!--
-
-    The following div defines the "people" page, similar to the pages above.
-
-    This page will be displayed when the #navPeople element is clicked or when the .banner element is clicked while the
-    current displayed page is "work".
-
-    -->
-	<div class="people" data-page="people" data-type="domclone" data-container="#page" data-handlers="#navPeople:click, .banner:click@work">
+	<div class="people">
 		<div><h1>PEOPLE</h1></div>
 		<div class="story">
 			<p>Vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Typi non habent claritatem insitam.</p>
