@@ -2208,7 +2208,7 @@
             this.session.id = this._params.id || this._createSessionId();
             this.session.root = root;
             this.session.defaultPropName = this._DEFAULT_PROP_NAME;
-            this.session.confParsers.push(this._parseConf);
+            this.session.confParsers.push(Utils.delegate(XmlConfParser.parse, XmlConfParser));
 
             this._handlerManager = new HandlerManager(this);
             this._initConf(conf);
@@ -2677,12 +2677,10 @@
 
         },
 
-        //TODO: Use mix function instead of the verbose proxy.
         observe: function(fName, hook, priority) {
             Agent.observe(this, fName, hook, priority);
         },
 
-        //TODO: Use mix function instead of the verbose proxy.
         ignore: function(fName, hook) {
             Agent.ignore(this, fName, hook);
         },
@@ -2867,7 +2865,7 @@
 
             for (i = 0; i < this.session.confParsers.length; i++) {
                 confParser = this.session.confParsers[i];
-                if ((typeof confParser == "function") && (parsedConf = confParser(source)))
+                if ((typeof confParser == "function") && (parsedConf = confParser(source, this.session)))
                     break;
             }
 
@@ -2960,11 +2958,6 @@
                     }
                 }
             }
-        },
-
-        _parseConf: function(source) {
-            //TODO: Check whether it is XML or JSON, etc.
-            return XmlConfParser.parse(source, this.session);
         },
 
         // --- EVENTS
