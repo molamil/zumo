@@ -2,16 +2,16 @@
 
     // *** PARSE XML CONF - FUNCTION
 
-    var parseXmlConf = function(conf, session) {
+    var parseXmlConf = function(conf) {
 
-        // TODO: Check for XML
-        // TODO: Parse top level props
+        if (!conf || typeof conf.getElementsByTagName != "function")
+            return null;
 
         var confObject = {},
 
             // Function variables below:
 
-            parseIncludes = function(conf, session) {
+            parseIncludes = function(conf) {
 
                 var includeNodes = conf.getElementsByTagName("include"),
                     includeNode,
@@ -33,7 +33,7 @@
 
             },
 
-            parseViews = function(conf, session) {
+            parseViews = function(conf) {
 
                 var viewNodes = conf.getElementsByTagName("views"),
                     views = {
@@ -59,7 +59,7 @@
                 nodeName = "page";
                 pageNodes = viewNodes[0].getElementsByTagName(nodeName);
                 for (i = 0; i < pageNodes.length; i++) {
-                    pageContext = parsePageBlock(pageNodes[i], session);
+                    pageContext = parsePageBlock(pageNodes[i]);
                     if (pageContext) {
                         pageContext.node = nodeName;
                         mergeAttributes(pageContext, pageNodes[i], ["parent"]);
@@ -73,7 +73,7 @@
                 nodeName = "block";
                 blockNodes = viewNodes[0].getElementsByTagName(nodeName);
                 for (i = 0; i < blockNodes.length; i++) {
-                    blockContext = parsePageBlock(blockNodes[i], session);
+                    blockContext = parsePageBlock(blockNodes[i]);
                     if (blockContext) {
                         blockContext.node = nodeName;
                         views.blocks.push(blockContext);
@@ -84,7 +84,7 @@
 
             },
 
-            parsePageBlock = function(conf, session) {
+            parsePageBlock = function(conf) {
                 var pageBlockContext = {},
                     dependsValue,
                     depends;
@@ -96,14 +96,14 @@
                     if (!(depends.length == 1 && depends[0] == ""))
                         pageBlockContext.depends = depends;
                 }
-                pageBlockContext.propContexts = parsePropContexts(conf, session);
+                pageBlockContext.propContexts = parsePropContexts(conf);
                 pageBlockContext.props = getPropsFromPropContexts(pageBlockContext.propContexts);
                 //TODO: Set props (no prop contexts)
-                pageBlockContext.handlers = parseHandlers(conf, session);
+                pageBlockContext.handlers = parseHandlers(conf);
                 return pageBlockContext;
             },
 
-            parseCommands = function(conf, session) {
+            parseCommands = function(conf) {
 
                 var commandsNodes = conf.getElementsByTagName("commands"),
                     commands = [],
@@ -121,9 +121,9 @@
                     for (i = 0; i < commandNodes.length; i++) {
                         commandContext = {};
                         mergeAttributes(commandContext, commandNodes[i], ["id", "type", "target"]);
-                        commandContext.propContexts = parsePropContexts(commandNodes[i], session);
+                        commandContext.propContexts = parsePropContexts(commandNodes[i]);
                         commandContext.props = getPropsFromPropContexts(commandContext.propContexts);
-                        commandContext.handlers = parseHandlers(commandNodes[i], session);
+                        commandContext.handlers = parseHandlers(commandNodes[i]);
                         commands.push(commandContext);
                     }
                 }
@@ -132,7 +132,7 @@
 
             },
 
-            parsePropContexts = function(conf, session) {
+            parsePropContexts = function(conf) {
 
                 var propNodes = Utils.getChildren(conf, "prop"),
                     propContexts = [],
@@ -140,7 +140,7 @@
                     i;
 
                 for (i = 0; i < propNodes.length; i++) {
-                    propContext = parsePropContext(propNodes[i], session);
+                    propContext = parsePropContext(propNodes[i]);
                     if (propContext)
                         propContexts.push(propContext);
                 }
@@ -149,7 +149,7 @@
 
             },
 
-            parsePropContext = function(conf, session) {
+            parsePropContext = function(conf) {
 
                 var propContext = {},
                     decoratorsValue,
@@ -166,13 +166,13 @@
                     if (!(decorators.length == 1 && decorators[0] == ""))
                         propContext.decorators = decorators;
                 }
-                propContext.value = parsePropValue(conf, session);
+                propContext.value = parsePropValue(conf);
 
                 return propContext;
 
             },
 
-            parsePropValue = function(conf, session) {
+            parsePropValue = function(conf) {
 
                 var propContext = {},
                     hasChildren,
@@ -268,7 +268,7 @@
                 }
             },
 
-            parseHandlers = function(conf, session) {
+            parseHandlers = function(conf) {
 
                 var handlerNodes = conf.getElementsByTagName("handler"),
                     handlers = [],
@@ -276,7 +276,7 @@
                     i;
 
                 for (i = 0; i < handlerNodes.length; i++) {
-                    handlerContext = parseHandler(handlerNodes[i], session);
+                    handlerContext = parseHandler(handlerNodes[i]);
                     if (handlerContext)
                         handlers.push(handlerContext);
                 }
@@ -285,17 +285,17 @@
 
             },
 
-            parseHandler = function(conf, session) {
+            parseHandler = function(conf) {
                 var handlerContext = {};
                 //TODO: Implement expressions
                 //TODO: Implement params
                 mergeAttributes(handlerContext, conf, ["type", "target", "priority", "class", "at", "action",
                                       "priority"]);
-                handlerContext.params = parseParams(conf, session);
+                handlerContext.params = parseParams(conf);
                 return handlerContext;
             },
 
-            parseParams = function(conf, session) {
+            parseParams = function(conf) {
 
                 var paramNodes = conf.getElementsByTagName("param"),
                     params = [],
@@ -303,7 +303,7 @@
                     i;
 
                 for (i = 0; i < paramNodes.length; i++) {
-                    paramContext = parseParam(paramNodes[i], session);
+                    paramContext = parseParam(paramNodes[i]);
                     if (paramContext)
                         params.push(paramContext);
                 }
@@ -312,7 +312,7 @@
 
             },
 
-            parseParam = function(conf, session) {
+            parseParam = function(conf) {
                 var paramContext = {};
                 //TODO: Add checks
                 //TODO: Implement type resolvers
@@ -327,11 +327,146 @@
             };
 
         // Main function statements:
-        confObject.propContexts = parsePropContexts(conf.getElementsByTagName("zumo")[0], session);
+        confObject.propContexts = parsePropContexts(conf.getElementsByTagName("zumo")[0]);
         confObject.props = getPropsFromPropContexts(confObject.propContexts);
-        confObject.includes = parseIncludes(conf, session);
-        confObject.views = parseViews(conf, session);
-        confObject.commands = parseCommands(conf, session);
+        confObject.includes = parseIncludes(conf);
+        confObject.views = parseViews(conf);
+        confObject.commands = parseCommands(conf);
+
+        return confObject;
+
+    };
+
+
+    // *** PARSE XML CONF - FUNCTION
+
+    var parseJsonConf = function(conf) {
+
+        if (typeof JSON != "object" || typeof JSON.parse != "function") {
+            Log.warn("There is no JSON parser available.");
+            return null;
+        }
+
+        var sourceObject = JSON.parse(conf),
+            confObject,
+
+            // Function variables below:
+
+            parseViews = function(conf) {
+
+                var views = {
+                        pages: [],
+                        blocks: []
+                    },
+                    nodeName,
+                    pageContext,
+                    blockContext,
+                    i;
+
+                if (!conf.views) {
+                    Log.info("No views to parse");
+                    return views;
+                }
+
+                if (conf.views.pages && conf.views.pages.length) {
+                    nodeName = "page";
+                    for (i = 0; i < conf.views.pages.length; i++) {
+                        pageContext = parsePageBlock(conf.views.pages[i]);
+                        if (pageContext) {
+                            pageContext.node = nodeName;
+                            pageContext.parentId = pageContext.parent;
+                            pageContext.parent = null;
+                            pageContext.children = [];
+                            views.pages.push(pageContext);
+                        }
+                    }
+                }
+
+                if (conf.views.blocks && conf.views.blocks.length) {
+                    nodeName = "block";
+                    for (i = 0; i < conf.views.blocks.length; i++) {
+                        blockContext = parsePageBlock(conf.views.blocks[i]);
+                        if (blockContext) {
+                            blockContext.node = nodeName;
+                            views.blocks.push(blockContext);
+                        }
+                    }
+                }
+
+                return views;
+
+            },
+
+            parsePageBlock = function(conf) {
+
+                var pageBlockContext = {},
+                    key;
+
+                for (key in conf) {
+                    if (conf.hasOwnProperty(key)) {
+                        pageBlockContext[key] = conf[key];
+                    }
+                }
+
+                pageBlockContext.props = pageBlockContext.props || {};
+                pageBlockContext.handlers = pageBlockContext.handlers || [];
+
+                return pageBlockContext;
+
+            },
+
+            parseCommands = function(conf) {
+
+                var commands = [],
+                    commandConf,
+                    commandContext,
+                    i,
+                    key;
+
+                if (!conf.commands || !conf.commands.length) {
+
+                    Log.info("No commands to parse");
+
+                } else {
+
+                    for (i = 0; i < conf.commands.length; i++) {
+
+                        commandConf = conf.commands[i];
+                        commandContext = {};
+
+                        for (key in commandConf) {
+                            if (commandConf.hasOwnProperty(key)) {
+                                commandContext[key] = commandConf[key];
+                            }
+                        }
+
+                        commandContext.props = commandContext.props || {};
+                        commandContext.handlers = commandContext.handlers || [];
+                        commands.push(commandContext);
+
+                    }
+
+                }
+
+                return commands;
+
+            },
+
+            parseProps = function(conf) {
+                return conf.props || {};
+                //TODO: Implement parseProps.
+            };
+
+        //TODO: Test commands, includes, top level props, expressions, parenting.
+        //TODO: Check about whether we need propContexts.
+
+        if (typeof sourceObject == "object") {
+            confObject = {};
+            confObject.props = parseProps(sourceObject);
+            confObject.includes = sourceObject.includes || [];
+            confObject.views = parseViews(sourceObject);
+            confObject.commands = parseCommands(sourceObject);
+        }
 
         return confObject;
 

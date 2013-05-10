@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+
+	<title>Zumo website example</title>
+
+	<link href='http://fonts.googleapis.com/css?family=Andada' rel='stylesheet' type='text/css' />
+	<link href="style.css" rel="stylesheet" type="text/css" />
+	
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+	<script type="text/javascript" src="../../output/zumo.js"></script>
+
+    <script type="text/javascript">
+
+        // Starting Zumo when the DOM is ready
+        $(function() {
+
+            // For testing purposes, set log level to "info" so we can see some activity on the JavaScript console
+            Zumo.log.level = 2;
+
+            // Observe when the zumo conf is ready and trigger a "ready" jQuery event,
+            // this event is used as a handler to display the "frontpage" page
+            Zumo.observe("onConfLoaded", function() {
+                $(document).trigger("ready");
+            });
+
+            // Init Zumo, with a single argument specifying the path to the JSON configuration file
+            // (it could also use a XML file or inline DOM configuration)
+            Zumo.init("zumo.json");
+
+        });
+
+    </script>
+
+</head>
+
+<body>
+
+<div id="site">
+
+    <div id="notification">Hey you!</div>
+
+	<div id="header">
+		<div id="logo">LO<br />GO</div>
+        <ul id="menu">
+			<li id="navFrontpage">FRONTPAGE</li>
+			<li id="navWork">WORK</li>
+			<li id="navPeople">PEOPLE</li>
+		</ul>
+	</div>
+
+    <!-- Using the #page div as a container for the Zumo pages -->
+	<div id="page"></div>
+
+</div>
+
+<!--
+#templates is not displayed (display: none), it is used for holding the DOM elements that will be cloned on to the
+#page container
+-->
+<div id="templates">
+
+    <div class="frontpage">
+		<div><h1>FRONTPAGE</h1></div>
+		<div class="banner">SEE OUR WORK</div>
+		<div class="about">
+			<h2>Lorem ipsum</h2>
+			<p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.</p>
+		</div>
+		<div class="services">
+			<h2>Dolor sit amet</h2>
+			<p>Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.</p>
+		</div>
+		<div class="news">
+			<h2>Diam nonummy</h2>
+			<p>Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan.</p>
+		</div>
+		<div class="story">
+			<p>Mirum est notare quam littera gothica, quam nunc putamus parum claram, anteposuerit litterarum formas humanitatis per seacula quarta decima et quinta decima. Eodem modo typi, qui nunc nobis videntur parum clari, fiant sollemnes in futurum.</p>
+			<p>Vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Typi non habent claritatem insitam.</p>
+		</div>
+		<div class="closing">
+			<p>Vero eros et accumsan</p>
+		</div>
+	</div>
+
+    <div class="work">
+		<div><h1>WORK</h1></div>
+		<div class="story">
+			<p>Mirum est notare quam littera gothica, quam nunc putamus parum claram, anteposuerit litterarum formas humanitatis per seacula quarta decima et quinta decima. Eodem modo typi, qui nunc nobis videntur parum clari, fiant sollemnes in futurum.</p>
+			<p>Vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Typi non habent claritatem insitam.</p>
+		</div>
+		<div class="intro">
+			<p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.</p>
+		</div>
+		<div class="banner">KNOW THE PEOPLE</div>
+		<div class="more">
+			<h2>Diam nonummy</h2>
+			<p>Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan.</p>
+		</div>
+		<div class="references">
+			<h2>Diam nonummy</h2>
+			<p>Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan.</p>
+		</div>
+		<div class="image"></div>
+	</div>
+
+	<div class="people">
+		<div><h1>PEOPLE</h1></div>
+		<div class="story">
+			<p>Vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Typi non habent claritatem insitam.</p>
+			<p>Mirum est notare quam littera gothica, quam nunc putamus parum claram, anteposuerit litterarum formas humanitatis per seacula quarta decima et quinta decima. Eodem modo typi, qui nunc nobis videntur parum clari, fiant sollemnes in futurum.</p>
+		</div>
+		<div class="closing">
+			<p>Typi non habent claritatem insitam; est usus legentis in iis qui facit eorum claritatem.</p>
+		</div>
+	</div>
+
+</div>
+
+</body>
+</html>

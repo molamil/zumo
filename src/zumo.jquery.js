@@ -177,8 +177,10 @@
             mergeAttributes,
             parsePageBlock;
 
-        if (typeof source != "object" || typeof source.getElementsByTagName != "function" || (source.firstChild && source.firstChild.nodeName == "zumo"))
+        if (!source || typeof source != "object" || typeof source.getElementsByTagName != "function" ||
+            (source.firstChild && source.firstChild.nodeName == "zumo")) {
             return null;
+        }
 
         mergeAttributes = function(o, element, list) {
             var i,

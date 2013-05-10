@@ -60,14 +60,16 @@
         _registerHandlersFromContext: function(context, contextType) {
             var activeHandler,
                 i;
-            for (i = 0; i < context.handlers.length; i++) {
-                activeHandler = {
-                    handlerContext: context.handlers[i],
-                    context: context,
-                    contextType: contextType,
-                    f: this._createHandlerAction(context.handlers[i], context, contextType)
-                };
-                this._activeHandlers.push(activeHandler);
+            if (context.handlers) {
+                for (i = 0; i < context.handlers.length; i++) {
+                    activeHandler = {
+                        handlerContext: context.handlers[i],
+                        context: context,
+                        contextType: contextType,
+                        f: this._createHandlerAction(context.handlers[i], context, contextType)
+                    };
+                    this._activeHandlers.push(activeHandler);
+                }
             }
         },
 

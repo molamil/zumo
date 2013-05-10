@@ -106,7 +106,7 @@
             this.session.root = root;
             this.session.defaultPropName = this._DEFAULT_PROP_NAME;
             this.session.confParsers.push(parseXmlConf);
-            //TODO: Add JSON conf parser.
+            this.session.confParsers.push(parseJsonConf);
 
             this._handlerManager = new HandlerManager(this);
             this._initConf(conf);
@@ -767,15 +767,19 @@
                     break;
             }
 
-            if (parsedConf.includes && parsedConf.includes.length > 0) {
-                for (i = 0; i < parsedConf.includes.length; i++)
-                    this._addConfTarget(parsedConf.includes[i]);
-            }
+            if (parsedConf) {
 
-            if (this._conf) {
-                Utils.mergeDeep(this._conf, parsedConf);
-            } else {
-                this._conf = parsedConf;
+                if (parsedConf.includes && parsedConf.includes.length > 0) {
+                    for (i = 0; i < parsedConf.includes.length; i++)
+                        this._addConfTarget(parsedConf.includes[i]);
+                }
+
+                if (this._conf) {
+                    Utils.mergeDeep(this._conf, parsedConf);
+                } else {
+                    this._conf = parsedConf;
+                }
+
             }
 
             if (this._getPendingConfTargets().length == 0) {
@@ -884,7 +888,7 @@
         _onConfLoaded: function(xmlHttp, target) {
             Log.info("Conf was loaded, target = " + target);
             this._markConfTarget(target);
-            this._processConf(xmlHttp.responseXML);
+            this._processConf(xmlHttp.responseXML || xmlHttp.responseText);
         }
 
     };

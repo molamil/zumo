@@ -1,0 +1,69 @@
+{
+    "views": {
+        "pages": [
+            {
+                "id": "frontpage",
+                "type": "domclone",
+                "target": "#templates .frontpage",
+                "container": "#page",
+                "handlers": [
+                    {
+                        "type": "ready"
+                    },
+                    {
+                        "type": "click",
+                        "target": "#navFrontpage"
+                    },
+                    {
+                        "type": "click",
+                        "target": "#logo"
+                    }
+                ]
+            },
+            {
+                "id": "work",
+                "type": "domclone",
+                "target": "#templates .work",
+                "container": "#page",
+                "depends": [
+                        "hey"
+                ],
+                "handlers": [
+                    {
+                        "type": "click",
+                        "target": "#navWork"
+                    },
+                    {
+                        "type": "click",
+                        "target": ".banner",
+                        "at": "frontpage"
+                    }
+                ]
+            },
+            {
+                "id": "people",
+                "type": "domclone",
+                "target": "#templates .people",
+                "container": "#page",
+                "handlers": [
+                    {
+                        "type": "click",
+                        "target": "#navPeople"
+                    },
+                    {
+                        "type": "click",
+                        "target": ".banner",
+                        "at": "work"
+                    }
+                ]
+            }
+        ],
+        "blocks": [
+            {
+                "id": "hey",
+                "target": "#notification",
+                "manager": "$fade"
+            }
+        ]
+    }
+}
