@@ -105,7 +105,8 @@
             this.session.id = this._params.id || this._createSessionId();
             this.session.root = root;
             this.session.defaultPropName = this._DEFAULT_PROP_NAME;
-            this.session.confParsers.push(Utils.delegate(XmlConfParser.parse, XmlConfParser));
+            this.session.confParsers.push(parseXmlConf);
+            //TODO: Add JSON conf parser.
 
             this._handlerManager = new HandlerManager(this);
             this._initConf(conf);

@@ -1535,340 +1535,340 @@
     };
 
 
-    // *** XML CONF PARSER - OBJECT
+    // *** PARSE XML CONF - FUNCTION
 
-    var XmlConfParser = {
+    var parseXmlConf = function(conf, session) {
 
-        // --- METHODS
+        // TODO: Check for XML
+        // TODO: Parse top level props
 
-        parse: function(conf, session) {
-            // TODO: Check for XML
-            // TODO: Parse top level props
-            var confObject = {};
-            confObject.propContexts = this._parsePropContexts(conf.getElementsByTagName("zumo")[0], session);
-            confObject.props = this._getPropsFromPropContexts(confObject.propContexts);
-            confObject.includes = this._parseIncludes(conf, session);
-            confObject.views = this._parseViews(conf, session);
-            confObject.commands = this._parseCommands(conf, session);
-            return confObject;
-        },
+        var confObject = {},
 
-        _parseIncludes: function(conf, session) {
+            // Function variables below:
 
-            var includeNodes = conf.getElementsByTagName("include"),
-                includeNode,
-                includes = [],
-                target,
-                i;
+            parseIncludes = function(conf, session) {
 
-            for (i = 0; i < includeNodes.length; i++) {
+                var includeNodes = conf.getElementsByTagName("include"),
+                    includeNode,
+                    includes = [],
+                    target,
+                    i;
 
-                includeNode = includeNodes[i];
-                target = includeNode.attributes.getNamedItem("target").nodeValue;
+                for (i = 0; i < includeNodes.length; i++) {
 
-                if (!Utils.isEmpty(target))
-                    includes.push(target);
+                    includeNode = includeNodes[i];
+                    target = includeNode.attributes.getNamedItem("target").nodeValue;
 
-            }
+                    if (!Utils.isEmpty(target))
+                        includes.push(target);
 
-            return includes;
-
-        },
-
-        _parseViews: function(conf, session) {
-
-            var viewNodes = conf.getElementsByTagName("views"),
-                views = {
-                    pages: [],
-                    blocks: []
-                },
-                nodeName,
-                pageNodes,
-                blockNodes,
-                pageContext,
-                blockContext,
-                i;
-
-            if (viewNodes.length > 1) {
-                Log.warn("There can only be zero or one views nodes on the XML configuration, there were " +
-                         viewNodes.length + " views nodes found");
-                return null;
-            } else if (viewNodes.length == 0) {
-                Log.info("No views to parse");
-                return null;
-            }
-
-            nodeName = "page";
-            pageNodes = viewNodes[0].getElementsByTagName(nodeName);
-            for (i = 0; i < pageNodes.length; i++) {
-                pageContext = this._parsePageBlock(pageNodes[i], session);
-                if (pageContext) {
-                    pageContext.node = nodeName;
-                    this._mergeAttributes(pageContext, pageNodes[i], ["parent"]);
-                    pageContext.parentId = pageContext.parent;
-                    pageContext.parent = null;
-                    pageContext.children = [];
-                    views.pages.push(pageContext);
                 }
-            }
 
-            nodeName = "block";
-            blockNodes = viewNodes[0].getElementsByTagName(nodeName);
-            for (i = 0; i < blockNodes.length; i++) {
-                blockContext = this._parsePageBlock(blockNodes[i], session);
-                if (blockContext) {
-                    blockContext.node = nodeName;
-                    views.blocks.push(blockContext);
+                return includes;
+
+            },
+
+            parseViews = function(conf, session) {
+
+                var viewNodes = conf.getElementsByTagName("views"),
+                    views = {
+                        pages: [],
+                        blocks: []
+                    },
+                    nodeName,
+                    pageNodes,
+                    blockNodes,
+                    pageContext,
+                    blockContext,
+                    i;
+
+                if (viewNodes.length > 1) {
+                    Log.warn("There can only be zero or one views nodes on the XML configuration, there were " +
+                             viewNodes.length + " views nodes found");
+                    return null;
+                } else if (viewNodes.length == 0) {
+                    Log.info("No views to parse");
+                    return null;
                 }
-            }
 
-            return views;
-
-        },
-
-        _parsePageBlock: function(conf, session) {
-            var pageBlockContext = {},
-                dependsValue,
-                depends;
-            this._mergeAttributes(pageBlockContext, conf, ["id", "type", "mediator", "target", "container", "manager",
-                                  "title"]);
-            dependsValue = conf.attributes.getNamedItem("depends");
-            if (dependsValue) {
-                depends = dependsValue.nodeValue.replace(/\s/g, "").split(",");
-                if (!(depends.length == 1 && depends[0] == ""))
-                    pageBlockContext.depends = depends;
-            }
-            pageBlockContext.propContexts = this._parsePropContexts(conf, session);
-            pageBlockContext.props = this._getPropsFromPropContexts(pageBlockContext.propContexts);
-            //TODO: Set props (no prop contexts)
-            pageBlockContext.handlers = this._parseHandlers(conf, session);
-            return pageBlockContext;
-        },
-
-        _parseCommands: function(conf, session) {
-
-            var commandsNodes = conf.getElementsByTagName("commands"),
-                commands = [],
-                commandNodes,
-                commandContext,
-                i;
-
-            if (commandsNodes.length > 1) {
-                Log.warn("There can only be zero or one commands nodes on the XML configuration, there were " +
-                         commandsNodes.length + " commands nodes found");
-            } else if (commandsNodes.length == 0) {
-                Log.info("No commands to parse");
-            } else {
-                commandNodes = commandsNodes[0].getElementsByTagName("command");
-                for (i = 0; i < commandNodes.length; i++) {
-                    commandContext = {};
-                    this._mergeAttributes(commandContext, commandNodes[i], ["id", "type", "target"]);
-                    commandContext.propContexts = this._parsePropContexts(commandNodes[i], session);
-                    commandContext.props = this._getPropsFromPropContexts(commandContext.propContexts);
-                    commandContext.handlers = this._parseHandlers(commandNodes[i], session);
-                    commands.push(commandContext);
+                nodeName = "page";
+                pageNodes = viewNodes[0].getElementsByTagName(nodeName);
+                for (i = 0; i < pageNodes.length; i++) {
+                    pageContext = parsePageBlock(pageNodes[i], session);
+                    if (pageContext) {
+                        pageContext.node = nodeName;
+                        mergeAttributes(pageContext, pageNodes[i], ["parent"]);
+                        pageContext.parentId = pageContext.parent;
+                        pageContext.parent = null;
+                        pageContext.children = [];
+                        views.pages.push(pageContext);
+                    }
                 }
-            }
 
-            return commands;
+                nodeName = "block";
+                blockNodes = viewNodes[0].getElementsByTagName(nodeName);
+                for (i = 0; i < blockNodes.length; i++) {
+                    blockContext = parsePageBlock(blockNodes[i], session);
+                    if (blockContext) {
+                        blockContext.node = nodeName;
+                        views.blocks.push(blockContext);
+                    }
+                }
 
-        },
+                return views;
 
-        _parsePropContexts: function(conf, session) {
+            },
 
-            var propNodes = Utils.getChildren(conf, "prop"),
-                propContexts = [],
-                propContext,
-                i;
+            parsePageBlock = function(conf, session) {
+                var pageBlockContext = {},
+                    dependsValue,
+                    depends;
+                mergeAttributes(pageBlockContext, conf, ["id", "type", "mediator", "target", "container", "manager",
+                                      "title"]);
+                dependsValue = conf.attributes.getNamedItem("depends");
+                if (dependsValue) {
+                    depends = dependsValue.nodeValue.replace(/\s/g, "").split(",");
+                    if (!(depends.length == 1 && depends[0] == ""))
+                        pageBlockContext.depends = depends;
+                }
+                pageBlockContext.propContexts = parsePropContexts(conf, session);
+                pageBlockContext.props = getPropsFromPropContexts(pageBlockContext.propContexts);
+                //TODO: Set props (no prop contexts)
+                pageBlockContext.handlers = parseHandlers(conf, session);
+                return pageBlockContext;
+            },
 
-            for (i = 0; i < propNodes.length; i++) {
-                propContext = this._parsePropContext(propNodes[i], session);
-                if (propContext)
-                    propContexts.push(propContext);
-            }
+            parseCommands = function(conf, session) {
 
-            return propContexts;
+                var commandsNodes = conf.getElementsByTagName("commands"),
+                    commands = [],
+                    commandNodes,
+                    commandContext,
+                    i;
 
-        },
+                if (commandsNodes.length > 1) {
+                    Log.warn("There can only be zero or one commands nodes on the XML configuration, there were " +
+                             commandsNodes.length + " commands nodes found");
+                } else if (commandsNodes.length == 0) {
+                    Log.info("No commands to parse");
+                } else {
+                    commandNodes = commandsNodes[0].getElementsByTagName("command");
+                    for (i = 0; i < commandNodes.length; i++) {
+                        commandContext = {};
+                        mergeAttributes(commandContext, commandNodes[i], ["id", "type", "target"]);
+                        commandContext.propContexts = parsePropContexts(commandNodes[i], session);
+                        commandContext.props = getPropsFromPropContexts(commandContext.propContexts);
+                        commandContext.handlers = parseHandlers(commandNodes[i], session);
+                        commands.push(commandContext);
+                    }
+                }
 
-        _parsePropContext: function(conf, session) {
+                return commands;
 
-            var propContext = {},
-                decoratorsValue,
-                decorators;
+            },
 
-            //TODO: Add checks
-            //TODO: Implement type resolvers
-            //TODO: Implement expressions
+            parsePropContexts = function(conf, session) {
 
-            this._mergeAttributes(propContext, conf, ["name", "target"]);
-            decoratorsValue = conf.attributes.getNamedItem("decorators");
-            if (decoratorsValue) {
-                decorators = decoratorsValue.nodeValue.replace(/\s/g, "").split(",");
-                if (!(decorators.length == 1 && decorators[0] == ""))
-                    propContext.decorators = decorators;
-            }
-            propContext.value = this._parsePropValue(conf, session);
+                var propNodes = Utils.getChildren(conf, "prop"),
+                    propContexts = [],
+                    propContext,
+                    i;
 
-            return propContext;
+                for (i = 0; i < propNodes.length; i++) {
+                    propContext = parsePropContext(propNodes[i], session);
+                    if (propContext)
+                        propContexts.push(propContext);
+                }
 
-        },
+                return propContexts;
 
-        _parsePropValue: function(conf, session) {
+            },
 
-            var propContext = {},
-                hasChildren,
-                itemNodes,
-                propNodes,
-                propNode,
-                nodeValue,
-                i;
+            parsePropContext = function(conf, session) {
 
-            this._mergeAttributes(propContext, conf, ["name", "value"]);
+                var propContext = {},
+                    decoratorsValue,
+                    decorators;
 
-            hasChildren = Utils.getChildren(conf).length > 0;
-            itemNodes = Utils.getChildren(conf, "item");
-            propNodes = Utils.getChildren(conf, "prop");
+                //TODO: Add checks
+                //TODO: Implement type resolvers
+                //TODO: Implement expressions
 
-            if (hasChildren) {
+                mergeAttributes(propContext, conf, ["name", "target"]);
+                decoratorsValue = conf.attributes.getNamedItem("decorators");
+                if (decoratorsValue) {
+                    decorators = decoratorsValue.nodeValue.replace(/\s/g, "").split(",");
+                    if (!(decorators.length == 1 && decorators[0] == ""))
+                        propContext.decorators = decorators;
+                }
+                propContext.value = parsePropValue(conf, session);
 
-                if (propContext.value) {
+                return propContext;
 
-                    Log.warn("Both value attribute and children nodes found on prop: '" + propContext.name + "'. " +
-                             "Only value attribute will be used.");
+            },
+
+            parsePropValue = function(conf, session) {
+
+                var propContext = {},
+                    hasChildren,
+                    itemNodes,
+                    propNodes,
+                    propNode,
+                    nodeValue,
+                    i;
+
+                mergeAttributes(propContext, conf, ["name", "value"]);
+
+                hasChildren = Utils.getChildren(conf).length > 0;
+                itemNodes = Utils.getChildren(conf, "item");
+                propNodes = Utils.getChildren(conf, "prop");
+
+                if (hasChildren) {
+
+                    if (propContext.value) {
+
+                        Log.warn("Both value attribute and children nodes found on prop: '" + propContext.name + "'. " +
+                                 "Only value attribute will be used.");
+
+                    } else {
+
+                        if (propNodes.length > 0) {
+
+                            if (itemNodes.length > 0)
+                                Log.warn("Both prop and item nodes found on prop: '" + propContext.name + "'. " +
+                                         "Only prop nodes will be used.");
+
+                            propContext.value = {};
+
+                            for (i = 0; i < propNodes.length; i++) {
+                                propNode = propNodes[i];
+                                nodeValue = propNode.attributes.getNamedItem("name").nodeValue;
+                                propContext.value[nodeValue] = parsePropValue(propNode);
+                            }
+
+                        } else if (itemNodes.length > 0) {
+
+                            propContext.value = [];
+
+                            for (i = 0; i < itemNodes.length; i++)
+                                propContext.value.push(parsePropValue(itemNodes[i]));
+
+                        }
+
+                    }
 
                 } else {
 
-                    if (propNodes.length > 0) {
+                    if (propContext.value) {
 
-                        if (itemNodes.length > 0)
-                            Log.warn("Both prop and item nodes found on prop: '" + propContext.name + "'. " +
-                                     "Only prop nodes will be used.");
+                        if (conf.firstChild && Utils.trim(conf.firstChild.nodeValue) != "")
+                            Log.warn("Both value attribute and text content found on prop: '" + propContext.name + "'. " +
+                                     "Only value attribute will be used.");
 
-                        propContext.value = {};
+                    } else if (conf.firstChild) {
 
-                        for (i = 0; i < propNodes.length; i++) {
-                            propNode = propNodes[i];
-                            nodeValue = propNode.attributes.getNamedItem("name").nodeValue;
-                            propContext.value[nodeValue] = this._parsePropValue(propNode);
-                        }
+                        propContext.value = conf.firstChild.nodeValue;
 
-                    } else if (itemNodes.length > 0) {
+                    } else {
 
-                        propContext.value = [];
-
-                        for (i = 0; i < itemNodes.length; i++)
-                            propContext.value.push(this._parsePropValue(itemNodes[i]));
+                        propContext.value = "";
 
                     }
 
                 }
 
-            } else {
+                return propContext.value;
 
-                if (propContext.value) {
+            },
 
-                    if (conf.firstChild && Utils.trim(conf.firstChild.nodeValue) != "")
-                        Log.warn("Both value attribute and text content found on prop: '" + propContext.name + "'. " +
-                                 "Only value attribute will be used.");
+            getPropsFromPropContexts = function(propContexts) {
+                var props = {},
+                    i;
+                for (i = 0; i < propContexts.length; i++)
+                    props[propContexts[i].name] = propContexts[i].value;
+                return props;
+            },
 
-                } else if (conf.firstChild) {
+            mergeAttributes = function(o, element, list) {
+                var i,
+                    name,
+                    value;
+                for (i = 0; i < list.length; i++) {
+                    name = list[i];
+                    if (name && Utils.trim(name) != "") {
+                        value = element.attributes.getNamedItem(name);
+                        if (value)
+                            o[name] = value.nodeValue;
+                    }
+                }
+            },
 
-                    propContext.value = conf.firstChild.nodeValue;
+            parseHandlers = function(conf, session) {
 
-                } else {
+                var handlerNodes = conf.getElementsByTagName("handler"),
+                    handlers = [],
+                    handlerContext,
+                    i;
 
-                    propContext.value = "";
-
+                for (i = 0; i < handlerNodes.length; i++) {
+                    handlerContext = parseHandler(handlerNodes[i], session);
+                    if (handlerContext)
+                        handlers.push(handlerContext);
                 }
 
-            }
+                return handlers;
 
-            return propContext.value;
+            },
 
-        },
+            parseHandler = function(conf, session) {
+                var handlerContext = {};
+                //TODO: Implement expressions
+                //TODO: Implement params
+                mergeAttributes(handlerContext, conf, ["type", "target", "priority", "class", "at", "action",
+                                      "priority"]);
+                handlerContext.params = parseParams(conf, session);
+                return handlerContext;
+            },
 
-        _getPropsFromPropContexts: function(propContexts) {
-            var props = {},
-                i;
-            for (i = 0; i < propContexts.length; i++)
-                props[propContexts[i].name] = propContexts[i].value;
-            return props;
-        },
+            parseParams = function(conf, session) {
 
-        _mergeAttributes: function(o, element, list) {
-            var i,
-                name,
-                value;
-            for (i = 0; i < list.length; i++) {
-                name = list[i];
-                if (name && Utils.trim(name) != "") {
-                    value = element.attributes.getNamedItem(name);
-                    if (value)
-                        o[name] = value.nodeValue;
+                var paramNodes = conf.getElementsByTagName("param"),
+                    params = [],
+                    paramContext,
+                    i;
+
+                for (i = 0; i < paramNodes.length; i++) {
+                    paramContext = parseParam(paramNodes[i], session);
+                    if (paramContext)
+                        params.push(paramContext);
                 }
-            }
-        },
 
-        _parseHandlers: function(conf, session) {
+                return params;
 
-            var handlerNodes = conf.getElementsByTagName("handler"),
-                handlers = [],
-                handlerContext,
-                i;
+            },
 
-            for (i = 0; i < handlerNodes.length; i++) {
-                handlerContext = this._parseHandler(handlerNodes[i], session);
-                if (handlerContext)
-                    handlers.push(handlerContext);
-            }
+            parseParam = function(conf, session) {
+                var paramContext = {};
+                //TODO: Add checks
+                //TODO: Implement type resolvers
+                //TODO: Implement required
+                //TODO: Implement validators
+                //TODO: Implement expressions
+                //TODO: Implement props
+                mergeAttributes(paramContext, conf, ["name", "value"]);
+                if (!paramContext.value)
+                    paramContext.value = conf.firstChild.nodeValue;
+                return paramContext;
+            };
 
-            return handlers;
+        // Main function statements:
+        confObject.propContexts = parsePropContexts(conf.getElementsByTagName("zumo")[0], session);
+        confObject.props = getPropsFromPropContexts(confObject.propContexts);
+        confObject.includes = parseIncludes(conf, session);
+        confObject.views = parseViews(conf, session);
+        confObject.commands = parseCommands(conf, session);
 
-        },
-
-        _parseHandler: function(conf, session) {
-            var handlerContext = {};
-            //TODO: Implement expressions
-            //TODO: Implement params
-            Log.debug(conf);
-            this._mergeAttributes(handlerContext, conf, ["type", "target", "priority", "class", "at", "action",
-                                  "priority"]);
-            handlerContext.params = this._parseParams(conf, session);
-            return handlerContext;
-        },
-
-        _parseParams: function(conf, session) {
-
-            var paramNodes = conf.getElementsByTagName("param"),
-                params = [],
-                paramContext,
-                i;
-
-            for (i = 0; i < paramNodes.length; i++) {
-                paramContext = this._parseParam(paramNodes[i], session);
-                if (paramContext)
-                    params.push(paramContext);
-            }
-
-            return params;
-
-        },
-
-        _parseParam: function(conf, session) {
-            var paramContext = {};
-            //TODO: Add checks
-            //TODO: Implement type resolvers
-            //TODO: Implement required
-            //TODO: Implement validators
-            //TODO: Implement expressions
-            //TODO: Implement props
-            this._mergeAttributes(paramContext, conf, ["name", "value"]);
-            Log.debug(conf);
-            if (!paramContext.value)
-                paramContext.value = conf.firstChild.nodeValue;
-            return paramContext;
-        }
+        return confObject;
 
     };
 
@@ -2208,7 +2208,8 @@
             this.session.id = this._params.id || this._createSessionId();
             this.session.root = root;
             this.session.defaultPropName = this._DEFAULT_PROP_NAME;
-            this.session.confParsers.push(Utils.delegate(XmlConfParser.parse, XmlConfParser));
+            this.session.confParsers.push(parseXmlConf);
+            //TODO: Add JSON conf parser.
 
             this._handlerManager = new HandlerManager(this);
             this._initConf(conf);
