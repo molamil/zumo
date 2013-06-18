@@ -19,14 +19,14 @@
             // For testing purposes, set log level to "info" so we can see some activity on the JavaScript console
             Zumo.log.level = 2;
 
-            // Observe when the zumo conf is ready and trigger a "ready" jQuery event,
-            // this event is used as a handler to display the "frontpage" page
+            // Observe when the Zumo conf is loaded and trigger a "ready" jQuery event,
+            // this event is used together with a handler to display the "frontpage" page
             Zumo.observe("onConfLoaded", function() {
                 $(document).trigger("ready");
             });
 
-            // Init Zumo, with no arguments it assumes that the configuration is made using the DOM data- attributes
-            // (it could also use external XML or JSON files)
+            // Initializing Zumo with no arguments assumes that the configuration is made using the DOM data- attributes
+            // (it also supports using external XML or JSON files)
             Zumo.init();
 
         });
@@ -84,7 +84,7 @@
     The data-handlers define when the page will be displayed. In other words, it tells which event to listen in order
     to display the page.
 
-    The list of handlers is separated by commas and if follows the format [selector:]eventType[@currentPage]
+    The list of handlers is separated by commas and follows the format [selector:]eventType[@currentPage]
 
     This page will then be displayed when the "ready" event is triggered, when the #navFrontpage element is clicked or
     when the #logo element is clicked.

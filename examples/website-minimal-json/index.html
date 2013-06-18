@@ -19,14 +19,14 @@
             // For testing purposes, set log level to "info" so we can see some activity on the JavaScript console
             Zumo.log.level = 2;
 
-            // Observe when the zumo conf is ready and trigger a "ready" jQuery event,
-            // this event is used as a handler to display the "frontpage" page
+            // Observe when the Zumo conf is ready and trigger a "ready" jQuery event,
+            // this event is used together with a handler to display the "frontpage" page
             Zumo.observe("onConfLoaded", function() {
                 $(document).trigger("ready");
             });
 
-            // Init Zumo, with a single argument specifying the path to the JSON configuration file
-            // (it could also use a XML file or inline DOM configuration)
+            // Initializing Zumo with a single argument specifying the path to the JSON configuration file
+            // (it also supports XML files or inline DOM configuration)
             Zumo.init("zumo.json");
 
         });
