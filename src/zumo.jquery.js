@@ -174,6 +174,8 @@
     var domConfParser = function(source) {
 
         var conf = {},
+            $body = $("body"),
+            bodyIncludes,
             mergeAttributes,
             parsePageBlock;
 
@@ -266,6 +268,12 @@
             context.node = "block";
             conf.views.blocks.push(context);
         });
+
+        bodyIncludes = $body.attr("data-includes");
+
+        if (bodyIncludes) {
+            conf.includes = bodyIncludes.replace(/\s*,\s*|\s+/g, ",").split(",");
+        }
 
         return conf;
 
