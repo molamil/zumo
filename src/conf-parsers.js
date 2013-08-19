@@ -338,7 +338,7 @@
     };
 
 
-    // *** PARSE XML CONF - FUNCTION
+    // *** PARSE JSON CONF - FUNCTION
 
     var parseJsonConf = function(conf) {
 
@@ -346,6 +346,9 @@
             Log.warn("There is no JSON parser available.");
             return null;
         }
+
+        if (!conf || typeof conf.getElementsByTagName != "string")
+            return null;
 
         var sourceObject = JSON.parse(conf),
             confObject,
