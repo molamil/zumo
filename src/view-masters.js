@@ -72,6 +72,14 @@
 
                     //TODO: XXX: Optimize, if there is both target and mediator, the same props are resolved twice.
 
+                    if (this.fMediator) {
+                        this.mediator = new this.fMediator(this.target);
+                        PropsManager.apply(this.mediator, this.context.propContexts, this.session);
+                        Utils.merge(this.mediator, this.request.params);
+                        if (typeof this.mediator.init == "function")
+                            this.mediator.init();
+                    }
+
                     if (this.target) {
 
                         PropsManager.apply(this.target, this.context.propContexts, this.session);
@@ -87,14 +95,6 @@
                             this.stateManager.setState(StateManagers.STATE_IN);
                         }
 
-                    }
-
-                    if (this.fMediator) {
-                        this.mediator = new this.fMediator(this.target);
-                        PropsManager.apply(this.mediator, this.context.propContexts, this.session);
-                        Utils.merge(this.mediator, this.request.params);
-                        if (typeof this.mediator.init == "function")
-                            this.mediator.init();
                     }
 
                     this.onInit(this);
