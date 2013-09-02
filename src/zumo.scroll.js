@@ -18,23 +18,16 @@
 
             init: function() {
 
-                Zumo.log.info("Scroll.init");
-
                 var that = this;
 
                 this.scroll = function() {
-                    var $target = $(that.target);
-                    Zumo.log.info("this.target = " + $target);
-//                    if (typeof $target.scroll == "function")
-//                        $target.scroll();
+                    if (that.master && that.master.mediator && typeof that.master.mediator.scroll == "function") {
+                        that.master.mediator.scroll();
+                    }
                 };
 
                 $(window).scroll(this.scroll);
 
-            },
-
-            doIn: function() {
-                var something;
             },
 
             destroy: function() {}
