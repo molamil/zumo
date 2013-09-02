@@ -1038,8 +1038,9 @@
 
                         if (this.stateManager) {
                             this.stateManager.target = this.target;
-                            Agent.observe(this.stateManager, "onStateChange", this.onStateChange, this);
                             //TODO: Merge props into state managers
+                            this.stateManager.init();
+                            Agent.observe(this.stateManager, "onStateChange", this.onStateChange, this);
                             this.stateManager.setState(StateManagers.STATE_IN);
                         }
 
@@ -1284,6 +1285,10 @@
             };
 
             BaseIo3Manager.prototype = {
+
+                init: function() {
+                    // Empty
+                },
 
                 destroy: function() {
                     // Empty
@@ -1873,7 +1878,7 @@
     };
 
 
-    // *** PARSE XML CONF - FUNCTION
+    // *** PARSE JSON CONF - FUNCTION
 
     var parseJsonConf = function(conf) {
 
@@ -1881,6 +1886,9 @@
             Log.warn("There is no JSON parser available.");
             return null;
         }
+
+        if (!conf || typeof conf.getElementsByTagName != "string")
+            return null;
 
         var sourceObject = JSON.parse(conf),
             confObject,

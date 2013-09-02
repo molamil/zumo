@@ -26,6 +26,10 @@
 
             BaseIo3Manager.prototype = {
 
+                init: function() {
+                    // Empty
+                },
+
                 destroy: function() {
                     // Empty
                 },

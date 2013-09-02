@@ -81,8 +81,9 @@
 
                         if (this.stateManager) {
                             this.stateManager.target = this.target;
-                            Agent.observe(this.stateManager, "onStateChange", this.onStateChange, this);
                             //TODO: Merge props into state managers
+                            this.stateManager.init();
+                            Agent.observe(this.stateManager, "onStateChange", this.onStateChange, this);
                             this.stateManager.setState(StateManagers.STATE_IN);
                         }
 
