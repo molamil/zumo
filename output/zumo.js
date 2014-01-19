@@ -997,14 +997,15 @@
             AbstractMaster.prototype = {
 
                 display: function() {
-                    var containerName;
                     Log.info("Displaying " + this.context.id + " with target " + this.context.target);
                     this.onDisplay(this);
-                    containerName = Utils.trim(this.context.container);
-                    if (containerName != "") {
-                        this.container = this.session.selector(this.context.container, this.session.root);
-                        if (this.container == null)
-                            Log.error("Invalid container for page " + this.context.id + ": " + this.context.container);
+                    this.container = this.request.params._container;
+                    if (!this.container) {
+                        if (Utils.trim(this.context.container) != "") {
+                            this.container = this.session.selector(this.context.container, this.session.root);
+                            if (this.container == null)
+                                Log.error("Invalid container for page " + this.context.id + ": " + this.context.container);
+                        }
                     }
                 },
 
@@ -1640,6 +1641,7 @@
                 pageBlockContext.props = getPropsFromPropContexts(pageBlockContext.propContexts);
                 //TODO: Set props (no prop contexts)
                 pageBlockContext.handlers = parseHandlers(conf);
+                pageBlockContext.bricks = parseBricks(conf);
                 return pageBlockContext;
             },
 
@@ -1833,6 +1835,32 @@
                                       "priority"]);
                 handlerContext.params = parseParams(conf);
                 return handlerContext;
+            },
+
+            parseBricks = function(conf) {
+
+                var brickNodes = conf.getElementsByTagName("brick"),
+                    bricks = [],
+                    brickContext,
+                    i;
+
+                for (i = 0; i < brickNodes.length; i++) {
+                    brickContext = parseBrick(brickNodes[i]);
+                    if (brickContext)
+                        bricks.push(brickContext);
+                }
+
+                return bricks;
+
+            },
+
+            parseBrick = function(conf) {
+                var brickContext = {};
+                //TODO: Implement expressions
+                mergeAttributes(brickContext, conf, ["of", "container"]);
+                brickContext.propContexts = parsePropContexts(conf);
+                brickContext.props = getPropsFromPropContexts(brickContext.propContexts);
+                return brickContext;
             },
 
             parseParams = function(conf) {
@@ -2279,7 +2307,6 @@
         },
         _DEFAULT_COMMAND_TYPE: "_function",
         _DEFAULT_PROP_NAME: "innerHTML",
-        _PARAM_NAME_CALLER: "_caller",
 
         log: Log,
         root: null,
@@ -2505,7 +2532,7 @@
         },
 
         // Displays a specific block by id
-        displayBlock: function(id, params) {
+        displayBlock: function(id, params, clone) {
 
             var block,
                 request,
@@ -2523,11 +2550,11 @@
             block = this.getDisplayedBlock(id);
 
             // Check whether the block is already displayed
-            if (block) {
+            if (!clone && block) {
 
                 // If it's a depends block, add the caller.
-                if (params[this._PARAM_NAME_CALLER]) {
-                    block.addCaller(params[this._PARAM_NAME_CALLER]);
+                if (params["_caller"]) {
+                    block.addCaller(params["_caller"]);
                 } else {
                     block.addCaller(block.id);
                 }
@@ -2544,7 +2571,7 @@
                 }
 
                 //TODO: Implement aliases
-                //TODO: Check wether that block is already being requested
+                //TODO: Check whether that block is already being requested
 
                 request = {
                     id: id,
@@ -2569,12 +2596,16 @@
                 Agent.observe(block.master, "onOff", this.onBlockOff, this);
 
                 // Add the caller
-                if (params[this._PARAM_NAME_CALLER]) {
-                    block.request.caller = params[this._PARAM_NAME_CALLER];
+                if (params["_caller"]) {
+                    block.request.caller = params["_caller"];
                 } else {
                     block.request.caller = block.id;
                 }
                 block.addCaller(block.request.caller);
+
+                // Give a unique ID if clone
+                if (clone)
+                    block.id = "block" + new Date().getTime();
 
                 block.master.display();
                 this._addDisplayedBlock(block);
@@ -2917,8 +2948,18 @@
 
             for (i = 0; i < a.length; i++) {
                 params = {};
-                params[this._PARAM_NAME_CALLER] = pageBlock.id;
+                params["_caller"] = pageBlock.id;
                 this.displayBlock(a[i], params);
+            }
+
+            // Get the bricks:
+            if (pageBlock && pageBlock.context.bricks) {
+                for (i = 0; i < pageBlock.context.bricks.length; i++) {
+                    params = {};
+                    params["_caller"] = pageBlock.id;
+                    params["_container"] = pageBlock.master.target;
+                    this.displayBlock(pageBlock.context.bricks[i].of, params, true);
+                }
             }
 
             // If the caller is a page, remove the previous page's obsolete depends.

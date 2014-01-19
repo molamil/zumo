@@ -40,14 +40,15 @@
             AbstractMaster.prototype = {
 
                 display: function() {
-                    var containerName;
                     Log.info("Displaying " + this.context.id + " with target " + this.context.target);
                     this.onDisplay(this);
-                    containerName = Utils.trim(this.context.container);
-                    if (containerName != "") {
-                        this.container = this.session.selector(this.context.container, this.session.root);
-                        if (this.container == null)
-                            Log.error("Invalid container for page " + this.context.id + ": " + this.context.container);
+                    this.container = this.request.params._container;
+                    if (!this.container) {
+                        if (Utils.trim(this.context.container) != "") {
+                            this.container = this.session.selector(this.context.container, this.session.root);
+                            if (this.container == null)
+                                Log.error("Invalid container for page " + this.context.id + ": " + this.context.container);
+                        }
                     }
                 },
 

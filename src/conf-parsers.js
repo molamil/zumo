@@ -100,6 +100,7 @@
                 pageBlockContext.props = getPropsFromPropContexts(pageBlockContext.propContexts);
                 //TODO: Set props (no prop contexts)
                 pageBlockContext.handlers = parseHandlers(conf);
+                pageBlockContext.bricks = parseBricks(conf);
                 return pageBlockContext;
             },
 
@@ -293,6 +294,32 @@
                                       "priority"]);
                 handlerContext.params = parseParams(conf);
                 return handlerContext;
+            },
+
+            parseBricks = function(conf) {
+
+                var brickNodes = conf.getElementsByTagName("brick"),
+                    bricks = [],
+                    brickContext,
+                    i;
+
+                for (i = 0; i < brickNodes.length; i++) {
+                    brickContext = parseBrick(brickNodes[i]);
+                    if (brickContext)
+                        bricks.push(brickContext);
+                }
+
+                return bricks;
+
+            },
+
+            parseBrick = function(conf) {
+                var brickContext = {};
+                //TODO: Implement expressions
+                mergeAttributes(brickContext, conf, ["of", "container"]);
+                brickContext.propContexts = parsePropContexts(conf);
+                brickContext.props = getPropsFromPropContexts(brickContext.propContexts);
+                return brickContext;
             },
 
             parseParams = function(conf) {
