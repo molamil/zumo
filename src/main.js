@@ -55,6 +55,7 @@
         _displayedPage: null,
         _displayedBlocks: [],
         _handlerManager: null,
+        _iBlock: 0,
 
         // --- METHODS
 
@@ -259,11 +260,15 @@
         // Displays a specific block by id
         displayBlock: function(id, params, clone) {
 
-            var block,
+            var bid = clone ? id + this._iBlock : id,
+                block,
                 request,
-                blockContext;
+                blockContext,
+                clonedContext;
 
-            Log.info("Displaying block " + id);
+            Log.info("Displaying block " + bid);
+
+            this._iBlock++;
 
             if (!this.isInit()) {
                 Log.warn("Cannot display " + id + " - Zumo is not yet initalized");
@@ -272,10 +277,10 @@
 
             params = params || {};
 
-            block = this.getDisplayedBlock(id);
+            block = this.getDisplayedBlock(bid);
 
             // Check whether the block is already displayed
-            if (!clone && block) {
+            if (block) {
 
                 // If it's a depends block, add the caller.
                 if (params["_caller"]) {
@@ -293,6 +298,21 @@
                 if (!blockContext || typeof blockContext !== "object") {
                     Log.error("No block context found with id: " + id);
                     return;
+                }
+
+                // Give a unique ID if clone
+                if (clone) {
+                    clonedContext = Utils.clone(blockContext);
+                    clonedContext.id = bid;
+                    if (params["_container"]) {
+                        clonedContext.container = params["_container"];
+                    }
+                    if (params["_props"]) {
+                        //TODO: Consider merging the props instead
+                        clonedContext.propContexts = params["_propContexts"];
+                        clonedContext.props = params["_props"];
+                    }
+                    blockContext = clonedContext;
                 }
 
                 //TODO: Implement aliases
@@ -327,10 +347,6 @@
                     block.request.caller = block.id;
                 }
                 block.addCaller(block.request.caller);
-
-                // Give a unique ID if clone
-                if (clone)
-                    block.id = "block" + new Date().getTime();
 
                 block.master.display();
                 this._addDisplayedBlock(block);
@@ -662,7 +678,8 @@
             var a,
                 params,
                 prevPage,
-                i;
+                i,
+                brick;
 
             Log.debug("Displaying depends for " + pageBlock.id);
 
@@ -680,10 +697,13 @@
             // Get the bricks:
             if (pageBlock && pageBlock.context.bricks) {
                 for (i = 0; i < pageBlock.context.bricks.length; i++) {
+                    brick = pageBlock.context.bricks[i];
                     params = {};
                     params["_caller"] = pageBlock.id;
                     params["_container"] = pageBlock.master.target;
-                    this.displayBlock(pageBlock.context.bricks[i].of, params, true);
+                    params["_propContexts"] = brick.propContexts;
+                    params["_props"] = brick.props;
+                    this.displayBlock(brick.of, params, true);
                 }
             }
 

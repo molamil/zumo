@@ -42,8 +42,9 @@
                 display: function() {
                     Log.info("Displaying " + this.context.id + " with target " + this.context.target);
                     this.onDisplay(this);
-                    this.container = this.request.params._container;
-                    if (!this.container) {
+                    if (this.context.container && this.context.container.nodeType) {
+                        this.container = this.context.container;
+                    } else {
                         if (Utils.trim(this.context.container) != "") {
                             this.container = this.session.selector(this.context.container, this.session.root);
                             if (this.container == null)

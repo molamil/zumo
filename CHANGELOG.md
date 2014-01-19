@@ -3,15 +3,16 @@ Zumo Framework Changelog
 
 ---
 
-ZUMO 0.5 (2013...)
+ZUMO 0.5 (2014...)
 ------------------
 
-[In progress...]
+[Bricks and JSON, in progress...]
 
 *  Support for includes in DOM configuration.
 *  Support for JSON configuration.
 *  Handlers listen on document instead of body.
 *  Fixed issue with handlers not being triggered some times when the target was contained on a newly created view.
+*  Bricks implemented.
 
 ---
 
