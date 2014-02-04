@@ -700,7 +700,7 @@
                     brick = pageBlock.context.bricks[i];
                     params = {};
                     params["_caller"] = pageBlock.id;
-                    params["_container"] = pageBlock.master.target;
+                    params["_container"] = brick.container || pageBlock.master.target;
                     params["_propContexts"] = brick.propContexts;
                     params["_props"] = brick.props;
                     this.displayBlock(brick.of, params, true);
