@@ -7,6 +7,7 @@
         this.context = context;
         this.request = request;
         this.session = session;
+        this.bricks = [];
         // --
         // Implementing:
         // this.master = null;
@@ -21,6 +22,7 @@
         this.request = request;
         this.session = session;
         this._callers = [];
+        this.bricks = [];
         // --
         // Implementing:
         // this.master = null;

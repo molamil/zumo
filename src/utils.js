@@ -27,6 +27,7 @@
             s = s || "";
             return s.replace(/\s+$/, "");
         },
+
         clone: function(o) {
             if (null == o || "object" != typeof o) return o;
             var copy = o.constructor();

@@ -320,6 +320,7 @@
             s = s || "";
             return s.replace(/\s+$/, "");
         },
+
         clone: function(o) {
             if (null == o || "object" != typeof o) return o;
             var copy = o.constructor();
@@ -829,6 +830,7 @@
         this.context = context;
         this.request = request;
         this.session = session;
+        this.bricks = [];
         // --
         // Implementing:
         // this.master = null;
@@ -843,6 +845,7 @@
         this.request = request;
         this.session = session;
         this._callers = [];
+        this.bricks = [];
         // --
         // Implementing:
         // this.master = null;
@@ -2479,6 +2482,8 @@
             this._displayedPage = page;
             this._displayDepends(page);
 
+            return page;
+
         },
 
         getPageContext: function(id) {
@@ -2636,6 +2641,8 @@
                 this._addDisplayedBlock(block);
 
                 this._displayDepends(block);
+
+                return block;
 
             }
 
@@ -2987,7 +2994,7 @@
                     params["_container"] = brick.container || pageBlock.master.target;
                     params["_propContexts"] = brick.propContexts;
                     params["_props"] = brick.props;
-                    this.displayBlock(brick.of, params, true);
+                    pageBlock.bricks.push(this.displayBlock(brick.of, params, true));
                 }
             }
 
