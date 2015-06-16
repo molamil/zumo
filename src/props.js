@@ -6,7 +6,7 @@
 
         // --- METHODS
 
-        apply: function(target, propContexts, session) {
+        apply: function(target, props, session) {
 
             var resolver = session.resolver || new ExpressionResolver(),
                 propContext,
@@ -18,12 +18,17 @@
                 i,
                 j;
 
-            if (!target || !propContexts)
+            if (!target || !props)
                 return;
 
+            if (typeof props == "object" && typeof props.length == "undefined") {
+                Utils.merge(target, props);
+                return;
+            }
+
             // Merge the props
-            for (i = 0; i < propContexts.length; i++) {
-                propContext = propContexts[i];
+            for (i = 0; i < props.length; i++) {
+                propContext = props[i];
                 nTarget = target;
                 if (propContext.target) {
                     nTarget = session.selector(propContext.target, target);

@@ -4,7 +4,7 @@
 
     var parseXmlConf = function(conf) {
 
-        if (!conf || typeof conf.getElementsByTagName != "function")
+        if (!conf || typeof conf.getElementsByTagName != "function")
             return null;
 
         var confObject = {},
@@ -369,12 +369,12 @@
 
     var parseJsonConf = function(conf) {
 
-        if (typeof JSON != "object" || typeof JSON.parse != "function") {
+        if (typeof JSON != "object" || typeof JSON.parse != "function") {
             Log.warn("There is no JSON parser available.");
             return null;
         }
 
-        if (!conf || typeof conf.getElementsByTagName != "string")
+        if (!conf || typeof conf != "string")
             return null;
 
         var sourceObject = JSON.parse(conf),
@@ -438,8 +438,8 @@
                     }
                 }
 
-                pageBlockContext.props = pageBlockContext.props || {};
-                pageBlockContext.handlers = pageBlockContext.handlers || [];
+                pageBlockContext.props = pageBlockContext.props || {};
+                pageBlockContext.handlers = pageBlockContext.handlers || [];
 
                 return pageBlockContext;
 
@@ -453,7 +453,7 @@
                     i,
                     key;
 
-                if (!conf.commands || !conf.commands.length) {
+                if (!conf.commands || !conf.commands.length) {
 
                     Log.info("No commands to parse");
 
@@ -470,8 +470,8 @@
                             }
                         }
 
-                        commandContext.props = commandContext.props || {};
-                        commandContext.handlers = commandContext.handlers || [];
+                        commandContext.props = commandContext.props || {};
+                        commandContext.handlers = commandContext.handlers || [];
                         commands.push(commandContext);
 
                     }
@@ -483,7 +483,7 @@
             },
 
             parseProps = function(conf) {
-                return conf.props || {};
+                return conf.props || {};
                 //TODO: Implement parseProps.
             };
 
@@ -493,7 +493,7 @@
         if (typeof sourceObject == "object") {
             confObject = {};
             confObject.props = parseProps(sourceObject);
-            confObject.includes = sourceObject.includes || [];
+            confObject.includes = sourceObject.includes || [];
             confObject.views = parseViews(sourceObject);
             confObject.commands = parseCommands(sourceObject);
         }

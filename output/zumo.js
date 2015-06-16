@@ -741,7 +741,7 @@
 
         // --- METHODS
 
-        apply: function(target, propContexts, session) {
+        apply: function(target, props, session) {
 
             var resolver = session.resolver || new ExpressionResolver(),
                 propContext,
@@ -753,12 +753,17 @@
                 i,
                 j;
 
-            if (!target || !propContexts)
+            if (!target || !props)
                 return;
 
+            if (typeof props == "object" && typeof props.length == "undefined") {
+                Utils.merge(target, props);
+                return;
+            }
+
             // Merge the props
-            for (i = 0; i < propContexts.length; i++) {
-                propContext = propContexts[i];
+            for (i = 0; i < props.length; i++) {
+                propContext = props[i];
                 nTarget = target;
                 if (propContext.target) {
                     nTarget = session.selector(propContext.target, target);
@@ -809,7 +814,7 @@
             var i,
                 param;
 
-            if (!target || !params)
+            if (!target || !params)
                 return;
 
             // Merge the params
@@ -1044,7 +1049,7 @@
 
                     if (this.fMediator) {
                         this.mediator = new this.fMediator(this.target);
-                        PropsManager.apply(this.mediator, this.context.propContexts, this.session);
+                        PropsManager.apply(this.mediator, this.context.propContexts || this.context.props, this.session);
                         Utils.merge(this.mediator, this.request.params);
                         if (typeof this.mediator.init == "function")
                             this.mediator.init();
@@ -1052,7 +1057,7 @@
 
                     if (this.target) {
 
-                        PropsManager.apply(this.target, this.context.propContexts, this.session);
+                        PropsManager.apply(this.target, this.context.propContexts || this.context.props, this.session);
                         Utils.merge(this.target, this.request.params);
 
                         this.onCreate(this);
@@ -1214,7 +1219,7 @@
                 },
 
                 init: function() {
-                    PropsManager.apply(this.builder, this.context.propContexts, this.session);
+                    PropsManager.apply(this.builder, this.context.propContexts || this.context.props, this.session);
                     Utils.merge(this.builder, this.request.params);
                 }
 
@@ -1557,7 +1562,7 @@
 
     var parseXmlConf = function(conf) {
 
-        if (!conf || typeof conf.getElementsByTagName != "function")
+        if (!conf || typeof conf.getElementsByTagName != "function")
             return null;
 
         var confObject = {},
@@ -1922,12 +1927,12 @@
 
     var parseJsonConf = function(conf) {
 
-        if (typeof JSON != "object" || typeof JSON.parse != "function") {
+        if (typeof JSON != "object" || typeof JSON.parse != "function") {
             Log.warn("There is no JSON parser available.");
             return null;
         }
 
-        if (!conf || typeof conf.getElementsByTagName != "string")
+        if (!conf || typeof conf != "string")
             return null;
 
         var sourceObject = JSON.parse(conf),
@@ -1991,8 +1996,8 @@
                     }
                 }
 
-                pageBlockContext.props = pageBlockContext.props || {};
-                pageBlockContext.handlers = pageBlockContext.handlers || [];
+                pageBlockContext.props = pageBlockContext.props || {};
+                pageBlockContext.handlers = pageBlockContext.handlers || [];
 
                 return pageBlockContext;
 
@@ -2006,7 +2011,7 @@
                     i,
                     key;
 
-                if (!conf.commands || !conf.commands.length) {
+                if (!conf.commands || !conf.commands.length) {
 
                     Log.info("No commands to parse");
 
@@ -2023,8 +2028,8 @@
                             }
                         }
 
-                        commandContext.props = commandContext.props || {};
-                        commandContext.handlers = commandContext.handlers || [];
+                        commandContext.props = commandContext.props || {};
+                        commandContext.handlers = commandContext.handlers || [];
                         commands.push(commandContext);
 
                     }
@@ -2036,7 +2041,7 @@
             },
 
             parseProps = function(conf) {
-                return conf.props || {};
+                return conf.props || {};
                 //TODO: Implement parseProps.
             };
 
@@ -2046,7 +2051,7 @@
         if (typeof sourceObject == "object") {
             confObject = {};
             confObject.props = parseProps(sourceObject);
-            confObject.includes = sourceObject.includes || [];
+            confObject.includes = sourceObject.includes || [];
             confObject.views = parseViews(sourceObject);
             confObject.commands = parseCommands(sourceObject);
         }
@@ -2419,7 +2424,8 @@
 
             var pageContext,
                 request,
-                page;
+                page,
+                i;
 
             Log.info("Going to page " + id);
 
@@ -2474,8 +2480,13 @@
             Agent.observe(page.master, "onOff", this.onPageOff, this);
 
             // Clear the currently displayed page
-            if (this._currentPage != null)
+            if (this._currentPage != null) {
+                //TODO: Consider moving the bricks logic elsewhere.
+                for (i = 0; i < this._currentPage.bricks.length; i++) {
+                    this._currentPage.bricks[i].master.clear();
+                }
                 this._currentPage.master.clear();
+            }
 
             this._currentPage = page;
             page.master.display();
@@ -2986,7 +2997,7 @@
             }
 
             // Get the bricks:
-            if (pageBlock && pageBlock.context.bricks) {
+            if (pageBlock && pageBlock.context.bricks) {
                 for (i = 0; i < pageBlock.context.bricks.length; i++) {
                     brick = pageBlock.context.bricks[i];
                     params = {};
@@ -3212,7 +3223,7 @@
         _onConfLoaded: function(xmlHttp, target) {
             Log.info("Conf was loaded, target = " + target);
             this._markConfTarget(target);
-            this._processConf(xmlHttp.responseXML || xmlHttp.responseText);
+            this._processConf(xmlHttp.responseXML || xmlHttp.responseText);
         }
 
     };
@@ -3444,7 +3455,7 @@
             mergeAttributes,
             parsePageBlock;
 
-        if (!source || typeof source != "object" || typeof source.getElementsByTagName != "function" ||
+        if (!source || typeof source != "object" || typeof source.getElementsByTagName != "function" ||
             (source.firstChild && source.firstChild.nodeName == "zumo")) {
             return null;
         }

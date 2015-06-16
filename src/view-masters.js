@@ -76,7 +76,7 @@
 
                     if (this.fMediator) {
                         this.mediator = new this.fMediator(this.target);
-                        PropsManager.apply(this.mediator, this.context.propContexts, this.session);
+                        PropsManager.apply(this.mediator, this.context.propContexts || this.context.props, this.session);
                         Utils.merge(this.mediator, this.request.params);
                         if (typeof this.mediator.init == "function")
                             this.mediator.init();
@@ -84,7 +84,7 @@
 
                     if (this.target) {
 
-                        PropsManager.apply(this.target, this.context.propContexts, this.session);
+                        PropsManager.apply(this.target, this.context.propContexts || this.context.props, this.session);
                         Utils.merge(this.target, this.request.params);
 
                         this.onCreate(this);
@@ -246,7 +246,7 @@
                 },
 
                 init: function() {
-                    PropsManager.apply(this.builder, this.context.propContexts, this.session);
+                    PropsManager.apply(this.builder, this.context.propContexts || this.context.props, this.session);
                     Utils.merge(this.builder, this.request.params);
                 }
 

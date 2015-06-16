@@ -11,7 +11,7 @@
             var i,
                 param;
 
-            if (!target || !params)
+            if (!target || !params)
                 return;
 
             // Merge the params

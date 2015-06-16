@@ -179,7 +179,7 @@
             mergeAttributes,
             parsePageBlock;
 
-        if (!source || typeof source != "object" || typeof source.getElementsByTagName != "function" ||
+        if (!source || typeof source != "object" || typeof source.getElementsByTagName != "function" ||
             (source.firstChild && source.firstChild.nodeName == "zumo")) {
             return null;
         }

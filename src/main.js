@@ -132,7 +132,8 @@
 
             var pageContext,
                 request,
-                page;
+                page,
+                i;
 
             Log.info("Going to page " + id);
 
@@ -187,8 +188,13 @@
             Agent.observe(page.master, "onOff", this.onPageOff, this);
 
             // Clear the currently displayed page
-            if (this._currentPage != null)
+            if (this._currentPage != null) {
+                //TODO: Consider moving the bricks logic elsewhere.
+                for (i = 0; i < this._currentPage.bricks.length; i++) {
+                    this._currentPage.bricks[i].master.clear();
+                }
                 this._currentPage.master.clear();
+            }
 
             this._currentPage = page;
             page.master.display();
@@ -699,7 +705,7 @@
             }
 
             // Get the bricks:
-            if (pageBlock && pageBlock.context.bricks) {
+            if (pageBlock && pageBlock.context.bricks) {
                 for (i = 0; i < pageBlock.context.bricks.length; i++) {
                     brick = pageBlock.context.bricks[i];
                     params = {};
@@ -925,7 +931,7 @@
         _onConfLoaded: function(xmlHttp, target) {
             Log.info("Conf was loaded, target = " + target);
             this._markConfTarget(target);
-            this._processConf(xmlHttp.responseXML || xmlHttp.responseText);
+            this._processConf(xmlHttp.responseXML || xmlHttp.responseText);
         }
 
     };

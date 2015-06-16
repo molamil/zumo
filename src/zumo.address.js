@@ -2,7 +2,7 @@
 
 
     // Check for Zumo and jquery
-    if (!Zumo || !ZumoExt || !$ || !$.address)
+    if (!Zumo || !ZumoExt || !$ || !$.address)
         return;
 
 
@@ -42,7 +42,7 @@
 
             if (Zumo.isInit()) {
 
-                if (id == "" || !Zumo.getPageContext(id))
+                if (id == "" || !Zumo.getPageContext(id))
                     id = this.defaultPage;
 
                 if (typeof id == "string")
