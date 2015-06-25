@@ -204,13 +204,14 @@
 
                 destroy: function() {
                     Log.debug("LoaderMaster destroy");
-                    this.container.innerHTML = "";
+                    this.container.removeChild(this.target);
                 },
 
                 onLoaded: function(xmlHttp) {
                     Log.debug("LoaderMaster received content");
-                    this.target = xmlHttp.responseText;
-                    this.container.innerHTML = this.target;
+                    this.target = document.createElement("div");
+                    this.target.innerHTML = xmlHttp.responseText;
+                    this.container.appendChild(this.target);
                     this.init();
                 }
 
